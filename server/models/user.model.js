@@ -1,0 +1,41 @@
+import mongoose from "mongoose";
+
+const userSchema = new mongoose.Schema({
+    userName: {
+        type: String,
+        required: [true, "Username is required"],
+        unique: [true, "Username must be unique"]
+    },
+    email: {
+        type: String,
+        required: [true, "Email is required"],
+        unique: [true, "Email must be unique"]
+    },
+    password: {
+        type: String,
+        required: function () {
+            return this.authProvider === "local";
+        },
+    },
+    googleId: {
+        type: String,
+        unique: true,
+        sparse: true,
+    },
+    avatar: {
+        type: String,
+    },
+    authProvider: {
+        type: String,
+        enum: ["local", "google"],
+        default: "local",
+    },
+    verified: {
+        type: Boolean,
+        default: false
+    },
+}, { timestamps: true });
+
+const userModel = mongoose.model("users", userSchema)
+
+export default userModel;
