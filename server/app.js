@@ -4,8 +4,13 @@ import authRouter from "./routes/auth.route.js";
 import cookieParser from "cookie-parser";
 import helmet from "helmet";
 import cors from "cors";
+import { requestMiddleware } from "./middleware/requestId.middleware.js";
+import { errorHandler } from "./middleware/error.middleware.js";
+import healthRouter from "./routes/health.route.js";
 
 const app = express();
+
+app.use(requestMiddleware); // tracking myst be first
 
 app.use(helmet());
 
@@ -27,14 +32,21 @@ app.use(cors({
     },
     credentials: true, //required for httpOnly cookies
     methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-    allowedHeaders: ["Content-Type", "Authorization"],
+    allowedHeaders: ["Content-Type", "Authorization", "X-Request-ID"],
 }));
 
 app.use(express.json());
-app.use(morgan("dev"));
 app.use(cookieParser());
+
+morgan.token("id", (req) => req.id);
+app.use(morgan("[:id] :method :url :status :response-time ms"));
+
+app.use(healthRouter);
 
 // routing
 app.use("/api/auth", authRouter);
+app.use("/v1/auth", authRouter);
+
+app.use(errorHandler); // must be after all routes
 
 export default app;
