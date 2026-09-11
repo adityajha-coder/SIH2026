@@ -143,3 +143,11 @@ export function requirePermission(permission) {
         next();
     };
 }
+
+export async function optionalAuth(req, res, next) {
+    const authHeader = req.headers.authorization;
+    if (authHeader && authHeader.startsWith("Bearer ")) {
+        return requireAuth(req, res, next);
+    }
+    next();
+}
