@@ -49,7 +49,8 @@ export async function login(req, res) {
     const accessToken = jwt.sign(
         {
             id: user._id,
-            sessionId: session._id
+            sessionId: session._id,
+            role: user.role,
         },
         config.JWT_SECRET,
         { expiresIn: "15m" }
@@ -63,44 +64,42 @@ export async function login(req, res) {
     });
 
     return res.status(200).json({
-        message: "Logged in successfully",
-        user: {
-            userName: user.userName,
-            email: user.email,
+        data: {
+            message: "Logged in successfully",
+            user: {
+                userName: user.userName,
+                email: user.email,
+                id: user.id,
+                role: user.role,
+                status: user.status,
+            },
+            accessToken,
+        },meta: {
+            traceId: req.id,
+            timestamp: new Date().toISOString(),
         },
-        accessToken,
+        error: null,
     });
 }
 
 export async function getMe(req, res) {
-    const token = req.headers.authorization?.split(" ")[1];
-
-    if (!token) {
-        return res.status(401).json({ message: "Unauthorized" });
-    }
-
-    let decoded;
-    try {
-        decoded = jwt.verify(token, config.JWT_SECRET);
-    } catch (err) {
-        return res.status(401).json({
-            message: "Invalid or expired token"
-        });
-    }
-
-    const user = await userModel.findById(decoded.id);
-
-    if (!user) {
-        return res.status(404).json({
-            message: "User not found"
-        });
-    }
 
     return res.status(200).json({
-        message: "User fetched successfully",
-        user: {
-            userName: user.userName,
-            email: user.email,
-        }
+        data: {
+            message: "User fetched successfully",
+            user: {
+                userName: req.user.userName,
+                email: req.user.email,
+                id: req.user.id,
+                role: req.user.role,
+                status: req.user.status,
+                verified: req.user.verified,
+                emailVerifiedAt: req.user.emailVerifiedAt,
+            }
+        }, meta: {
+            traceId: req.id,
+            timestamp: new Date().toISOString(),
+        },
+        error: null,
     });
 }

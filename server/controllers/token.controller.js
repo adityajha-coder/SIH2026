@@ -36,7 +36,7 @@ export async function refreshToken(req, res) {
     }
 
     const accessToken = jwt.sign(
-        { id: decoded.id },
+        { id: decoded.id, sessionId: session._id },
         config.JWT_SECRET,
         { expiresIn: "15m" }
     );

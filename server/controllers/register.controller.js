@@ -4,22 +4,29 @@ import otpModel from "../models/otp.model.js";
 import { sendEmail } from "../services/email.service.js";
 import { generateOTP, hashSHA256 } from "../utils/crypto.utils.js";
 import { getOTPHtml } from "../emails/otp.template.js";
+import { ROLES } from "../constants/role.constant.js";
 
 
 export async function register(req, res) {
-    const { userName, email, password } = req.body;
+    const { userName, email, password, role } = req.body;
+    const emailNormalized = email.toLowerCase().trim();
 
     const isAlreadyRegistered = await userModel.findOne({
         $or: [
             { userName },
-            { email }
+            { emailNormalized }
         ]
     });
 
     if (isAlreadyRegistered) {
-        const isEmailTaken = isAlreadyRegistered.email === email;
+        const isEmailTaken = isAlreadyRegistered.emailNormalized === emailNormalized;
         return res.status(409).json({
-            message: isEmailTaken ? "Email is already registered" : "Username is already taken"
+            data: null,
+            meta: { traceId: req.id, timestamp: new Date().toISOString() },
+            error: {
+                code: "USER_EXISTS",
+                message: isEmailTaken ? "Email is already registered" : "Username is already taken"
+            }
         });
     }
 
@@ -28,7 +35,9 @@ export async function register(req, res) {
     const user = await userModel.create({
         userName,
         email,
-        password: hashedPassword
+        emailNormalized,
+        password: hashedPassword,
+        role: role || ROLES.STARTUP_USER,
     });
 
     const otp = generateOTP();
@@ -49,17 +58,28 @@ export async function register(req, res) {
         );
     } catch (emailError) {
         return res.status(500).json({
-            message: "User created, but failed to send verification email. Please try logging in or requesting a new OTP."
+            data: null,
+            meta: { traceId: req.id, timestamp: new Date().toISOString() },
+            error: {
+                code: "EMAIL_SEND_FAILED",
+                message: "User created, but failed to send verification email. Please try logging in or requesting a new OTP."
+            }
         });
     }
 
     return res.status(201).json({
-        message: "User registered successfully",
-        user: {
-            userName: user.userName,
-            email: user.email,
-            verified: user.verified
-        }
+        data: {
+            message: "User registered successfully",
+            user: {
+                userName: user.userName,
+                email: user.email,
+                id: user._id,
+                role: user.role,
+                verified: user.verified
+            }
+        },
+        meta: { traceId: req.id, timestamp: new Date().toISOString() },
+        error: null
     });
 }
 
@@ -81,7 +101,10 @@ export async function verifyEmail(req, res) {
 
     const user = await userModel.findByIdAndUpdate(
         otpDoc.user,
-        { verified: true },
+        { 
+            verified: true,
+            emailVerifiedAt: new Date(),
+        },
         { new: true }
     );
 
@@ -90,11 +113,20 @@ export async function verifyEmail(req, res) {
     });
 
     return res.status(200).json({
-        message: "Email verified successfully",
-        user: {
-            userName: user.userName,
-            email: user.email,
-            verified: user.verified
-        }
+        data: {
+            message: "Email verified successfully",
+            user: {
+                userName: user.userName,
+                email: user.email,
+                id: user._id,
+                role: user.role,
+                verified: user.verified,
+                emailVerifiedAt: user.emailVerifiedAt,
+            }
+        }, meta : {
+            traceId: req.id, 
+            timestamp: new Date().toISOString()
+        },
+        error: null   
     });
 }

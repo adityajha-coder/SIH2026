@@ -4,6 +4,7 @@ import { registerLimiter, loginLimiter, otpLimiter, passwordResetLimiter } from 
 import { validate } from "../middleware/validate.middleware.js";
 import { registerSchema, loginSchema, verifyEmailSchema } from "../validators/auth.validator.js";
 import { forgotPasswordSchema, resetPasswordSchema } from "../validators/password.validator.js";
+import { requireAuth } from "../middleware/auth.middleware.js";
 import passport from "../config/passport.js";
 import { handleSocialCallback } from "../controllers/social.controller.js";
 
@@ -23,7 +24,7 @@ authRouter.post("/login", loginLimiter, validate(loginSchema), authController.lo
 /**
  * GET /api/auth/get-me
  */
-authRouter.get("/get-me", authController.getMe)
+authRouter.get("/get-me", requireAuth, authController.getMe)
 
 /**
  * GET /api/auth/refresh-token
