@@ -8,6 +8,7 @@ import { requestMiddleware } from "./middleware/requestId.middleware.js";
 import { errorHandler } from "./middleware/error.middleware.js";
 import organizationRouter from "./routes/organization.route.js";
 import problemRouter from "./routes/problem.route.js";
+import submissionRouter from "./routes/submission.route.js";
 import healthRouter from "./routes/health.route.js";
 
 const app = express();
@@ -52,6 +53,8 @@ app.use("/v1/organizations", organizationRouter);
 app.use("/api/organizations", organizationRouter);
 app.use("/v1/problems", problemRouter);
 app.use("/api/problems", problemRouter);
+app.use("/v1/submissions", submissionRouter);
+app.use("/api/submissions", submissionRouter);
 
 app.use(errorHandler); // must be after all routes
 
