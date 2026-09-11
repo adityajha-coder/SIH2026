@@ -6,6 +6,7 @@ import helmet from "helmet";
 import cors from "cors";
 import { requestMiddleware } from "./middleware/requestId.middleware.js";
 import { errorHandler } from "./middleware/error.middleware.js";
+import organizationRouter from "./routes/organization.route.js";
 import healthRouter from "./routes/health.route.js";
 
 const app = express();
@@ -46,6 +47,8 @@ app.use(healthRouter);
 // routing
 app.use("/api/auth", authRouter);
 app.use("/v1/auth", authRouter);
+app.use("/v1/organizations", organizationRouter);
+app.use("/api/organizations", organizationRouter);
 
 app.use(errorHandler); // must be after all routes
 
