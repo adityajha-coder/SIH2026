@@ -2,6 +2,7 @@ import { Router } from "express";
 import { problemController } from "../controllers/problem.controller.js";
 import { requireAuth, optionalAuth, requirePermission } from "../middleware/auth.middleware.js";
 import { validate } from "../middleware/validate.middleware.js";
+import { eligibilityController } from "../controllers/eligibility.controller.js";
 import { PERMISSIONS } from "../constants/role.constant.js";
 import {
     createProblemSchema,
@@ -15,6 +16,12 @@ const problemRouter = Router();
  */
 problemRouter.get("/", problemController.listProblems
 );
+
+/**
+ * GET /v1/problems/:id/eligibility
+ * Deterministic check for a startup against a problem statement
+ */
+problemRouter.get("/:id/eligibility", requireAuth, eligibilityController.checkEligibility);
 
 /**
  * GET /v1/problems/:id
