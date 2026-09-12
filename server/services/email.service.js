@@ -4,11 +4,8 @@ import config from '../config/config.js';
 const transporter = nodemailer.createTransport({
     service: 'gmail',
     auth:{
-        type: 'OAUTH2',
-        user: config.GOOGLE_USER,
-        clientId: config.GOOGLE_CLIENT_ID,
-        clientSecret: config.GOOGLE_CLIENT_SECRET,
-        refreshToken: config.GOOGLE_REFRESH_TOKEN
+        user: config.EMAIL_USER,
+        pass: config.EMAIL_APP_PASSWORD,
     }
 })
 
@@ -25,7 +22,7 @@ transporter.verify((error, success) => {
 export const sendEmail = async (to, subject, text, html) => {
   try {
     const info = await transporter.sendMail({
-      from: `"Your Name" <${config.GOOGLE_USER}>`, // sender address
+      from: `"Pragati-GovX" <${config.EMAIL_USER}>`, // sender address
       to, // list of receivers
       subject, // Subject line
       text, // plain text body
