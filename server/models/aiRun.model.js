@@ -61,6 +61,18 @@ const aiRunSchema = new mongoose.Schema(
             type: Number,
             default: 0,
         },
+        generatorResult: {
+            type: mongoose.Schema.Types.Mixed,
+            default: null,
+        },
+        verifierResult: {
+            type: mongoose.Schema.Types.Mixed,
+            default: null,
+        },
+        auditorResult: {
+            type: mongoose.Schema.Types.Mixed,
+            default: null,
+        },
     },
     {
         timestamps: true,

@@ -1,19 +1,15 @@
 import crypto from "crypto";
 import { geminiProvider } from "./providers/gemini.provider.js";
 import { groqProvider } from "./providers/groq.provider.js";
+import { openrouterProvider } from "./providers/openrouter.provider.js";
+import { ollamaProvider } from "./providers/ollama.provider.js";
 import { aiPolicy } from "./ai.policy.js";
 import { AIRun, AI_VERDICTS } from "../../models/aiRun.model.js";
 
 export const verificationService = {
     /**
-     * Run the multi-model verification pipeline with Anti-Cascade guarantees
-     * @param {Object} params
-     * @param {Object} params.actor - Authenticated user context
-     * @param {string} params.task - Evaluation task description
-     * @param {string} params.userInput - Solution / proposal text
-     * @param {Array<string>} params.evidence - Canonical document snippets
-     * @param {string} params.entityType - 'SUBMISSION' | 'PROBLEM' | 'ORGANIZATION' | 'MATCH'
-     * @param {string} params.entityId - Target MongoDB ObjectId
+     * Complete 3-Layer Verification Pipeline with Anti-Cascade Rule:
+     * Model 1 (Gemini) -> Model 2 (Groq) -> Model 3 (OpenRouter) -> Model 4 (Ollama Fallback)
      */
     async verifyProposal({ actor, task, userInput, evidence = [], entityType, entityId }) {
         const startTime = Date.now();
@@ -25,51 +21,95 @@ export const verificationService = {
             .update(cleanInput + JSON.stringify(cleanEvidence))
             .digest("hex");
 
-        // Execute Model 1 (Primary Generator: Gemini 2.5 Flash)
+        // LAYER 1: Generator (Gemini 2.5 Flash)
         aiPolicy.validateCall({ provider: "google", model: "gemini-2.5-flash" });
-        const generatorResult = await geminiProvider.execute({
-            task,
-            userInput: cleanInput,
-            evidence: cleanEvidence,
-        });
+        let generatorResult;
+        try {
+            generatorResult = await geminiProvider.execute({
+                task,
+                userInput: cleanInput,
+                evidence: cleanEvidence,
+            });
+        } catch (err) {
+            console.warn("⚠️ Layer 1 failed, calling Model 4 fallback:", err.message);
+            generatorResult = await ollamaProvider.execute({ task, userInput: cleanInput, evidence: cleanEvidence });
+        }
 
-        // Execute Model 2 (Independent Verifier: Groq LLaMA)
-        // ANTI-CASCADE: Model 2 receives original input + canonical evidence + Model 1 findings
+        // LAYER 2: Independent Verifier (Groq)
+        // ANTI-CASCADE: Receives original input + evidence + Model 1 output
         aiPolicy.validateCall({ provider: "groq", model: "llama-3.3-70b-versatile" });
         const verifierInput = `
 ORIGINAL PROPOSAL:
 ${cleanInput}
 
-MODEL 1 (GENERATOR) ANALYSIS:
+LAYER 1 (GENERATOR) FINDINGS:
 Conclusion: ${generatorResult.conclusion}
 Reported Claims: ${generatorResult.claims.join("; ")}
 Identified Uncertainties: ${generatorResult.uncertainties.join("; ")}
 `;
 
-        const verifierResult = await groqProvider.execute({
-            task: `Verify claims and audit generator findings for: ${task}`,
-            userInput: verifierInput,
-            evidence: cleanEvidence,
-        });
+        let verifierResult;
+        try {
+            verifierResult = await groqProvider.execute({
+                task: `Verify claims and audit generator findings for: ${task}`,
+                userInput: verifierInput,
+                evidence: cleanEvidence,
+            });
+        } catch (err) {
+            console.warn("!! Layer 2 failed, calling Model 4 fallback:", err.message);
+            verifierResult = await ollamaProvider.execute({ task, userInput: verifierInput, evidence: cleanEvidence });
+        }
+
+        // LAYER 3: Diversity Auditor (OpenRouter)
+        // ANTI-CASCADE: Receives original input + evidence + Model 1 + Model 2 outputs
+        aiPolicy.validateCall({ provider: "openrouter", model: "google/gemma-3-27b-it:free" });
+        const auditorInput = `
+ORIGINAL PROPOSAL:
+${cleanInput}
+
+LAYER 1 (GEMINI) CONCLUSION:
+${generatorResult.conclusion}
+
+LAYER 2 (GROQ VERIFIER) ASSESSMENT:
+${verifierResult.conclusion}
+Reported Issues: ${(verifierResult.issues || []).join("; ") || "None"}
+`;
+
+        let auditorResult;
+        try {
+            auditorResult = await openrouterProvider.execute({
+                task: `Perform third-party diversity audit on consensus for: ${task}`,
+                userInput: auditorInput,
+                evidence: cleanEvidence,
+            });
+        } catch (err) {
+            console.warn("!! Layer 3 rate-limited/failed, calling Model 4 fallback:", err.message);
+            auditorResult = await ollamaProvider.execute({ task, userInput: auditorInput, evidence: cleanEvidence });
+        }
 
         const disagreements = [];
-
         if (verifierResult.issues && verifierResult.issues.length > 0) {
             disagreements.push(...verifierResult.issues);
         }
+        if (auditorResult.issues && auditorResult.issues.length > 0) {
+            disagreements.push(...auditorResult.issues);
+        }
 
-        //final verdict
         let finalVerdict = AI_VERDICTS.PASS;
         if (disagreements.length > 0) {
             finalVerdict = AI_VERDICTS.PASS_WITH_FLAGS;
         }
-        if (generatorResult.confidence < 0.6 || verifierResult.confidence < 0.6) {
+        if (
+            generatorResult.confidence < 0.6 ||
+            verifierResult.confidence < 0.6 ||
+            auditorResult.confidence < 0.6
+        ) {
             finalVerdict = AI_VERDICTS.UNKNOWN;
         }
 
         const totalLatencyMs = Date.now() - startTime;
 
-        //Auditable AIRun Record
+        // aiRun record
         const aiRun = await AIRun.create({
             task,
             userInputHash: inputHash,
@@ -80,6 +120,7 @@ Identified Uncertainties: ${generatorResult.uncertainties.join("; ")}
             entityId,
             generatorResult,
             verifierResult,
+            auditorResult,
             disagreements,
             totalLatencyMs,
         });
@@ -90,9 +131,13 @@ Identified Uncertainties: ${generatorResult.uncertainties.join("; ")}
             disagreements,
             summary: generatorResult.conclusion,
             auditedClaims: generatorResult.claims,
-            flags: verifierResult.uncertainties,
+            flags: [...(verifierResult.uncertainties || []), ...(auditorResult.uncertainties || [])],
             totalLatencyMs,
-            providers: [generatorResult.provider, verifierResult.provider],
+            providerChain: [
+                generatorResult.provider,
+                verifierResult.provider,
+                auditorResult.provider,
+            ],
         };
     },
 };
