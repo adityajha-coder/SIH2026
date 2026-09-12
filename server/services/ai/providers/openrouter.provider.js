@@ -1,7 +1,7 @@
 import { BaseAIAdapter } from "../aiAdapter.js";
 
 const OPENROUTER_API_KEY = process.env.OPENROUTER_API_KEY || "";
-const DEFAULT_MODEL = "google/gemma-3-27b-it:free";
+const DEFAULT_MODEL = "liquid/lfm-2.5-2.6b:free";
 
 export class OpenRouterProvider extends BaseAIAdapter {
     constructor() {

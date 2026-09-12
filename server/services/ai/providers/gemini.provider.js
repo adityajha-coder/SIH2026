@@ -2,7 +2,7 @@ import { GoogleGenAI, Type } from "@google/genai";
 import { BaseAIAdapter } from "../aiAdapter.js";
 
 const GEMINI_API_KEY = process.env.GEMINI_API_KEY || "";
-const DEFAULT_MODEL = "gemini-2.5-flash";
+const DEFAULT_MODEL = "gemini-3.5-flash-lite";
 
 let aiClient = null;
 if (GEMINI_API_KEY) {

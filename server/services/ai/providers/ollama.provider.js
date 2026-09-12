@@ -1,7 +1,7 @@
 import { BaseAIAdapter } from "../aiAdapter.js";
 
 const OLLAMA_BASE_URL = process.env.OLLAMA_BASE_URL || "http://localhost:11434";
-const DEFAULT_MODEL = "gemma3:latest";
+const DEFAULT_MODEL = process.env.OLLAMA_MODEL || "qwen2.5:3b";
 
 export class OllamaProvider extends BaseAIAdapter {
     constructor() {

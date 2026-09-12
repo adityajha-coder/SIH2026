@@ -7,13 +7,17 @@ export const APPROVED_PROVIDERS = Object.freeze({
 });
 
 export const APPROVED_MODELS = Object.freeze([
+     "gemini-3.5-flash-lite",
     "gemini-2.5-flash",
     "gemini-2.5-flash-mock",
+    "openai/gpt-oss-20b",
     "llama-3.3-70b-versatile",
     "llama-3.1-8b-instant",
-    "llama-3.1-8b-instant-mock",
+    "liquid/lfm-2.5-2.6b:free",
     "google/gemma-3-27b-it:free",
     "gemma3:latest",
+    "qwen2.5:3b",
+    "qwen:latest",
 ]);
 
 export const AI_LIMITS = Object.freeze({
