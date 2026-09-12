@@ -2,6 +2,7 @@ import { verificationService } from "../services/ai/verification.service.js";
 import { geminiProvider } from "../services/ai/providers/gemini.provider.js";
 import { aiPolicy } from "../services/ai/ai.policy.js";
 import { AIRun } from "../models/aiRun.model.js";
+import { matchingService } from "../services/matching.service.js";
 
 export const aiController = {
     
@@ -71,4 +72,24 @@ export const aiController = {
             next(error);
         }
     },
+
+    // POST /v1/ai/match — Explain deterministic match between startup + problem
+    async matchAndExplain(req, res, next) {
+        try {
+            const result = await matchingService.matchAndExplain({
+                actor: req.user,
+                problemId: req.body.problemId,
+                organizationId: req.body.organizationId,
+            });
+
+            return res.status(200).json({
+                data: result,
+                meta: { traceId: req.id, timestamp: new Date().toISOString() },
+                error: null,
+            });
+        }catch (error) {
+            next(error);
+            }
+    },
+
 };

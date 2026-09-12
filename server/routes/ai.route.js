@@ -2,7 +2,7 @@ import { Router } from "express";
 import { aiController } from "../controllers/ai.controller.js";
 import { requireAuth } from "../middleware/auth.middleware.js";
 import { validate } from "../middleware/validate.middleware.js";
-import { aiGenerateSchema, aiVerifySchema } from "../validators/ai.validator.js";
+import { aiGenerateSchema, aiVerifySchema, aiMatchSchema } from "../validators/ai.validator.js";
 
 const aiRouter = Router();
 
@@ -14,5 +14,8 @@ aiRouter.post("/verify", requireAuth, validate(aiVerifySchema), aiController.ver
 
 // GET /v1/ai/runs/:id
 aiRouter.get("/runs/:id", requireAuth, aiController.getRunById);
+
+// POST /v1/ai/match
+aiRouter.post("/match", requireAuth, validate(aiMatchSchema), aiController.matchAndExplain);
 
 export default aiRouter;

@@ -19,3 +19,13 @@ export const aiVerifySchema = z.object({
         .string({ required_error: "Entity ID is required" })
         .regex(objectIdRegex, "Invalid entity ID format"),
 });
+
+export const aiMatchSchema = z.object({
+    problemId: z
+        .string({ required_error: "Problem ID is required" })
+        .regex(objectIdRegex, "Invalid problem ID format"),
+    organizationId: z
+        .string()
+        .regex(objectIdRegex, "Invalid organization ID format")
+        .optional(),
+});
