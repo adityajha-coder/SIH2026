@@ -1,21 +1,40 @@
 import React, { useState } from "react";
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { 
-  Building2, 
   Menu, 
   X, 
   ArrowRight, 
-  ExternalLink,
-  ShieldCheck
+  LayoutDashboard,
+  LogOut,
+  UserCircle
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { getRoleDashboardPath } from "@/context/AuthContext";
+import { useAuth } from "@/hooks/useAuth";
 
 import logoImg from "@/assets/logo.png";
+
+const ROLE_LABELS = {
+  STARTUP_USER: "STARTUP",
+  GOVERNMENT_USER: "GOV",
+  EVALUATOR: "EVAL",
+  ADMIN: "ADMIN",
+};
 
 export function Navbar() {
   const [mobileOpen, setMobileOpen] = useState(false);
   const location = useLocation();
+  const navigate = useNavigate();
+  const { user, organization, isAuthenticated, isLoading, logout } = useAuth();
 
   const navLinks = [
     { label: "Challenges", href: "/challenges" },
@@ -25,6 +44,87 @@ export function Navbar() {
   ];
 
   const isActive = (path) => location.pathname === path;
+  const roleLabel = ROLE_LABELS[user?.role] || user?.role || "USER";
+  const initial = user?.userName?.charAt(0)?.toUpperCase() || "U";
+
+  const handleLogout = async () => {
+    await logout();
+    setMobileOpen(false);
+    navigate("/", { replace: true });
+  };
+
+  const authActions = isAuthenticated ? (
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <Button variant="outline" size="sm" className="gap-2 pl-2">
+          <span className="flex h-6 w-6 items-center justify-center rounded-full bg-blue-100 text-[11px] font-bold text-[#2563EB]">
+            {initial}
+          </span>
+          <span className="hidden max-w-28 truncate text-xs sm:inline">
+            {user.userName}
+          </span>
+        </Button>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent align="end" className="w-64">
+        <DropdownMenuLabel>
+          <div className="space-y-1">
+            <p className="truncate text-sm font-bold text-[#10233F]">
+              {user.userName}
+            </p>
+            <p className="truncate text-xs font-normal text-[#64748B]">
+              {user.email}
+            </p>
+          </div>
+        </DropdownMenuLabel>
+        <DropdownMenuSeparator />
+        <div className="px-2 py-1.5">
+          <div className="flex items-center justify-between gap-2">
+            <Badge variant="secondary" className="text-[10px]">
+              {roleLabel}
+            </Badge>
+            <span className="truncate text-[11px] text-[#64748B]">
+              {organization?.name || "No organization"}
+            </span>
+          </div>
+        </div>
+        <DropdownMenuSeparator />
+        <DropdownMenuItem asChild>
+          <Link to={getRoleDashboardPath(user.role)} className="gap-2">
+            <LayoutDashboard className="h-4 w-4" />
+            Dashboard
+          </Link>
+        </DropdownMenuItem>
+        <DropdownMenuItem asChild>
+          <Link to="/dashboard" className="gap-2">
+            <UserCircle className="h-4 w-4" />
+            Profile
+          </Link>
+        </DropdownMenuItem>
+        <DropdownMenuSeparator />
+        <DropdownMenuItem
+          className="gap-2 text-[#DC2626] focus:text-[#DC2626]"
+          onClick={handleLogout}
+        >
+          <LogOut className="h-4 w-4" />
+          Sign Out
+        </DropdownMenuItem>
+      </DropdownMenuContent>
+    </DropdownMenu>
+  ) : (
+    <>
+      <Link to="/login">
+        <Button variant="outline" size="sm" className="font-medium text-xs">
+          Sign In
+        </Button>
+      </Link>
+      <Link to="/register">
+        <Button size="sm" className="gap-1.5 font-medium text-xs shadow-sm">
+          Register Startup
+          <ArrowRight className="h-3.5 w-3.5" />
+        </Button>
+      </Link>
+    </>
+  );
 
   return (
     <header className="sticky top-0 z-40 w-full">
@@ -61,17 +161,7 @@ export function Navbar() {
         </div>
 
         <div className="hidden sm:flex items-center gap-2.5">
-          <Link to="/login">
-            <Button variant="outline" size="sm" className="font-medium text-xs">
-              Sign In
-            </Button>
-          </Link>
-          <Link to="/register">
-            <Button size="sm" className="gap-1.5 font-medium text-xs shadow-sm">
-              Register Startup
-              <ArrowRight className="h-3.5 w-3.5" />
-            </Button>
-          </Link>
+          {!isLoading && authActions}
         </div>
 
         {/* Mobile hamburger */}
@@ -101,16 +191,42 @@ export function Navbar() {
             </Link>
           ))}
           <div className="pt-3 border-t border-[#E2E8F0] flex flex-col gap-2">
-            <Link to="/login" onClick={() => setMobileOpen(false)}>
-              <Button variant="outline" className="w-full text-sm">
-                Sign In
-              </Button>
-            </Link>
-            <Link to="/register" onClick={() => setMobileOpen(false)}>
-              <Button className="w-full text-sm">
-                Register Startup
-              </Button>
-            </Link>
+            {isAuthenticated ? (
+              <>
+                <div className="rounded-lg bg-[#F8FAFC] p-3">
+                  <p className="text-sm font-bold text-[#10233F]">{user.userName}</p>
+                  <p className="truncate text-xs text-[#64748B]">
+                    {organization?.name || roleLabel}
+                  </p>
+                </div>
+                <Link
+                  to={getRoleDashboardPath(user.role)}
+                  onClick={() => setMobileOpen(false)}
+                >
+                  <Button className="w-full text-sm">Open Dashboard</Button>
+                </Link>
+                <Button
+                  variant="outline"
+                  className="w-full text-sm text-[#DC2626]"
+                  onClick={handleLogout}
+                >
+                  Sign Out
+                </Button>
+              </>
+            ) : (
+              <>
+                <Link to="/login" onClick={() => setMobileOpen(false)}>
+                  <Button variant="outline" className="w-full text-sm">
+                    Sign In
+                  </Button>
+                </Link>
+                <Link to="/register" onClick={() => setMobileOpen(false)}>
+                  <Button className="w-full text-sm">
+                    Register Startup
+                  </Button>
+                </Link>
+              </>
+            )}
           </div>
         </div>
       )}

@@ -1,7 +1,6 @@
 import React, { useState } from "react";
-import { Outlet, Link, useLocation } from "react-router-dom";
+import { Outlet, Link, useLocation, useNavigate } from "react-router-dom";
 import { 
-  Building2, 
   LayoutDashboard, 
   FileText, 
   Send, 
@@ -17,14 +16,21 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { getRoleDashboardPath } from "@/context/AuthContext";
+import { useAuth } from "@/hooks/useAuth";
+import { cn } from "@/lib/utils";
 import logoImg from "@/assets/logo.png";
 
-export function AppLayout({ userRole = "STARTUP_USER", userName = "Aditya Jha" }) {
+export function AppLayout() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const location = useLocation();
+  const navigate = useNavigate();
+  const { user, organization, logout } = useAuth();
+  const userRole = user?.role || "STARTUP_USER";
+  const userName = user?.userName || "User";
 
   const navItems = [
-    { label: "Dashboard", href: "/dashboard", icon: LayoutDashboard, roles: ["ALL"] },
+    { label: "Dashboard", href: getRoleDashboardPath(userRole), icon: LayoutDashboard, roles: ["ALL"] },
     { label: "Find Challenges", href: "/challenges", icon: FileText, roles: ["STARTUP_USER", "ALL"] },
     { label: "My Applications", href: "/startup/submissions", icon: Send, roles: ["STARTUP_USER"] },
     { label: "Startup Passport", href: "/startup/profile", icon: User, roles: ["STARTUP_USER"] },
@@ -36,6 +42,32 @@ export function AppLayout({ userRole = "STARTUP_USER", userName = "Aditya Jha" }
   const filteredNav = navItems.filter(
     (item) => item.roles.includes("ALL") || item.roles.includes(userRole)
   );
+
+  const handleLogout = async () => {
+    await logout();
+    navigate("/", { replace: true });
+  };
+
+  const renderNavItem = (item) => {
+    const Icon = item.icon;
+    const active = location.pathname === item.href;
+    return (
+      <Link
+        key={item.href}
+        to={item.href}
+        onClick={() => setSidebarOpen(false)}
+        className={cn(
+          "flex items-center gap-3 rounded-lg px-3 py-2.5 text-xs font-semibold transition-all",
+          active
+            ? "bg-[#2563EB] text-white shadow-sm"
+            : "text-[#64748B] hover:bg-[#F1F5F9] hover:text-[#10233F]"
+        )}
+      >
+        <Icon className="h-4 w-4" />
+        <span>{item.label}</span>
+      </Link>
+    );
+  };
 
   return (
     <div className="flex min-h-screen bg-[#F7F9FC]">
@@ -56,24 +88,7 @@ export function AppLayout({ userRole = "STARTUP_USER", userName = "Aditya Jha" }
 
         {/* Navigation list */}
         <div className="flex-1 px-3 py-4 space-y-1">
-          {filteredNav.map((item) => {
-            const Icon = item.icon;
-            const active = location.pathname === item.href;
-            return (
-              <Link
-                key={item.href}
-                to={item.href}
-                className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-xs font-semibold transition-all ${
-                  active
-                    ? "bg-[#2563EB] text-white shadow-sm"
-                    : "text-[#64748B] hover:bg-[#F1F5F9] hover:text-[#10233F]"
-                }`}
-              >
-                <Icon className="h-4 w-4" />
-                <span>{item.label}</span>
-              </Link>
-            );
-          })}
+          {filteredNav.map(renderNavItem)}
         </div>
 
         {/* User Card & Logout */}
@@ -87,14 +102,61 @@ export function AppLayout({ userRole = "STARTUP_USER", userName = "Aditya Jha" }
               <Badge variant="secondary" className="text-[9px] py-0 px-1 font-mono">
                 {userRole}
               </Badge>
+              {organization?.name && (
+                <p className="mt-1 truncate text-[10px] text-[#64748B]">
+                  {organization.name}
+                </p>
+              )}
             </div>
           </div>
-          <Button variant="outline" size="sm" className="w-full text-xs text-[#DC2626] hover:bg-red-50 hover:text-[#DC2626] border-red-100">
+          <Button
+            variant="outline"
+            size="sm"
+            className="w-full text-xs text-[#DC2626] hover:bg-red-50 hover:text-[#DC2626] border-red-100"
+            onClick={handleLogout}
+          >
             <LogOut className="h-3.5 w-3.5 mr-1.5" />
             Sign Out
           </Button>
         </div>
       </aside>
+
+      {sidebarOpen && (
+        <div className="fixed inset-0 z-50 lg:hidden">
+          <button
+            type="button"
+            className="absolute inset-0 bg-black/30"
+            onClick={() => setSidebarOpen(false)}
+            aria-label="Close workspace navigation"
+          />
+          <aside className="relative flex h-full w-72 flex-col border-r border-[#E2E8F0] bg-white shadow-xl">
+            <div className="h-16 flex items-center justify-between gap-3 px-5 border-b border-[#E2E8F0]">
+              <Link to={getRoleDashboardPath(userRole)} className="flex items-center gap-3">
+                <img
+                  src={logoImg}
+                  alt="Pragati-GovX"
+                  className="h-8 w-auto object-contain rounded-md"
+                />
+                <div>
+                  <h1 className="font-bold text-sm text-[#10233F]">Pragati-GovX</h1>
+                  <span className="text-[10px] text-[#64748B] font-medium">Console</span>
+                </div>
+              </Link>
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={() => setSidebarOpen(false)}
+                aria-label="Close workspace navigation"
+              >
+                <X className="h-5 w-5" />
+              </Button>
+            </div>
+            <div className="flex-1 px-3 py-4 space-y-1">
+              {filteredNav.map(renderNavItem)}
+            </div>
+          </aside>
+        </div>
+      )}
 
       {/* Main Content Area */}
       <div className="flex-1 flex flex-col min-w-0">
@@ -106,13 +168,14 @@ export function AppLayout({ userRole = "STARTUP_USER", userName = "Aditya Jha" }
               size="icon"
               className="lg:hidden"
               onClick={() => setSidebarOpen(!sidebarOpen)}
+              aria-label="Open workspace navigation"
             >
               <Menu className="h-5 w-5" />
             </Button>
-            <div className="flex items-center gap-1.5 text-xs text-[#64748B]">
-              <Link to="/dashboard" className="hover:text-[#10233F]">Workspace</Link>
+            <div className="flex min-w-0 items-center gap-1.5 text-xs text-[#64748B]">
+              <Link to={getRoleDashboardPath(userRole)} className="hover:text-[#10233F]">Workspace</Link>
               <ChevronRight className="h-3 w-3" />
-              <span className="font-semibold text-[#10233F] capitalize">
+              <span className="truncate font-semibold text-[#10233F] capitalize">
                 {location.pathname.replace("/", "").replace(/-/g, " ") || "Overview"}
               </span>
             </div>

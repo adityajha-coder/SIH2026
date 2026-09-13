@@ -3,6 +3,19 @@ import axios from "axios";
 // In-memory access token storage
 let currentAccessToken = null;
 
+function normalizeBaseUrl(value) {
+  const fallback = "/v1";
+  const rawValue = value || fallback;
+
+  if (rawValue === "/v1" || rawValue.endsWith("/v1") || rawValue.endsWith("/api")) {
+    return rawValue;
+  }
+
+  return `${rawValue.replace(/\/$/, "")}/v1`;
+}
+
+export const API_BASE_URL = normalizeBaseUrl(import.meta.env.VITE_API_BASE_URL);
+
 export function setAccessToken(token) {
   currentAccessToken = token;
 }
@@ -12,7 +25,7 @@ export function getAccessToken() {
 }
 
 const apiClient = axios.create({
-  baseURL: import.meta.env.VITE_API_BASE_URL || "/v1",
+  baseURL: API_BASE_URL,
   withCredentials: true, // Necessary for HTTP-only cookies
   headers: {
     "Content-Type": "application/json",
@@ -69,7 +82,7 @@ apiClient.interceptors.response.use(
 
       try {
         // Attempt refresh via HTTP-only cookie
-        const refreshRes = await axios.get("/v1/auth/refresh-token", {
+        const refreshRes = await axios.get(`${API_BASE_URL}/auth/refresh-token`, {
           withCredentials: true,
         });
 
