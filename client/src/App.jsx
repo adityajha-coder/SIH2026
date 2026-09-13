@@ -9,7 +9,6 @@ import { AppLayout } from "./components/layout/AppLayout";
 import { PublicLayout } from "./components/layout/PublicLayout";
 import { RoleGuard } from "./components/layout/RoleGuard";
 import { DashboardRedirect } from "./pages/app/DashboardRedirect";
-import { WorkspacePlaceholder } from "./pages/app/WorkspacePlaceholder";
 import { AuthCallbackPage } from "./pages/public/AuthCallbackPage";
 import { ForgotPasswordPage } from "./pages/public/ForgotPasswordPage";
 import { LandingPage } from "./pages/public/LandingPage";
@@ -36,20 +35,13 @@ import { AdminAuditConsole } from "./pages/admin/AdminAuditConsole";
 import { NotificationCenter } from "./pages/app/NotificationCenter";
 import { PublicTransparencyPage } from "./pages/public/PublicTransparencyPage";
 
-function PublicPlaceholder({ title, phase }) {
-  return (
-    <div className="mx-auto max-w-4xl space-y-4 px-4 py-20 text-center">
-      <h2 className="text-2xl font-bold text-[#10233F]">{title}</h2>
-      <p className="text-sm text-[#64748B]">
-        Scheduled for {phase} implementation.
-      </p>
-    </div>
-  );
-}
+import { ErrorBoundary } from "./components/common/ErrorBoundary";
+import { NotFoundPage } from "./pages/public/NotFoundPage";
 
 export function App() {
   return (
-    <QueryClientProvider client={queryClient}>
+    <ErrorBoundary>
+      <QueryClientProvider client={queryClient}>
       <BrowserRouter>
         <AuthProvider>
           <Routes>
@@ -192,13 +184,14 @@ export function App() {
               </Route>
             </Route>
 
-            <Route path="*" element={<Navigate to="/" replace />} />
+            <Route path="*" element={<NotFoundPage />} />
           </Routes>
           <OrgSetupModal />
         </AuthProvider>
       </BrowserRouter>
       <Toaster position="top-right" richColors closeButton />
     </QueryClientProvider>
+    </ErrorBoundary>
   );
 }
 
