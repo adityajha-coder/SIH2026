@@ -214,10 +214,10 @@ export function ChallengeDetailPage() {
                     <h4 className="text-xs font-bold uppercase tracking-wider text-rose-700">
                       Mandatory Criteria (Hard Gate)
                     </h4>
-                    <ul className="space-y-2">
+                    <ul className="space-y-1.5 text-xs text-[#334155]">
                       {mandatoryRequirements.map((req, i) => (
-                        <li key={i} className="flex items-start gap-2 text-xs text-[#334155]">
-                          <CheckCircle2 className="h-4 w-4 text-rose-600 shrink-0 mt-0.5" />
+                        <li key={i} className="leading-relaxed flex items-start gap-2">
+                          <span className="text-slate-400 select-none">•</span>
                           <span>{req}</span>
                         </li>
                       ))}
@@ -228,12 +228,12 @@ export function ChallengeDetailPage() {
                 {preferredRequirements.length > 0 && (
                   <div className="space-y-2">
                     <h4 className="text-xs font-bold uppercase tracking-wider text-blue-700">
-                      Preferred Tech & Capabilities
+                      Preferred Tech &amp; Capabilities
                     </h4>
-                    <ul className="space-y-2">
+                    <ul className="space-y-1.5 text-xs text-[#334155]">
                       {preferredRequirements.map((req, i) => (
-                        <li key={i} className="flex items-start gap-2 text-xs text-[#334155]">
-                          <Sparkles className="h-4 w-4 text-blue-600 shrink-0 mt-0.5" />
+                        <li key={i} className="leading-relaxed flex items-start gap-2">
+                          <span className="text-slate-400 select-none">•</span>
                           <span>{req}</span>
                         </li>
                       ))}
@@ -244,12 +244,12 @@ export function ChallengeDetailPage() {
                 {constraints.length > 0 && (
                   <div className="space-y-2">
                     <h4 className="text-xs font-bold uppercase tracking-wider text-amber-700">
-                      Operational & Regulatory Constraints
+                      Operational &amp; Regulatory Constraints
                     </h4>
-                    <ul className="space-y-2">
+                    <ul className="space-y-1.5 text-xs text-[#334155]">
                       {constraints.map((req, i) => (
-                        <li key={i} className="flex items-start gap-2 text-xs text-[#334155]">
-                          <ShieldCheck className="h-4 w-4 text-amber-600 shrink-0 mt-0.5" />
+                        <li key={i} className="leading-relaxed flex items-start gap-2">
+                          <span className="text-slate-400 select-none">•</span>
                           <span>{req}</span>
                         </li>
                       ))}
@@ -299,61 +299,92 @@ export function ChallengeDetailPage() {
                     </div>
                   ) : (
                     <div className="space-y-4">
-                      {/* Status Banner */}
-                      <div
-                        className={`p-3 rounded-xl border flex items-center gap-2.5 text-xs font-semibold ${
-                          eligibility?.isEligible
-                            ? "border-emerald-200 bg-emerald-50 text-emerald-800"
-                            : "border-amber-200 bg-amber-50 text-amber-900"
-                        }`}
-                      >
-                        {eligibility?.isEligible ? (
+                      {(() => {
+                        const hasBlockers = (eligibility?.blockers?.length || 0) > 0;
+                        const hasMissing = (eligibility?.missingEvidence?.length || 0) > 0;
+                        const isEligible = Boolean(
+                          eligibility?.eligible ??
+                          eligibility?.isEligible ??
+                          (!hasBlockers && !hasMissing && (eligibility?.matchedRequirements?.length || 0) > 0)
+                        );
+                        const canApply = Boolean(
+                          eligibility?.canApply ??
+                          eligibility?.eligible ??
+                          !hasBlockers
+                        );
+
+                        return (
                           <>
-                            <CheckCircle2 className="h-4 w-4 text-emerald-600 shrink-0" />
-                            <span>Qualified: Eligible to Apply</span>
+                            {/* Status Banner */}
+                            <div
+                              className={`p-3 rounded-xl border flex items-center gap-2.5 text-xs font-semibold ${
+                                isEligible
+                                  ? "border-emerald-200 bg-emerald-50 text-emerald-800"
+                                  : "border-amber-200 bg-amber-50 text-amber-900"
+                              }`}
+                            >
+                              {isEligible ? (
+                                <>
+                                  <CheckCircle2 className="h-4 w-4 text-emerald-600 shrink-0" />
+                                  <span>Qualified: Eligible to Apply</span>
+                                </>
+                              ) : (
+                                <>
+                                  <ShieldAlert className="h-4 w-4 text-amber-600 shrink-0" />
+                                  <span>Action Needed Before Applying</span>
+                                </>
+                              )}
+                            </div>
+
+                            {/* Rule Results */}
+                            <div className="space-y-2 text-xs">
+                              {eligibility?.matchedRequirements?.map((item, i) => (
+                                <div key={i} className="flex items-start gap-2 text-emerald-700">
+                                  <CheckCircle2 className="h-3.5 w-3.5 text-emerald-600 shrink-0 mt-0.5" />
+                                  <span>{item}</span>
+                                </div>
+                              ))}
+
+                              {eligibility?.blockers?.map((item, i) => (
+                                <div key={i} className="flex items-start gap-2 text-rose-700 bg-rose-50/60 p-2 rounded-lg border border-rose-200/60">
+                                  <XCircle className="h-3.5 w-3.5 text-rose-600 shrink-0 mt-0.5" />
+                                  <span className="font-medium">{item}</span>
+                                </div>
+                              ))}
+
+                              {eligibility?.missingEvidence?.map((item, i) => (
+                                <div key={i} className="flex items-start gap-2 text-amber-800 bg-amber-50/60 p-2 rounded-lg border border-amber-200/60">
+                                  <Clock className="h-3.5 w-3.5 text-amber-600 shrink-0 mt-0.5" />
+                                  <span>Action Required: {item}</span>
+                                </div>
+                              ))}
+
+                              {!isEligible && !hasBlockers && !hasMissing && (
+                                <div className="p-2.5 rounded-lg border border-amber-200 bg-amber-50/60 text-amber-800 space-y-1">
+                                  <p className="font-semibold">Action Required:</p>
+                                  <p className="text-[11px] leading-relaxed">
+                                    Your startup profile requires complete statutory verification. Please ensure your DPIIT recognition number and stage are updated.
+                                  </p>
+                                  <Link to="/profile" className="inline-block text-[11px] font-bold text-blue-600 hover:underline pt-0.5">
+                                    Update Startup Profile &rarr;
+                                  </Link>
+                                </div>
+                              )}
+                            </div>
+
+                            {/* Apply Button */}
+                            <Link to={`/challenges/${id}/apply`} className="block w-full pt-2">
+                              <Button
+                                className="w-full h-11 gap-2 font-semibold bg-[#2563EB] hover:bg-blue-600 shadow-sm cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+                                disabled={!canApply}
+                              >
+                                <Rocket className="h-4 w-4" />
+                                Apply for Pilot Compact
+                              </Button>
+                            </Link>
                           </>
-                        ) : (
-                          <>
-                            <ShieldAlert className="h-4 w-4 text-amber-600 shrink-0" />
-                            <span>Action Needed Before Applying</span>
-                          </>
-                        )}
-                      </div>
-
-                      {/* Rule Results */}
-                      <div className="space-y-2 text-xs">
-                        {eligibility?.matchedRequirements?.map((item, i) => (
-                          <div key={i} className="flex items-start gap-2 text-emerald-700">
-                            <CheckCircle2 className="h-3.5 w-3.5 text-emerald-600 shrink-0 mt-0.5" />
-                            <span>{item}</span>
-                          </div>
-                        ))}
-
-                        {eligibility?.blockers?.map((item, i) => (
-                          <div key={i} className="flex items-start gap-2 text-rose-700">
-                            <XCircle className="h-3.5 w-3.5 text-rose-600 shrink-0 mt-0.5" />
-                            <span>{item}</span>
-                          </div>
-                        ))}
-
-                        {eligibility?.missingEvidence?.map((item, i) => (
-                          <div key={i} className="flex items-start gap-2 text-amber-700">
-                            <Clock className="h-3.5 w-3.5 text-amber-600 shrink-0 mt-0.5" />
-                            <span>Missing: {item}</span>
-                          </div>
-                        ))}
-                      </div>
-
-                      {/* Apply Button */}
-                      <Link to={`/challenges/${id}/apply`} className="block w-full pt-2">
-                        <Button
-                          className="w-full h-11 gap-2 font-semibold bg-[#2563EB] hover:bg-blue-600 shadow-sm"
-                          disabled={!eligibility?.canApply}
-                        >
-                          <Rocket className="h-4 w-4" />
-                          Apply for Pilot Compact
-                        </Button>
-                      </Link>
+                        );
+                      })()}
                     </div>
                   )
                 ) : (

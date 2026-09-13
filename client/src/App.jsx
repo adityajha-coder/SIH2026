@@ -191,7 +191,13 @@ export function App() {
           <OrgSetupModal />
         </AuthProvider>
       </BrowserRouter>
-      <Toaster position="top-right" richColors closeButton />
+      <Toaster
+        position="top-right"
+        richColors
+        closeButton
+        offset={{ top: 80, right: 24 }}
+        mobileOffset={{ top: 72, right: 16 }}
+      />
     </QueryClientProvider>
     </ErrorBoundary>
   );

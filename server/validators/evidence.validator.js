@@ -12,6 +12,8 @@ export const ALLOWED_MIME_TYPES = [
     "application/msword",
     "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
     "application/zip",
+    "application/x-zip-compressed",
+    "application/octet-stream",
 ];
 
 const MAX_FILE_SIZE = 25 * 1024 * 1024; // 25 MB

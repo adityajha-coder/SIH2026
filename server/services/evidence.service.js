@@ -40,11 +40,11 @@ export const evidenceService = {
                 const isOrgAdmin = await OrganizationMember.findOne({
                     organizationId: entityId,
                     userId: actor._id,
-                    orgRole: { $in: ["OWNER", "ADMIN"] },
+                    orgRole: { $in: ["OWNER", "ADMIN", "MEMBER"] },
                     status: "ACTIVE",
                 });
                 if (!isOrgAdmin) {
-                    const err = new Error("Only organization owners/admins can upload organization evidence");
+                    const err = new Error("Only organization members can upload organization evidence");
                     err.statusCode = 403;
                     err.code = "FORBIDDEN";
                     throw err;

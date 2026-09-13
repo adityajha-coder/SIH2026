@@ -19,7 +19,7 @@ export const submissionService = {
             error.code = "NOT_FOUND";
             throw error;
         }
-        if (problem.status !== PROBLEM_STATUS.ACCEPTING) {
+        if (![PROBLEM_STATUS.PUBLISHED, PROBLEM_STATUS.ACCEPTING].includes(problem.status)) {
             const error = new Error("This problem is not currently accepting submissions");
             error.statusCode = 400;
             error.code = "NOT_ACCEPTING";

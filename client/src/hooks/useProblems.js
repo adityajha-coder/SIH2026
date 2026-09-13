@@ -50,7 +50,18 @@ export function useProblemEligibility(problemId, organizationId) {
       if (!problemId) return null;
       const params = organizationId ? { organizationId } : {};
       const response = await apiClient.get(`/problems/${problemId}/eligibility`, { params });
-      return response?.data || null;
+      const raw = response?.data || response || {};
+      const hasBlockers = (raw.blockers?.length || 0) > 0;
+      const hasMissing = (raw.missingEvidence?.length || 0) > 0;
+      const isEligible = Boolean(raw.eligible ?? raw.isEligible ?? (!hasBlockers && !hasMissing));
+      const canApply = Boolean(raw.canApply ?? raw.eligible ?? (!hasBlockers));
+
+      return {
+        ...raw,
+        isEligible,
+        canApply,
+        eligible: isEligible,
+      };
     },
     enabled: !!problemId,
     retry: false,

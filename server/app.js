@@ -51,6 +51,14 @@ app.use(morgan("[:id] :method :url :status :response-time ms"));
 
 app.use(healthRouter);
 
+// Local dev mock storage handler
+app.put("/v1/mock-storage/upload", express.raw({ type: "*/*", limit: "50mb" }), (req, res) => {
+    res.status(200).send("Mock upload successful");
+});
+app.get("/v1/mock-storage/download", (req, res) => {
+    res.status(200).json({ message: "Mock download" });
+});
+
 // routing
 app.use("/api/auth", authRouter);
 app.use("/v1/auth", authRouter);
