@@ -26,6 +26,23 @@ jobs:
         run: npm ci
 
       - name: Verify All Models, Services & Routes
+        env:
+          MONGO_URI: "mongodb://localhost:27017/ci_test_db"
+          JWT_SECRET: "ci_test_secret_key_1234567890_abcdef"
+          GOOGLE_CLIENT_ID: "ci_test_google_client_id.apps.googleusercontent.com"
+          GOOGLE_CLIENT_SECRET: "ci_test_google_client_secret"
+          EMAIL_USER: "ci_test@example.com"
+          EMAIL_APP_PASSWORD: "ci_test_email_password"
+          AWS_REGION: "auto"
+          AWS_BUCKET_NAME: "ci-test-bucket"
+          AWS_ACCESS_KEY_ID: "ci_test_access_key"
+          AWS_SECRET_ACCESS_KEY: "ci_test_secret_key"
+          AWS_ENDPOINT: "https://ci-test.r2.cloudflarestorage.com"
+          GEMINI_API_KEY: "ci_test_gemini_key"
+          GROQ_API_KEY: "ci_test_groq_key"
+          OPENROUTER_API_KEY: "ci_test_openrouter_key"
+          OGD_API_KEY: "ci_test_ogd_key"
+          NODE_ENV: "test"
         run: |
           node -e "
             Promise.all([
