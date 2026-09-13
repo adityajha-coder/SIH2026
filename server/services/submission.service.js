@@ -5,6 +5,9 @@ import organizationMemberModel from "../models/organizationmember.model.js";
 import { ROLES } from "../constants/role.constant.js";
 import { assertTransition } from "./submission/transitionGuard.js";
 import { eligibilityService } from "./eligibility.service.js";
+import { auditService } from "./audit.service.js";
+import { AUDIT_ACTIONS, AUDIT_ENTITY_TYPES } from "../models/auditEvent.model.js";
+import { notificationService } from "./notification.service.js";
 
 export const submissionService = {
     async createSubmission({ actor, input }) {
@@ -81,6 +84,16 @@ export const submissionService = {
             evidenceFileIds: input.evidenceFileIds || [],
             status: SUBMISSION_STATUS.DRAFT,
         });
+
+        // Audit log
+        auditService.logEvent({
+            actorId: actor._id,
+            actorRole: actor.role,
+            action: AUDIT_ACTIONS.SUBMISSION_CREATED,
+            entityType: AUDIT_ENTITY_TYPES.SUBMISSION,
+            entityId: submission._id,
+            metadata: { problemId: submission.problemId, solutionTitle: submission.solutionTitle },
+        }).catch(() => {});
 
         return submission;
     },
@@ -248,6 +261,21 @@ export const submissionService = {
         });
 
         await submission.save();
+
+        auditService.logEvent({
+            actorId: actor._id,
+            actorRole: actor.role,
+            action: AUDIT_ACTIONS.SUBMISSION_STATUS_TRANSITIONED,
+            entityType: AUDIT_ENTITY_TYPES.SUBMISSION,
+            entityId: submission._id,
+            changes: { before: { status: previousStatus }, after: { status: toStatus } },
+            metadata: { note: note || "", solutionTitle: submission.solutionTitle },
+        }).catch(() => {});
+
+        notificationService.onSubmissionStatusChanged({ submission, newStatus: toStatus, note }).catch((err) => {
+            console.warn("!! Notification dispatch failed for submission status transition:", err.message);
+        });
+
         return submission;
     },
 

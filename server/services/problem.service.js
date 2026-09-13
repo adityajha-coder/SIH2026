@@ -2,6 +2,9 @@ import problemModel, { PROBLEM_STATUS } from "../models/problem.model.js";
 import organizationModel from "../models/organization.model.js";
 import organizationMemberModel from "../models/organizationmember.model.js";
 import { ROLES } from "../constants/role.constant.js";
+import { auditService } from "./audit.service.js";
+import { AUDIT_ACTIONS, AUDIT_ENTITY_TYPES } from "../models/auditEvent.model.js";
+import { notificationService } from "./notification.service.js";
 
 export const problemService = {
     // problem creation
@@ -35,6 +38,16 @@ export const problemService = {
             status: PROBLEM_STATUS.DRAFT,
         });
 
+        // Audit log
+        auditService.logEvent({
+            actorId: actor._id,
+            actorRole: actor.role,
+            action: AUDIT_ACTIONS.PROBLEM_CREATED,
+            entityType: AUDIT_ENTITY_TYPES.PROBLEM,
+            entityId: problem._id,
+            metadata: { title: problem.title, organizationId: problem.organizationId },
+        }).catch(() => {});
+
         return problem;
     },
 
@@ -62,9 +75,24 @@ export const problemService = {
             throw error;
         }
 
+        const previousStatus = problem.status;
         problem.status = PROBLEM_STATUS.PUBLISHED;
         problem.publishedAt = new Date();
         await problem.save();
+
+        auditService.logEvent({
+            actorId: actor._id,
+            actorRole: actor.role,
+            action: AUDIT_ACTIONS.PROBLEM_PUBLISHED,
+            entityType: AUDIT_ENTITY_TYPES.PROBLEM,
+            entityId: problem._id,
+            changes: { before: { status: previousStatus }, after: { status: problem.status } },
+            metadata: { title: problem.title },
+        }).catch(() => {});
+
+        notificationService.onProblemPublished({ problem }).catch((err) => {
+            console.warn("!! Notification dispatch failed for problem publish:", err.message);
+        });
 
         return problem;
     },

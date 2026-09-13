@@ -13,6 +13,7 @@ import evaluationRouter from "./routes/evaluation.route.js";
 import evidenceRouter from "./routes/evidence.route.js";
 import aiRouter from "./routes/ai.route.js";
 import notificationRouter from "./routes/notification.route.js";
+import adminRouter from "./routes/admin.route.js";
 import healthRouter from "./routes/health.route.js";
 
 const app = express();
@@ -67,6 +68,8 @@ app.use("/v1/ai", aiRouter);
 app.use("/api/ai", aiRouter);
 app.use("/v1/notifications", notificationRouter);
 app.use("/api/notifications", notificationRouter);
+app.use("/v1/admin", adminRouter);
+app.use("/api/admin", adminRouter);
 
 app.use(errorHandler); // must be after all routes
 
