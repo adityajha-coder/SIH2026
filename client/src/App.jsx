@@ -29,6 +29,8 @@ import { ChallengeStudio } from "./pages/government/ChallengeStudio";
 import { CandidateMatching } from "./pages/government/CandidateMatching";
 import { EvaluatorQueue } from "./pages/evaluator/EvaluatorQueue";
 import { EvaluationRoom } from "./pages/evaluator/EvaluationRoom";
+import { PilotCanvas } from "./pages/pilot/PilotCanvas";
+import { PilotFrameworkPage } from "./pages/public/PilotFrameworkPage";
 
 function PublicPlaceholder({ title, phase }) {
   return (
@@ -60,12 +62,7 @@ export function App() {
               <Route path="/policy" element={<DpiitExemptionPolicyPage />} />
               <Route
                 path="/pilot-framework"
-                element={
-                  <PublicPlaceholder
-                    title="Pilot Framework"
-                    phase="Phase F6"
-                  />
-                }
+                element={<PilotFrameworkPage />}
               />
               <Route
                 path="/audit-public"
@@ -154,6 +151,14 @@ export function App() {
                   element={
                     <RoleGuard allowedRoles={["EVALUATOR", "ADMIN"]}>
                       <EvaluationRoom />
+                    </RoleGuard>
+                  }
+                />
+                <Route
+                  path="/pilots/:id"
+                  element={
+                    <RoleGuard allowedRoles={["STARTUP_USER", "GOVERNMENT_USER", "EVALUATOR", "ADMIN"]}>
+                      <PilotCanvas />
                     </RoleGuard>
                   }
                 />

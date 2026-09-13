@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import {
   ArrowLeft,
+  ArrowRight,
   CheckCircle2,
   Clock,
   FileText,
@@ -210,6 +211,32 @@ export function SubmissionDetail() {
           })}
         </div>
       </Card>
+
+      {/* Field Pilot Sandbox Active Banner */}
+      {["ACCEPTED", "PILOT_PROPOSED", "PILOT_ACTIVE", "PILOT_COMPLETED", "SCALED"].includes(status) && (
+        <div className="rounded-2xl border border-teal-200 bg-gradient-to-r from-teal-50 via-emerald-50 to-blue-50 p-5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 shadow-xs">
+          <div className="space-y-1">
+            <div className="flex items-center gap-2">
+              <Rocket className="h-4 w-4 text-[#0F766E]" />
+              <span className="text-xs font-bold uppercase tracking-wider text-[#0F766E]">
+                Field Pilot Sandbox Active
+              </span>
+              <span className="text-[11px] font-mono text-slate-500">
+                Statutory 30-Day SLA Active
+              </span>
+            </div>
+            <p className="text-xs text-[#475569] leading-relaxed">
+              This proposal has transitioned into the Maharashtra Sovereign Sandbox. Monitor baseline vs target telemetry, submit deliverable evidence, and track statutory SLA payment releases.
+            </p>
+          </div>
+          <Link to={`/pilots/${id}`} className="shrink-0">
+            <Button className="bg-[#0F766E] hover:bg-[#0D655E] text-white text-xs font-semibold h-9 px-4 gap-1.5 shadow-sm">
+              Open Pilot Canvas
+              <ArrowRight className="h-3.5 w-3.5" />
+            </Button>
+          </Link>
+        </div>
+      )}
 
       {/* Clarification Drawer if in CLARIFICATION state */}
       {status === "CLARIFICATION" && (
