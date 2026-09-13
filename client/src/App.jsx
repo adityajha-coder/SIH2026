@@ -31,6 +31,10 @@ import { EvaluatorQueue } from "./pages/evaluator/EvaluatorQueue";
 import { EvaluationRoom } from "./pages/evaluator/EvaluationRoom";
 import { PilotCanvas } from "./pages/pilot/PilotCanvas";
 import { PilotFrameworkPage } from "./pages/public/PilotFrameworkPage";
+import { ScaleGateConsole } from "./pages/government/ScaleGateConsole";
+import { AdminAuditConsole } from "./pages/admin/AdminAuditConsole";
+import { NotificationCenter } from "./pages/app/NotificationCenter";
+import { PublicTransparencyPage } from "./pages/public/PublicTransparencyPage";
 
 function PublicPlaceholder({ title, phase }) {
   return (
@@ -66,12 +70,7 @@ export function App() {
               />
               <Route
                 path="/audit-public"
-                element={
-                  <PublicPlaceholder
-                    title="Audit & Transparency"
-                    phase="Phase F7"
-                  />
-                }
+                element={<PublicTransparencyPage />}
               />
             </Route>
 
@@ -163,16 +162,32 @@ export function App() {
                   }
                 />
                 <Route
+                  path="/challenges/:id/scale-gate"
+                  element={
+                    <RoleGuard allowedRoles={["GOVERNMENT_USER", "ADMIN"]}>
+                      <ScaleGateConsole />
+                    </RoleGuard>
+                  }
+                />
+                <Route
+                  path="/government/challenges/:id/scale-gate"
+                  element={
+                    <RoleGuard allowedRoles={["GOVERNMENT_USER", "ADMIN"]}>
+                      <ScaleGateConsole />
+                    </RoleGuard>
+                  }
+                />
+                <Route
                   path="/admin/audit"
                   element={
                     <RoleGuard allowedRoles={["ADMIN"]}>
-                      <WorkspacePlaceholder type="adminAudit" />
+                      <AdminAuditConsole />
                     </RoleGuard>
                   }
                 />
                 <Route
                   path="/notifications"
-                  element={<WorkspacePlaceholder type="notifications" />}
+                  element={<NotificationCenter />}
                 />
               </Route>
             </Route>
