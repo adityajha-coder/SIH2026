@@ -1,0 +1,150 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches: [ "main", "master", "server", "client" ]
+  pull_request:
+    branches: [ "main", "master", "server", "client" ]
+
+jobs:
+
+  backend-integrity:
+    name: Backend Integrity & Architecture Audit
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: "npm"
+
+      - name: Install Root Dependencies
+        run: npm ci
+
+      - name: Verify All Models, Services & Routes
+        run: |
+          node -e "
+            Promise.all([
+              // Models
+              import('./server/models/user.model.js'),
+              import('./server/models/organization.model.js'),
+              import('./server/models/organizationmember.model.js'),
+              import('./server/models/startupProfile.model.js'),
+              import('./server/models/problem.model.js'),
+              import('./server/models/submission.model.js'),
+              import('./server/models/evaluationTemplate.model.js'),
+              import('./server/models/evaluationAssignment.model.js'),
+              import('./server/models/evaluationResponse.model.js'),
+              import('./server/models/decisionRecord.model.js'),
+              import('./server/models/evidence.model.js'),
+              import('./server/models/aiRun.model.js'),
+              import('./server/models/notification.model.js'),
+              import('./server/models/auditEvent.model.js'),
+
+              // Core Services
+              import('./server/services/email.service.js'),
+              import('./server/services/organization.service.js'),
+              import('./server/services/problem.service.js'),
+              import('./server/services/eligibility.service.js'),
+              import('./server/services/submission.service.js'),
+              import('./server/services/evaluation.service.js'),
+              import('./server/services/evidence.service.js'),
+              import('./server/services/storage.service.js'),
+              import('./server/services/matching.service.js'),
+              import('./server/services/notification.service.js'),
+              import('./server/services/audit.service.js'),
+
+              // AI & Government Adapters
+              import('./server/services/ai/aiAdapter.js'),
+              import('./server/services/ai/ai.policy.js'),
+              import('./server/services/ai/verification.service.js'),
+              import('./server/services/ai/providers/gemini.provider.js'),
+              import('./server/services/ai/providers/groq.provider.js'),
+              import('./server/services/ai/providers/openrouter.provider.js'),
+              import('./server/services/ai/providers/ollama.provider.js'),
+              import('./server/services/geocoding/nominatim.service.js'),
+              import('./server/services/government/ogd.service.js'),
+              import('./server/services/government/apiSetu.service.js'),
+              import('./server/services/government/digilocker.service.js'),
+
+              // Controllers & Routes
+              import('./server/controllers/admin.controller.js'),
+              import('./server/controllers/notification.controller.js'),
+              import('./server/controllers/ai.controller.js'),
+              import('./server/routes/admin.route.js'),
+              import('./server/routes/notification.route.js'),
+              import('./server/routes/ai.route.js'),
+              import('./server/app.js')
+            ]).then(() => {
+              console.log(' ALL BACKEND SCHEMAS, SERVICES & ROUTES VERIFIED CLEANLY');
+            }).catch(err => {
+              console.error(' BACKEND MODULE INTEGRITY FAILURE:', err);
+              process.exit(1);
+            });
+          "
+
+  frontend-build:
+    name: Frontend Build Verification (Auto-detect)
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Detect & Build Client (if client/ exists)
+        run: |
+          if [ -d "client" ]; then
+            echo " Found client directory. Running frontend install & build..."
+            cd client
+            npm ci
+            npm run build
+            echo " Frontend build passed successfully!"
+          else
+            echo " client/ folder not present yet. Skipping frontend build step."
+          fi
+
+  deploy-backend:
+    name: Deploy Backend to Render
+    needs: [backend-integrity]
+    if: (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/final') && github.event_name == 'push'
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Trigger Render Deploy Webhook
+        run: |
+          if [ -n "${{ secrets.RENDER_DEPLOY_HOOK_URL }}" ]; then
+            echo " Triggering Render deploy hook..."
+            curl -s -X POST "${{ secrets.RENDER_DEPLOY_HOOK_URL }}"
+            echo " Render deployment triggered successfully!"
+          else
+            echo " RENDER_DEPLOY_HOOK_URL secret not configured. Skipping deploy."
+          fi
+
+  deploy-frontend:
+    name: Deploy Frontend to Vercel
+    needs: [frontend-build]
+    if: (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/final') && github.event_name == 'push'
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Deploy to Vercel (if client/ exists and token configured)
+        run: |
+          if [ -d "client" ] && [ -n "${{ secrets.VERCEL_TOKEN }}" ]; then
+            echo " Deploying client to Vercel production..."
+            npx vercel --token ${{ secrets.VERCEL_TOKEN }} --prod --yes
+            echo " Vercel deployment completed successfully!"
+          else
+            echo " Client folder or VERCEL_TOKEN secret not present yet. Skipping Vercel deploy."
+          fi
