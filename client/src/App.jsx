@@ -27,6 +27,8 @@ import { SubmissionDetail } from "./pages/startup/SubmissionDetail";
 import { DepartmentDashboard } from "./pages/government/DepartmentDashboard";
 import { ChallengeStudio } from "./pages/government/ChallengeStudio";
 import { CandidateMatching } from "./pages/government/CandidateMatching";
+import { EvaluatorQueue } from "./pages/evaluator/EvaluatorQueue";
+import { EvaluationRoom } from "./pages/evaluator/EvaluationRoom";
 
 function PublicPlaceholder({ title, phase }) {
   return (
@@ -143,7 +145,15 @@ export function App() {
                   path="/evaluator/queue"
                   element={
                     <RoleGuard allowedRoles={["EVALUATOR", "ADMIN"]}>
-                      <WorkspacePlaceholder type="evaluatorQueue" />
+                      <EvaluatorQueue />
+                    </RoleGuard>
+                  }
+                />
+                <Route
+                  path="/evaluator/evaluate/:assignmentId"
+                  element={
+                    <RoleGuard allowedRoles={["EVALUATOR", "ADMIN"]}>
+                      <EvaluationRoom />
                     </RoleGuard>
                   }
                 />
