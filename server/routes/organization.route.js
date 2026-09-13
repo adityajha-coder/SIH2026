@@ -20,6 +20,11 @@ organizationRouter.post(
     organizationController.createOrganization
 );
 
+// GET /v1/organizations/my/current 
+organizationRouter.get(
+    "/my/current",
+    organizationController.getMyOrganization
+);
 
  // GET /v1/organizations/:id
 organizationRouter.get(

@@ -23,6 +23,23 @@ export const organizationController = {
         }
     },
 
+    // GET /v1/organizations/my/current
+    async getMyOrganization(req, res, next) {
+        try {
+            const result = await organizationService.getMyOrganization({
+                actor: req.user,
+            });
+
+            return res.status(200).json({
+                data: result,
+                meta: { traceId: req.id, timestamp: new Date().toISOString() },
+                error: null,
+            });
+        } catch (err) {
+            next(err);
+        }
+    },
+
     // GET /v1/organizations/:id
     async getOrganization(req, res, next) {
         try {

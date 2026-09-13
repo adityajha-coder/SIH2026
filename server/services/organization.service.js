@@ -49,6 +49,34 @@ export const organizationService = {
         };
     },
 
+    // get active user's current organization & profile
+    async getMyOrganization({ actor }) {
+        const membership = await organizationMemberModel.findOne({
+            userId: actor._id,
+            status: "ACTIVE",
+        }).populate("organizationId");
+
+        if (!membership || !membership.organizationId) {
+            return {
+                organization: null,
+                membership: null,
+                profile: null,
+            };
+        }
+
+        const organization = membership.organizationId;
+        let profile = null;
+        if (organization.type === "STARTUP") {
+            profile = await startupProfileModel.findOne({ organizationId: organization._id });
+        }
+
+        return {
+            organization,
+            membership,
+            profile,
+        };
+    },
+
     // get org by id and profile
     async getOrganizationById({ actor, organizationId }) {
         const organization = await organizationModel.findById(organizationId);
