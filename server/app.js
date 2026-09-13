@@ -1,4 +1,5 @@
-import express from "express"
+import "dotenv/config";
+import express from "express";
 import morgan from "morgan";
 import authRouter from "./routes/auth.route.js";
 import cookieParser from "cookie-parser";

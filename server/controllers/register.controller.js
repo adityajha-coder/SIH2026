@@ -11,21 +11,15 @@ export async function register(req, res) {
     const { userName, email, password, role } = req.body;
     const emailNormalized = email.toLowerCase().trim();
 
-    const isAlreadyRegistered = await userModel.findOne({
-        $or: [
-            { userName },
-            { emailNormalized }
-        ]
-    });
+    const isAlreadyRegistered = await userModel.findOne({ emailNormalized });
 
     if (isAlreadyRegistered) {
-        const isEmailTaken = isAlreadyRegistered.emailNormalized === emailNormalized;
         return res.status(409).json({
             data: null,
             meta: { traceId: req.id, timestamp: new Date().toISOString() },
             error: {
                 code: "USER_EXISTS",
-                message: isEmailTaken ? "Email is already registered" : "Username is already taken"
+                message: "Email is already registered"
             }
         });
     }

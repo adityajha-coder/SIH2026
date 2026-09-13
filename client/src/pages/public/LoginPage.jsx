@@ -47,24 +47,6 @@ function GoogleIcon(props) {
   );
 }
 
-const DEMO_ACCOUNTS = {
-  startup: {
-    label: "Startup",
-    email: "startup.demo@pragati-govx.in",
-    password: "Demo@12345",
-  },
-  government: {
-    label: "Government",
-    email: "gov.demo@pragati-govx.in",
-    password: "Demo@12345",
-  },
-  evaluator: {
-    label: "Evaluator",
-    email: "evaluator.demo@pragati-govx.in",
-    password: "Demo@12345",
-  },
-};
-
 export function LoginPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [unverifiedEmail, setUnverifiedEmail] = useState("");
@@ -84,13 +66,6 @@ export function LoginPage() {
     () => location.state?.from || "",
     [location.state?.from]
   );
-
-  const onDemoSelect = (key) => {
-    const account = DEMO_ACCOUNTS[key];
-    form.setValue("email", account.email, { shouldValidate: true });
-    form.setValue("password", account.password, { shouldValidate: true });
-    setUnverifiedEmail("");
-  };
 
   const onSubmit = async (values) => {
     try {
@@ -261,24 +236,6 @@ export function LoginPage() {
           </CardContent>
         </Card>
 
-        {/* Discreet Demo Fast-Fill Bar */}
-        <div className="rounded-xl border border-slate-200 bg-white/80 backdrop-blur-sm p-3 text-center shadow-2xs">
-          <p className="text-[11px] font-medium text-[#64748B] mb-2">
-            Quick Demo Login:
-          </p>
-          <div className="flex items-center justify-center gap-2">
-            {Object.entries(DEMO_ACCOUNTS).map(([key, account]) => (
-              <button
-                key={key}
-                type="button"
-                onClick={() => onDemoSelect(key)}
-                className="text-[11px] px-2.5 py-1 rounded-md border border-slate-200 bg-white text-[#10233F] hover:bg-blue-50 hover:text-[#2563EB] hover:border-blue-200 transition-colors font-medium"
-              >
-                {account.label}
-              </button>
-            ))}
-          </div>
-        </div>
       </div>
     </section>
   );

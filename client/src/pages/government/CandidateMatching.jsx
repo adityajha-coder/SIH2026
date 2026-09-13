@@ -74,7 +74,8 @@ export function CandidateMatching() {
       toast.success("Explainable AI Match evaluated successfully!");
     } catch (err) {
       toast.error(
-        err.response?.data?.error?.message ||
+        err?.message ||
+        err?.response?.data?.error?.message ||
           "Failed to evaluate AI match. Ensure startup has a completed profile."
       );
     }

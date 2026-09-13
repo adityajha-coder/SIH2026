@@ -21,8 +21,8 @@ export const verificationService = {
             .update(cleanInput + JSON.stringify(cleanEvidence))
             .digest("hex");
 
-        // LAYER 1: Generator (Gemini 2.5 Flash)
-        aiPolicy.validateCall({ provider: "google", model: "gemini-2.5-flash" });
+        // LAYER 1: Generator (Gemini 3.5 Flash Lite)
+        aiPolicy.validateCall({ provider: "google", model: "gemini-3.5-flash-lite" });
         let generatorResult;
         try {
             generatorResult = await geminiProvider.execute({
@@ -37,7 +37,7 @@ export const verificationService = {
 
         // LAYER 2: Independent Verifier (Groq)
         // ANTI-CASCADE: Receives original input + evidence + Model 1 output
-        aiPolicy.validateCall({ provider: "groq", model: "llama-3.3-70b-versatile" });
+        aiPolicy.validateCall({ provider: "groq", model: "openai/gpt-oss-20b" });
         const verifierInput = `
 ORIGINAL PROPOSAL:
 ${cleanInput}
@@ -62,7 +62,7 @@ Identified Uncertainties: ${generatorResult.uncertainties.join("; ")}
 
         // LAYER 3: Diversity Auditor (OpenRouter)
         // ANTI-CASCADE: Receives original input + evidence + Model 1 + Model 2 outputs
-        aiPolicy.validateCall({ provider: "openrouter", model: "google/gemma-3-27b-it:free" });
+        aiPolicy.validateCall({ provider: "openrouter", model: "liquid/lfm-2.5-2.6b:free" });
         const auditorInput = `
 ORIGINAL PROPOSAL:
 ${cleanInput}

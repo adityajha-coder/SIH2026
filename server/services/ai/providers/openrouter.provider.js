@@ -1,6 +1,5 @@
 import { BaseAIAdapter } from "../aiAdapter.js";
 
-const OPENROUTER_API_KEY = process.env.OPENROUTER_API_KEY || "";
 const DEFAULT_MODEL = "liquid/lfm-2.5-2.6b:free";
 
 export class OpenRouterProvider extends BaseAIAdapter {
@@ -9,14 +8,15 @@ export class OpenRouterProvider extends BaseAIAdapter {
     }
 
     async isAvailable() {
-        return Boolean(OPENROUTER_API_KEY);
+        return Boolean(process.env.OPENROUTER_API_KEY);
     }
 
     async execute({ task, userInput, evidence = [] }) {
         const startTime = Date.now();
+        const apiKey = process.env.OPENROUTER_API_KEY || "";
 
         // fallback if no API key is provided
-        if (!OPENROUTER_API_KEY) {
+        if (!apiKey) {
             return {
                 conclusion: `[SIMULATED OPENROUTER AUDIT] Third-party diversity audit concurs with primary feasibility for: ${task}.`,
                 claims: ["Independent check confirms regulatory alignment with state procurement rules"],
@@ -57,7 +57,7 @@ Respond ONLY with a valid JSON object matching this exact shape:
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
-                Authorization: `Bearer ${OPENROUTER_API_KEY}`,
+                Authorization: `Bearer ${apiKey}`,
                 "HTTP-Referer": "http://localhost:3001",
                 "X-Title": "SIH-2026-GovX-Platform",
             },

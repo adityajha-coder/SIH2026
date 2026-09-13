@@ -1,6 +1,5 @@
 import { BaseAIAdapter } from "../aiAdapter.js";
 
-const GROQ_API_KEY = process.env.GROQ_API_KEY || "";
 const DEFAULT_MODEL = "openai/gpt-oss-20b";
 
 export class GroqProvider extends BaseAIAdapter {
@@ -9,14 +8,15 @@ export class GroqProvider extends BaseAIAdapter {
     }
 
     async isAvailable() {
-        return Boolean(GROQ_API_KEY);
+        return Boolean(process.env.GROQ_API_KEY);
     }
 
     async execute({ task, userInput, evidence = [] }) {
         const startTime = Date.now();
+        const apiKey = process.env.GROQ_API_KEY || "";
 
         // fallback if no API key is set
-        if (!GROQ_API_KEY) {
+        if (!apiKey) {
             return {
                 conclusion: `[SIMULATED GROQ VERIFICATION] Independent audit confirms core feasibility for task: ${task}.`,
                 claims: ["Proposed delivery schedule aligns with rural operational constraints"],
@@ -55,7 +55,7 @@ Respond ONLY with a valid JSON object matching this exact shape:
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
-                Authorization: `Bearer ${GROQ_API_KEY}`,
+                Authorization: `Bearer ${apiKey}`,
             },
             body: JSON.stringify({
                 model: DEFAULT_MODEL,

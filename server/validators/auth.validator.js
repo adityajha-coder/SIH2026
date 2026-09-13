@@ -28,8 +28,8 @@ export const registerSchema = z.object({
             "Password must contain at least 1 uppercase letter, 1 lowercase letter, 1 number, and 1 special character (@$!%*?&)"
         ),
     role: z
-        .enum([ROLES.STARTUP_USER, ROLES.GOVERNMENT_USER], {
-            errorMap: () => ({ message: "Role must be either STARTUP_USER or GOVERNMENT_USER" }),
+        .enum([ROLES.STARTUP_USER, ROLES.GOVERNMENT_USER, ROLES.EVALUATOR], {
+            errorMap: () => ({ message: "Role must be STARTUP_USER, GOVERNMENT_USER, or EVALUATOR" }),
         })
         .optional()
         .default(ROLES.STARTUP_USER),

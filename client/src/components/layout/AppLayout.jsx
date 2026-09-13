@@ -55,7 +55,11 @@ export function AppLayout() {
 
   const renderNavItem = (item) => {
     const Icon = item.icon;
-    const active = location.pathname === item.href;
+    const active =
+      location.pathname === item.href ||
+      (item.href !== "/" &&
+        item.href !== getRoleDashboardPath(userRole) &&
+        location.pathname.startsWith(`${item.href}/`));
     return (
       <Link
         key={item.href}

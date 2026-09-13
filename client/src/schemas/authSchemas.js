@@ -32,7 +32,11 @@ export const registerSchema = z.object({
       "Use uppercase, lowercase, number, and special character (@$!%*?&)"
     ),
   role: z
-    .enum([USER_ROLES.STARTUP_USER, USER_ROLES.GOVERNMENT_USER])
+    .enum([
+      USER_ROLES.STARTUP_USER,
+      USER_ROLES.GOVERNMENT_USER,
+      USER_ROLES.EVALUATOR,
+    ])
     .default(USER_ROLES.STARTUP_USER),
 });
 

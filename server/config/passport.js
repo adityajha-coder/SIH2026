@@ -37,12 +37,7 @@ if (config.GOOGLE_CLIENT_ID && config.GOOGLE_CLIENT_SECRET) {
                         return done(null, user);
                     }
 
-                    // Ensure unique username if collision exists
-                    let userName = baseUserName;
-                    const existingUserWithUsername = await userModel.findOne({ userName });
-                    if (existingUserWithUsername) {
-                        userName = `${baseUserName}_${Math.floor(1000 + Math.random() * 9000)}`;
-                    }
+                    const userName = baseUserName;
 
                     user = await userModel.create({
                         userName,

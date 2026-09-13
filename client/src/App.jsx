@@ -23,6 +23,7 @@ import { StartupDashboard } from "./pages/startup/StartupDashboard";
 import { StartupPassport } from "./pages/startup/StartupPassport";
 import { ApplicationWizard } from "./pages/startup/ApplicationWizard";
 import { SubmissionDetail } from "./pages/startup/SubmissionDetail";
+import { MyApplicationsPage } from "./pages/startup/MyApplicationsPage";
 import { DepartmentDashboard } from "./pages/government/DepartmentDashboard";
 import { ChallengeStudio } from "./pages/government/ChallengeStudio";
 import { CandidateMatching } from "./pages/government/CandidateMatching";
@@ -89,7 +90,11 @@ export function App() {
                 />
                 <Route
                   path="/startup/submissions"
-                  element={<Navigate to="/startup/dashboard" replace />}
+                  element={
+                    <RoleGuard allowedRoles={["STARTUP_USER", "ADMIN"]}>
+                      <MyApplicationsPage />
+                    </RoleGuard>
+                  }
                 />
                 <Route
                   path="/startup/submissions/:id"

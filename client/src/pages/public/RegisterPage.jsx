@@ -4,6 +4,7 @@ import {
   ArrowRight,
   Building2,
   Check,
+  ClipboardCheck,
   Eye,
   EyeOff,
   Landmark,
@@ -63,7 +64,7 @@ export function RegisterPage() {
 
   return (
     <section className="min-h-[calc(100vh-140px)] flex flex-col items-center justify-center bg-[#F7F9FC] px-4 py-10 sm:py-16">
-      <div className="w-full max-w-[460px] space-y-5">
+      <div className="w-full max-w-[480px] space-y-5">
         {/* Brand Header */}
         <div className="text-center space-y-2">
           <Link to="/" className="inline-flex items-center gap-2.5">
@@ -96,7 +97,7 @@ export function RegisterPage() {
                 <label className="text-xs font-semibold text-[#10233F]">
                   Account Role
                 </label>
-                <div className="grid grid-cols-2 gap-2 p-1 bg-slate-100/90 rounded-xl">
+                <div className="grid grid-cols-3 gap-1.5 p-1 bg-slate-100/90 rounded-xl">
                   <button
                     type="button"
                     onClick={() =>
@@ -106,14 +107,14 @@ export function RegisterPage() {
                       })
                     }
                     className={cn(
-                      "flex items-center justify-center gap-2 py-2.5 px-3 rounded-lg text-xs font-medium transition-all",
+                      "flex items-center justify-center gap-1.5 py-2 px-2 rounded-lg text-xs font-medium transition-all text-center",
                       selectedRole === USER_ROLES.STARTUP_USER
                         ? "bg-white text-[#10233F] shadow-sm font-semibold ring-1 ring-black/5"
                         : "text-[#64748B] hover:text-[#10233F]"
                     )}
                   >
-                    <Building2 className={cn("h-4 w-4", selectedRole === USER_ROLES.STARTUP_USER ? "text-[#2563EB]" : "text-slate-400")} />
-                    Startup Innovator
+                    <Building2 className={cn("h-3.5 w-3.5 shrink-0", selectedRole === USER_ROLES.STARTUP_USER ? "text-[#2563EB]" : "text-slate-400")} />
+                    <span className="truncate">Startup</span>
                   </button>
                   <button
                     type="button"
@@ -124,20 +125,41 @@ export function RegisterPage() {
                       })
                     }
                     className={cn(
-                      "flex items-center justify-center gap-2 py-2.5 px-3 rounded-lg text-xs font-medium transition-all",
+                      "flex items-center justify-center gap-1.5 py-2 px-2 rounded-lg text-xs font-medium transition-all text-center",
                       selectedRole === USER_ROLES.GOVERNMENT_USER
                         ? "bg-white text-[#10233F] shadow-sm font-semibold ring-1 ring-black/5"
                         : "text-[#64748B] hover:text-[#10233F]"
                     )}
                   >
-                    <Landmark className={cn("h-4 w-4", selectedRole === USER_ROLES.GOVERNMENT_USER ? "text-[#0F766E]" : "text-slate-400")} />
-                    Government Officer
+                    <Landmark className={cn("h-3.5 w-3.5 shrink-0", selectedRole === USER_ROLES.GOVERNMENT_USER ? "text-[#0F766E]" : "text-slate-400")} />
+                    <span className="truncate">Government</span>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() =>
+                      form.setValue("role", USER_ROLES.EVALUATOR, {
+                        shouldValidate: true,
+                        shouldDirty: true,
+                      })
+                    }
+                    className={cn(
+                      "flex items-center justify-center gap-1.5 py-2 px-2 rounded-lg text-xs font-medium transition-all text-center",
+                      selectedRole === USER_ROLES.EVALUATOR
+                        ? "bg-white text-[#10233F] shadow-sm font-semibold ring-1 ring-black/5"
+                        : "text-[#64748B] hover:text-[#10233F]"
+                    )}
+                  >
+                    <ClipboardCheck className={cn("h-3.5 w-3.5 shrink-0", selectedRole === USER_ROLES.EVALUATOR ? "text-[#7C3AED]" : "text-slate-400")} />
+                    <span className="truncate">Validator</span>
                   </button>
                 </div>
                 <p className="text-[11px] text-[#64748B] pt-0.5 px-1">
-                  {selectedRole === USER_ROLES.STARTUP_USER
-                    ? "Apply to challenges, seek prior-turnover exemptions & pilot tech."
-                    : "Post operational challenges, evaluate proposals & govern pilots."}
+                  {selectedRole === USER_ROLES.STARTUP_USER &&
+                    "Apply to challenges, seek prior-turnover exemptions & pilot tech."}
+                  {selectedRole === USER_ROLES.GOVERNMENT_USER &&
+                    "Post operational challenges, evaluate proposals & govern pilots."}
+                  {selectedRole === USER_ROLES.EVALUATOR &&
+                    "Review double-blind proposal dossiers & submit consensus scorecards."}
                 </p>
               </div>
 
