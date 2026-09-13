@@ -18,6 +18,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { getRoleDashboardPath } from "@/context/AuthContext";
 import { useAuth } from "@/hooks/useAuth";
+import { useNotifications } from "@/hooks/useNotifications";
 import { cn } from "@/lib/utils";
 import logoImg from "@/assets/logo.png";
 
@@ -26,6 +27,8 @@ export function AppLayout() {
   const location = useLocation();
   const navigate = useNavigate();
   const { user, organization, logout } = useAuth();
+  const { data: notifsData } = useNotifications();
+  const unreadCount = notifsData?.unreadCount ?? 0;
   const userRole = user?.role || "STARTUP_USER";
   const userName = user?.userName || "User";
 
@@ -34,7 +37,8 @@ export function AppLayout() {
     { label: "Dashboard", href: getRoleDashboardPath(userRole), icon: LayoutDashboard, roles: ["ALL"] },
     { label: "Find Challenges", href: "/challenges", icon: FileText, roles: ["STARTUP_USER", "ALL"] },
     { label: "My Applications", href: "/startup/submissions", icon: Send, roles: ["STARTUP_USER"] },
-    { label: "Startup Passport", href: "/startup/profile", icon: User, roles: ["STARTUP_USER"] },
+    { label: "Startup Passport", href: "/startup/profile", icon: FileText, roles: ["STARTUP_USER"] },
+    { label: "Profile & Data", href: "/profile", icon: User, roles: ["ALL"] },
     { label: "Challenge Studio", href: "/government/challenges/new", icon: Sliders, roles: ["GOVERNMENT_USER", "ADMIN"] },
     { label: "Evaluations Queue", href: "/evaluator/queue", icon: CheckSquare, roles: ["EVALUATOR", "ADMIN"] },
     { label: "Forensic Audit Trail", href: "/admin/audit", icon: ShieldAlert, roles: ["ADMIN"] },
@@ -98,12 +102,18 @@ export function AppLayout() {
 
         {/* User Card & Logout */}
         <div className="p-4 border-t border-[#E2E8F0] space-y-3">
-          <div className="flex items-center gap-3">
-            <div className="h-8 w-8 rounded-full bg-blue-100 text-[#2563EB] flex items-center justify-center font-bold text-xs">
+          <Link
+            to="/profile"
+            title="View Profile & Data"
+            className="flex items-center gap-3 p-1.5 -m-1.5 rounded-lg hover:bg-slate-50 transition-colors group cursor-pointer"
+          >
+            <div className="h-8 w-8 rounded-full bg-blue-100 text-[#2563EB] flex items-center justify-center font-bold text-xs group-hover:scale-105 transition-transform">
               {userName.charAt(0)}
             </div>
             <div className="flex-1 min-w-0">
-              <p className="text-xs font-semibold text-[#10233F] truncate">{userName}</p>
+              <p className="text-xs font-semibold text-[#10233F] truncate group-hover:text-blue-600 transition-colors">
+                {userName}
+              </p>
               <span className="inline-block rounded bg-slate-100 px-1 py-0.2 text-[9px] font-mono font-semibold text-slate-700">
                 {userRole}
               </span>
@@ -113,11 +123,11 @@ export function AppLayout() {
                 </p>
               )}
             </div>
-          </div>
+          </Link>
           <Button
             variant="outline"
             size="sm"
-            className="w-full text-xs text-[#DC2626] hover:bg-red-50 hover:text-[#DC2626] border-red-100"
+            className="w-full text-xs text-[#DC2626] hover:bg-red-50 hover:text-[#DC2626] border-red-100 cursor-pointer"
             onClick={handleLogout}
           >
             <LogOut className="h-3.5 w-3.5 mr-1.5" />
@@ -204,10 +214,13 @@ export function AppLayout() {
             </Link>
             <Link
               to="/notifications"
+              title="Universal Notification Hub"
               className="relative p-2 rounded-lg text-[#64748B] hover:text-[#10233F] hover:bg-slate-100 transition-colors"
             >
               <Bell className="h-4 w-4" />
-              <span className="absolute top-1.5 right-1.5 h-2 w-2 rounded-full bg-[#2563EB]" />
+              {unreadCount > 0 && (
+                <span className="absolute top-1.5 right-1.5 h-2 w-2 rounded-full bg-[#2563EB]" />
+              )}
             </Link>
           </div>
         </header>

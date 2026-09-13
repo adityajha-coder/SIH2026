@@ -4,6 +4,8 @@ import {
   useNotifications,
   useMarkNotificationRead,
   useMarkAllNotificationsRead,
+  formatISTDateTime,
+  DEFAULT_NOTIFICATIONS,
 } from "@/hooks/useNotifications";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -26,62 +28,34 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 
-const DEFAULT_NOTIFICATIONS = [
-  {
-    _id: "notif_01",
-    title: "Statutory 30-Day SLA Payment Active",
-    message: "Tranche 2 (M2: Mid-Term Field Validation) deliverable evidence submitted. 30-day statutory SLA clock started (Day 18 of 30 remaining).",
-    type: "PAYMENT_SLA",
-    read: false,
-    link: "/pilots/sub_441029",
-    createdAt: "2026-09-14T01:30:00.000Z",
-  },
-  {
-    _id: "notif_02",
-    title: "Double-Blind Evaluation Assignment Received",
-    message: "You have been assigned to evaluate proposal ANON-VENTURE-7829 for Real-Time Non-Revenue Water Loss Detection.",
-    type: "EVALUATION",
-    read: false,
-    link: "/evaluator/queue",
-    createdAt: "2026-09-13T22:15:00.000Z",
-  },
-  {
-    _id: "notif_03",
-    title: "Explainable AI Match Complete",
-    message: "Candidate discovery cascade executed. 3 high-affinity startups identified for Pune Municipal Zone IoT challenge.",
-    type: "AI_MATCH",
-    read: true,
-    link: "/government/dashboard",
-    createdAt: "2026-09-13T19:00:00.000Z",
-  },
-  {
-    _id: "notif_04",
-    title: "DPIIT Statutory Waiver Verified",
-    message: "Your startup passport has verified DPIIT eligibility under GFR Rule 173(i) with 100% EMD waiver active.",
-    type: "COMPLIANCE",
-    read: true,
-    link: "/policy",
-    createdAt: "2026-09-12T10:45:00.000Z",
-  },
-  {
-    _id: "notif_05",
-    title: "Scale Gate Decision Sanctioned",
-    message: "Order Ref GR-MSInS/2026 ratified for statewide expansion across 4 Maharashtra districts.",
-    type: "GOVERNANCE",
-    read: true,
-    link: "/pilot-framework",
-    createdAt: "2026-09-11T16:20:00.000Z",
-  },
-];
-
 export function NotificationCenter() {
-  const [filterTab, setFilterTab] = useState("ALL"); // ALL, UNREAD, SLA, EVALUATION
+  const [filterTab, setFilterTab] = useState("ALL");
+
+  const [localReadIds, setLocalReadIds] = useState(() => {
+    try {
+      const saved = localStorage.getItem("pragati_notifications_read");
+      return saved ? JSON.parse(saved) : [];
+    } catch {
+      return [];
+    }
+  });
 
   const { data: notifsData, isLoading } = useNotifications({ limit: 50 });
   const markReadMutation = useMarkNotificationRead();
   const markAllReadMutation = useMarkAllNotificationsRead();
 
-  const items = notifsData?.items?.length ? notifsData.items : DEFAULT_NOTIFICATIONS;
+  // Merge server notifications with local read status
+  const items = useMemo(() => {
+    const source = notifsData?.items?.length ? notifsData.items : DEFAULT_NOTIFICATIONS;
+    return source.map((item) => ({
+      ...item,
+      read: item.read || localReadIds.includes(item._id),
+    }));
+  }, [notifsData?.items, localReadIds]);
+
+  const unreadCount = useMemo(() => {
+    return items.filter((item) => !item.read).length;
+  }, [items]);
 
   const filteredItems = useMemo(() => {
     return items.filter((item) => {
@@ -92,23 +66,37 @@ export function NotificationCenter() {
     });
   }, [items, filterTab]);
 
-  const unreadCount = items.filter((item) => !item.read).length;
-
   const handleMarkAsRead = async (id) => {
+    setLocalReadIds((prev) => {
+      const next = Array.from(new Set([...prev, id]));
+      try {
+        localStorage.setItem("pragati_notifications_read", JSON.stringify(next));
+      } catch {}
+      return next;
+    });
+    toast.success("Notification marked as read");
+
+    // 2. Sync to server in background
     try {
       await markReadMutation.mutateAsync(id);
-      toast.success("Notification marked as read");
     } catch {
-      // Handled
     }
   };
 
   const handleMarkAllRead = async () => {
+    const allIds = items.map((i) => i._id);
+    setLocalReadIds((prev) => {
+      const next = Array.from(new Set([...prev, ...allIds]));
+      try {
+        localStorage.setItem("pragati_notifications_read", JSON.stringify(next));
+      } catch {}
+      return next;
+    });
+    toast.success("All notifications marked as read");
+
     try {
       await markAllReadMutation.mutateAsync();
-      toast.success("All notifications marked as read");
     } catch {
-      // Handled
     }
   };
 
@@ -153,7 +141,7 @@ export function NotificationCenter() {
                 </div>
                 <div>
                   <CardTitle className="text-base font-bold text-[#10233F]">
-                    Sovereign Notifications & Alerts
+                    Sovereign Notifications &amp; Alerts
                   </CardTitle>
                   <CardDescription className="text-xs text-[#64748B]">
                     Statutory milestones, evaluation updates, and FSM lifecycle transitions
@@ -163,7 +151,7 @@ export function NotificationCenter() {
 
               <div className="flex items-center gap-2">
                 {unreadCount > 0 && (
-                  <span className="font-mono text-xs font-bold text-blue-700 bg-blue-50 border border-blue-200 px-2.5 py-1 rounded">
+                  <span className="text-xs font-semibold text-blue-600 bg-blue-50 border border-blue-200 px-2.5 py-1 rounded">
                     {unreadCount} Unread
                   </span>
                 )}
@@ -172,7 +160,7 @@ export function NotificationCenter() {
                   size="sm"
                   onClick={handleMarkAllRead}
                   disabled={markAllReadMutation.isPending || unreadCount === 0}
-                  className="h-8 text-xs border-slate-300 gap-1 text-slate-700"
+                  className="h-8 text-xs border-slate-300 gap-1 text-slate-700 cursor-pointer"
                 >
                   <CheckCheck className="h-3.5 w-3.5" />
                   Mark All as Read
@@ -184,7 +172,7 @@ export function NotificationCenter() {
             <div className="flex gap-4 text-xs font-semibold text-[#64748B] pt-4">
               <button
                 onClick={() => setFilterTab("ALL")}
-                className={`pb-2 border-b-2 transition-colors ${
+                className={`pb-2 border-b-2 transition-colors cursor-pointer ${
                   filterTab === "ALL"
                     ? "border-[#2563EB] text-[#2563EB]"
                     : "border-transparent hover:text-[#10233F]"
@@ -194,7 +182,7 @@ export function NotificationCenter() {
               </button>
               <button
                 onClick={() => setFilterTab("UNREAD")}
-                className={`pb-2 border-b-2 transition-colors ${
+                className={`pb-2 border-b-2 transition-colors cursor-pointer ${
                   filterTab === "UNREAD"
                     ? "border-[#2563EB] text-[#2563EB]"
                     : "border-transparent hover:text-[#10233F]"
@@ -204,7 +192,7 @@ export function NotificationCenter() {
               </button>
               <button
                 onClick={() => setFilterTab("SLA")}
-                className={`pb-2 border-b-2 transition-colors ${
+                className={`pb-2 border-b-2 transition-colors cursor-pointer ${
                   filterTab === "SLA"
                     ? "border-[#2563EB] text-[#2563EB]"
                     : "border-transparent hover:text-[#10233F]"
@@ -214,7 +202,7 @@ export function NotificationCenter() {
               </button>
               <button
                 onClick={() => setFilterTab("EVALUATION")}
-                className={`pb-2 border-b-2 transition-colors ${
+                className={`pb-2 border-b-2 transition-colors cursor-pointer ${
                   filterTab === "EVALUATION"
                     ? "border-[#2563EB] text-[#2563EB]"
                     : "border-transparent hover:text-[#10233F]"
@@ -253,12 +241,7 @@ export function NotificationCenter() {
                           )}
                         </div>
                         <span className="font-mono text-[10px] text-[#64748B]">
-                          {new Date(item.createdAt).toLocaleDateString("en-IN", {
-                            day: "numeric",
-                            month: "short",
-                            hour: "2-digit",
-                            minute: "2-digit",
-                          })}
+                          {formatISTDateTime(item.createdAt)}
                         </span>
                       </div>
 
@@ -277,8 +260,9 @@ export function NotificationCenter() {
 
                         {!item.read && (
                           <button
+                            type="button"
                             onClick={() => handleMarkAsRead(item._id)}
-                            className="text-[11px] text-[#64748B] hover:text-[#10233F]"
+                            className="text-[11px] font-medium text-[#2563EB] hover:underline cursor-pointer"
                           >
                             Mark as read
                           </button>

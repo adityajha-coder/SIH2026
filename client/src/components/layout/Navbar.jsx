@@ -95,7 +95,7 @@ export function Navbar() {
           </Link>
         </DropdownMenuItem>
         <DropdownMenuItem asChild>
-          <Link to="/dashboard" className="gap-2">
+          <Link to="/profile" className="gap-2">
             <UserCircle className="h-4 w-4" />
             Profile
           </Link>

@@ -33,6 +33,7 @@ import { PilotFrameworkPage } from "./pages/public/PilotFrameworkPage";
 import { ScaleGateConsole } from "./pages/government/ScaleGateConsole";
 import { AdminAuditConsole } from "./pages/admin/AdminAuditConsole";
 import { NotificationCenter } from "./pages/app/NotificationCenter";
+import { ProfilePage } from "./pages/app/ProfilePage";
 import { PublicTransparencyPage } from "./pages/public/PublicTransparencyPage";
 
 import { ErrorBoundary } from "./components/common/ErrorBoundary";
@@ -69,6 +70,7 @@ export function App() {
             <Route element={<RoleGuard />}>
               <Route element={<AppLayout />}>
                 <Route path="/dashboard" element={<DashboardRedirect />} />
+                <Route path="/profile" element={<ProfilePage />} />
                 <Route
                   path="/startup/dashboard"
                   element={
