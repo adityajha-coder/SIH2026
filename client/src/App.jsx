@@ -19,6 +19,10 @@ import { ResetPasswordPage } from "@/pages/public/ResetPasswordPage";
 import { VerifyEmailPage } from "@/pages/public/VerifyEmailPage";
 import { ChallengeCatalogPage } from "@/pages/public/ChallengeCatalogPage";
 import { ChallengeDetailPage } from "@/pages/public/ChallengeDetailPage";
+import { StartupDashboard } from "@/pages/startup/StartupDashboard";
+import { StartupPassport } from "@/pages/startup/StartupPassport";
+import { ApplicationWizard } from "@/pages/startup/ApplicationWizard";
+import { SubmissionDetail } from "@/pages/startup/SubmissionDetail";
 
 function PublicPlaceholder({ title, phase }) {
   return (
@@ -83,7 +87,7 @@ export function App() {
                   path="/startup/dashboard"
                   element={
                     <RoleGuard allowedRoles={["STARTUP_USER", "ADMIN"]}>
-                      <WorkspacePlaceholder type="startupDashboard" />
+                      <StartupDashboard />
                     </RoleGuard>
                   }
                 />
@@ -91,15 +95,27 @@ export function App() {
                   path="/startup/profile"
                   element={
                     <RoleGuard allowedRoles={["STARTUP_USER", "ADMIN"]}>
-                      <WorkspacePlaceholder type="startupProfile" />
+                      <StartupPassport />
                     </RoleGuard>
                   }
                 />
                 <Route
                   path="/startup/submissions"
+                  element={<Navigate to="/startup/dashboard" replace />}
+                />
+                <Route
+                  path="/startup/submissions/:id"
                   element={
                     <RoleGuard allowedRoles={["STARTUP_USER", "ADMIN"]}>
-                      <WorkspacePlaceholder type="startupSubmissions" />
+                      <SubmissionDetail />
+                    </RoleGuard>
+                  }
+                />
+                <Route
+                  path="/challenges/:id/apply"
+                  element={
+                    <RoleGuard allowedRoles={["STARTUP_USER", "ADMIN"]}>
+                      <ApplicationWizard />
                     </RoleGuard>
                   }
                 />
