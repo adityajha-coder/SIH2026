@@ -1,28 +1,32 @@
 import React from "react";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { QueryClientProvider } from "@tanstack/react-query";
-import { queryClient } from "@/lib/queryClient";
+import { queryClient } from "./lib/queryClient.js";
 import { Toaster } from "sonner";
-import { AuthProvider } from "@/context/AuthContext";
-import { OrgSetupModal } from "@/components/common/OrgSetupModal";
-import { AppLayout } from "@/components/layout/AppLayout";
-import { PublicLayout } from "@/components/layout/PublicLayout";
-import { RoleGuard } from "@/components/layout/RoleGuard";
-import { DashboardRedirect } from "@/pages/app/DashboardRedirect";
-import { WorkspacePlaceholder } from "@/pages/app/WorkspacePlaceholder";
-import { AuthCallbackPage } from "@/pages/public/AuthCallbackPage";
-import { ForgotPasswordPage } from "@/pages/public/ForgotPasswordPage";
-import { LandingPage } from "@/pages/public/LandingPage";
-import { LoginPage } from "@/pages/public/LoginPage";
-import { RegisterPage } from "@/pages/public/RegisterPage";
-import { ResetPasswordPage } from "@/pages/public/ResetPasswordPage";
-import { VerifyEmailPage } from "@/pages/public/VerifyEmailPage";
-import { ChallengeCatalogPage } from "@/pages/public/ChallengeCatalogPage";
-import { ChallengeDetailPage } from "@/pages/public/ChallengeDetailPage";
-import { StartupDashboard } from "@/pages/startup/StartupDashboard";
-import { StartupPassport } from "@/pages/startup/StartupPassport";
-import { ApplicationWizard } from "@/pages/startup/ApplicationWizard";
-import { SubmissionDetail } from "@/pages/startup/SubmissionDetail";
+import { AuthProvider } from "./context/AuthContext";
+import { OrgSetupModal } from "./components/common/OrgSetupModal";
+import { AppLayout } from "./components/layout/AppLayout";
+import { PublicLayout } from "./components/layout/PublicLayout";
+import { RoleGuard } from "./components/layout/RoleGuard";
+import { DashboardRedirect } from "./pages/app/DashboardRedirect";
+import { WorkspacePlaceholder } from "./pages/app/WorkspacePlaceholder";
+import { AuthCallbackPage } from "./pages/public/AuthCallbackPage";
+import { ForgotPasswordPage } from "./pages/public/ForgotPasswordPage";
+import { LandingPage } from "./pages/public/LandingPage";
+import { LoginPage } from "./pages/public/LoginPage";
+import { RegisterPage } from "./pages/public/RegisterPage";
+import { ResetPasswordPage } from "./pages/public/ResetPasswordPage";
+import { VerifyEmailPage } from "./pages/public/VerifyEmailPage";
+import { ChallengeCatalogPage } from "./pages/public/ChallengeCatalogPage";
+import { ChallengeDetailPage } from "./pages/public/ChallengeDetailPage";
+import { DpiitExemptionPolicyPage } from "./pages/public/DpiitExemptionPolicyPage";
+import { StartupDashboard } from "./pages/startup/StartupDashboard";
+import { StartupPassport } from "./pages/startup/StartupPassport";
+import { ApplicationWizard } from "./pages/startup/ApplicationWizard";
+import { SubmissionDetail } from "./pages/startup/SubmissionDetail";
+import { DepartmentDashboard } from "./pages/government/DepartmentDashboard";
+import { ChallengeStudio } from "./pages/government/ChallengeStudio";
+import { CandidateMatching } from "./pages/government/CandidateMatching";
 
 function PublicPlaceholder({ title, phase }) {
   return (
@@ -51,15 +55,7 @@ export function App() {
               <Route path="/auth/callback" element={<AuthCallbackPage />} />
               <Route path="/challenges" element={<ChallengeCatalogPage />} />
               <Route path="/challenges/:id" element={<ChallengeDetailPage />} />
-              <Route
-                path="/policy"
-                element={
-                  <PublicPlaceholder
-                    title="DPIIT Exemption Policy Framework"
-                    phase="Phase F2"
-                  />
-                }
-              />
+              <Route path="/policy" element={<DpiitExemptionPolicyPage />} />
               <Route
                 path="/pilot-framework"
                 element={
@@ -123,7 +119,7 @@ export function App() {
                   path="/government/dashboard"
                   element={
                     <RoleGuard allowedRoles={["GOVERNMENT_USER", "ADMIN"]}>
-                      <WorkspacePlaceholder type="governmentDashboard" />
+                      <DepartmentDashboard />
                     </RoleGuard>
                   }
                 />
@@ -131,7 +127,15 @@ export function App() {
                   path="/government/challenges/new"
                   element={
                     <RoleGuard allowedRoles={["GOVERNMENT_USER", "ADMIN"]}>
-                      <WorkspacePlaceholder type="challengeStudio" />
+                      <ChallengeStudio />
+                    </RoleGuard>
+                  }
+                />
+                <Route
+                  path="/government/challenges/:id/matching"
+                  element={
+                    <RoleGuard allowedRoles={["GOVERNMENT_USER", "ADMIN"]}>
+                      <CandidateMatching />
                     </RoleGuard>
                   }
                 />

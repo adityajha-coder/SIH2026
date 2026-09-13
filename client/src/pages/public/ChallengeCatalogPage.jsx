@@ -4,7 +4,6 @@ import { ProblemCard } from "@/components/common/ProblemCard";
 import { DistrictGeoMap } from "@/components/common/DistrictGeoMap";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import {
   Search,
@@ -82,9 +81,9 @@ export function ChallengeCatalogPage() {
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 pb-2 border-b border-slate-200">
           <div className="space-y-2 max-w-2xl">
             <div className="flex items-center gap-2">
-              <Badge variant="outline" className="text-xs font-semibold border-blue-200 text-[#2563EB] bg-blue-50/50">
+              <span className="text-xs font-bold uppercase tracking-wider text-[#2563EB]">
                 Sovereign Challenge Studio
-              </Badge>
+              </span>
               <span className="text-xs text-[#64748B]">• Statutory DPIIT Exemption Enabled</span>
             </div>
             <h1 className="text-3xl sm:text-4xl font-extrabold text-[#10233F] tracking-tight">

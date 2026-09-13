@@ -2,7 +2,6 @@ import React, { useMemo } from "react";
 import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
 import L from "leaflet";
 import { Link } from "react-router-dom";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { MapPin, ArrowRight, Building2 } from "lucide-react";
 
@@ -147,9 +146,9 @@ export function DistrictGeoMap({ problems = [], className = "" }) {
                     <MapPin className="h-3.5 w-3.5 text-[#2563EB]" />
                     {district} District
                   </div>
-                  <Badge variant="secondary" className="text-[10px]">
+                  <span className="text-[10px] font-semibold text-[#2563EB]">
                     {data.problems.length} {data.problems.length === 1 ? "Problem" : "Problems"}
-                  </Badge>
+                  </span>
                 </div>
 
                 <div className="space-y-2 max-h-56 overflow-y-auto pr-1">

@@ -1,7 +1,6 @@
 import React from "react";
 import { Link } from "react-router-dom";
 import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { 
   ArrowRight, 
@@ -54,10 +53,10 @@ export function ProblemCard({ problem }) {
             <Building2 className="h-3.5 w-3.5 text-[#2563EB] shrink-0" />
             <span className="truncate">{departmentName}</span>
           </div>
-          <Badge variant="outline" className="text-[10px] text-emerald-700 border-emerald-200 bg-emerald-50 shrink-0 gap-1">
+          <span className="flex items-center gap-1 text-[11px] font-semibold text-emerald-700">
             <ShieldCheck className="h-3 w-3" />
             Verified
-          </Badge>
+          </span>
         </div>
 
         {/* Title */}
@@ -74,23 +73,20 @@ export function ProblemCard({ problem }) {
           {shortSummary}
         </p>
 
-        {/* Sector and Path Pills */}
-        <div className="flex flex-wrap items-center gap-1.5 pt-1">
+        {/* Sector and Path Metadata */}
+        <div className="flex flex-wrap items-center gap-2 text-xs text-[#64748B] pt-1">
           {sectors.slice(0, 2).map((sector) => (
-            <Badge
+            <span
               key={sector}
-              variant="secondary"
-              className="text-[10px] font-medium bg-slate-100 text-slate-700"
+              className="font-medium text-slate-600"
             >
               {sector}
-            </Badge>
+            </span>
           ))}
-          <Badge
-            variant="outline"
-            className="text-[10px] font-medium border-blue-200 text-blue-700 bg-blue-50/50"
-          >
+          {sectors.length > 0 && <span className="text-slate-300">•</span>}
+          <span className="font-medium text-[#2563EB]">
             {pathLabels[procurementPath] || procurementPath}
-          </Badge>
+          </span>
         </div>
       </CardContent>
 

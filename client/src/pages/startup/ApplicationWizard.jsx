@@ -7,7 +7,6 @@ import { useAuth } from "@/hooks/useAuth";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import {
   ArrowLeft,
@@ -186,9 +185,9 @@ export function ApplicationWizard() {
           Back to Challenge Statement
         </Link>
         <div className="flex items-center gap-2 pt-1">
-          <Badge variant="outline" className="text-[10px] text-blue-700 border-blue-200 bg-blue-50">
+          <span className="text-xs font-bold uppercase tracking-wider text-[#2563EB]">
             Sandbox Pilot Proposal
-          </Badge>
+          </span>
           <span className="text-xs text-[#64748B]">• Statutory Prior-Turnover Exempt</span>
         </div>
         <h1 className="text-2xl sm:text-3xl font-extrabold text-[#10233F] tracking-tight">

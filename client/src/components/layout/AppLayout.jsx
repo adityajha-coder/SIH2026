@@ -15,7 +15,6 @@ import {
   User
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
 import { getRoleDashboardPath } from "@/context/AuthContext";
 import { useAuth } from "@/hooks/useAuth";
 import { cn } from "@/lib/utils";
@@ -99,9 +98,9 @@ export function AppLayout() {
             </div>
             <div className="flex-1 min-w-0">
               <p className="text-xs font-semibold text-[#10233F] truncate">{userName}</p>
-              <Badge variant="secondary" className="text-[9px] py-0 px-1 font-mono">
+              <span className="inline-block rounded bg-slate-100 px-1 py-0.2 text-[9px] font-mono font-semibold text-slate-700">
                 {userRole}
-              </Badge>
+              </span>
               {organization?.name && (
                 <p className="mt-1 truncate text-[10px] text-[#64748B]">
                   {organization.name}

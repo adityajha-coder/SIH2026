@@ -2,7 +2,6 @@ import React, { useState } from "react";
 import { useParams, Link, useNavigate } from "react-router-dom";
 import { useSubmission, useTransitionSubmission, useDeleteSubmission } from "@/hooks/useSubmissions";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import {
@@ -146,9 +145,9 @@ export function SubmissionDetail() {
       {/* Header Card */}
       <div className="rounded-2xl border border-slate-200 bg-white p-6 sm:p-8 shadow-sm space-y-4">
         <div className="flex flex-wrap items-center justify-between gap-2">
-          <Badge variant="outline" className="text-xs font-semibold border-blue-200 text-[#2563EB] bg-blue-50">
+          <span className="text-xs font-bold uppercase tracking-wider text-[#2563EB]">
             Proposal Record
-          </Badge>
+          </span>
           <span className="text-xs text-[#64748B]">
             Submitted on {new Date(createdAt).toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" })}
           </span>

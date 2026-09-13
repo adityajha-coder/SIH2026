@@ -3,7 +3,6 @@ import { useParams, Link, useNavigate } from "react-router-dom";
 import { useProblem, useProblemEligibility } from "@/hooks/useProblems";
 import { useAuth } from "@/hooks/useAuth";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import {
@@ -134,14 +133,15 @@ export function ChallengeDetailPage() {
               <span className="text-slate-300">•</span>
               <span className="text-[#64748B]">{stateName}</span>
             </div>
-            <div className="flex items-center gap-2">
-              <Badge variant="outline" className="border-blue-200 text-blue-700 bg-blue-50/60 font-semibold text-xs">
+            <div className="flex items-center gap-2 text-xs">
+              <span className="font-semibold text-blue-700">
                 {procurementPath.replace("_", " ")}
-              </Badge>
-              <Badge variant="outline" className="border-emerald-200 text-emerald-700 bg-emerald-50/60 font-semibold text-xs gap-1">
+              </span>
+              <span className="text-slate-300">•</span>
+              <span className="font-semibold text-emerald-700 flex items-center gap-1">
                 <ShieldCheck className="h-3.5 w-3.5" />
                 Verified Challenge
-              </Badge>
+              </span>
             </div>
           </div>
 
@@ -280,9 +280,9 @@ export function ChallengeDetailPage() {
                   <span className="text-xs font-bold text-[#10233F]">
                     Eligibility Engine
                   </span>
-                  <Badge variant="outline" className="text-[10px] bg-white text-[#2563EB] border-blue-200">
+                  <span className="text-[11px] font-semibold text-[#2563EB]">
                     Deterministic
-                  </Badge>
+                  </span>
                 </div>
                 <CardTitle className="text-sm font-semibold text-[#64748B] pt-1">
                   Automated Statutory Verification

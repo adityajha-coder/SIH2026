@@ -3,7 +3,6 @@ import { Link } from "react-router-dom";
 import { useSubmissions } from "@/hooks/useSubmissions";
 import { useAuth } from "@/hooks/useAuth";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import {
@@ -59,13 +58,10 @@ export function StartupDashboard() {
             <span className="text-xs font-semibold uppercase tracking-wider text-[#2563EB]">
               Startup Innovator Console
             </span>
-            <Badge
-              variant="outline"
-              className="text-[10px] text-emerald-700 border-emerald-200 bg-emerald-50 gap-1"
-            >
-              <ShieldCheck className="h-3 w-3" />
+            <span className="text-[11px] font-semibold text-emerald-700 flex items-center gap-1">
+              <ShieldCheck className="h-3.5 w-3.5" />
               {isDpiitVerified ? "DPIIT Prior-Turnover Exempt" : "Self-Registered"}
-            </Badge>
+            </span>
           </div>
           <h1 className="text-2xl sm:text-3xl font-extrabold text-[#10233F] tracking-tight">
             {organization?.name || "Startup Innovation Workspace"}

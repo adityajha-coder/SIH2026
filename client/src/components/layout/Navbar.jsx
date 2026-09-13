@@ -9,7 +9,6 @@ import {
   UserCircle
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -37,6 +36,7 @@ export function Navbar() {
   const { user, organization, isAuthenticated, isLoading, logout } = useAuth();
 
   const navLinks = [
+    { label: "Home", href: "/" },
     { label: "Challenges", href: "/challenges" },
     { label: "Eligibility Policy", href: "/policy" },
     { label: "Pilot Framework", href: "/pilot-framework" },
@@ -79,9 +79,9 @@ export function Navbar() {
         <DropdownMenuSeparator />
         <div className="px-2 py-1.5">
           <div className="flex items-center justify-between gap-2">
-            <Badge variant="secondary" className="text-[10px]">
+            <span className="rounded bg-slate-100 px-1.5 py-0.5 text-[10px] font-semibold text-slate-700">
               {roleLabel}
-            </Badge>
+            </span>
             <span className="truncate text-[11px] text-[#64748B]">
               {organization?.name || "No organization"}
             </span>

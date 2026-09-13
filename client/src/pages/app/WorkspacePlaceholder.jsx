@@ -6,7 +6,6 @@ import {
   LayoutDashboard,
   ShieldAlert,
 } from "lucide-react";
-import { Badge } from "@/components/ui/badge";
 import {
   Card,
   CardContent,
@@ -84,9 +83,9 @@ export function WorkspacePlaceholder({ type }) {
     <div className="space-y-6">
       <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-end">
         <div className="space-y-2">
-          <Badge variant="secondary" className="w-fit">
+          <p className="text-xs font-bold uppercase tracking-wider text-[#2563EB]">
             {config.phase} Workspace
-          </Badge>
+          </p>
           <h1 className="text-2xl font-bold tracking-tight text-[#10233F]">
             {config.title}
           </h1>

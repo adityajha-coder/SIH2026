@@ -2,7 +2,6 @@ import React, { useState } from "react";
 import { useAuth } from "@/hooks/useAuth";
 import { useCurrentOrganization, useUpdateStartupProfile } from "@/hooks/useOrganization";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -110,10 +109,10 @@ export function StartupPassport() {
             <span className="text-xs font-bold uppercase tracking-wider text-[#2563EB]">
               Sovereign Innovator Credentials
             </span>
-            <Badge variant="outline" className="border-emerald-200 text-emerald-700 bg-emerald-50 text-[10px] gap-1">
-              <ShieldCheck className="h-3 w-3" />
+            <span className="text-[11px] font-semibold text-emerald-700 flex items-center gap-1">
+              <ShieldCheck className="h-3.5 w-3.5" />
               DPIIT Recognized
-            </Badge>
+            </span>
           </div>
           <h1 className="text-2xl sm:text-3xl font-extrabold text-[#10233F] tracking-tight">
             Startup Passport
