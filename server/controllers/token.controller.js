@@ -90,7 +90,11 @@ export async function logout(req, res) {
     session.revoked = true;
     await session.save();
 
-    res.clearCookie("refreshToken");
+    res.clearCookie("refreshToken", {
+        httpOnly: true,
+        secure: true,
+        sameSite: "strict",
+    });
 
     return res.status(200).json({
         message: "Logged out successfully"
@@ -126,7 +130,11 @@ export async function logoutALL(req, res) {
         }
     );
 
-    res.clearCookie("refreshToken");
+    res.clearCookie("refreshToken", {
+        httpOnly: true,
+        secure: true,
+        sameSite: "strict",
+    });
 
     return res.status(200).json({
         message: "Logged out from all devices successfully"

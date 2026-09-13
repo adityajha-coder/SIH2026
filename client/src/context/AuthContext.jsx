@@ -174,11 +174,14 @@ export function AuthProvider({ children }) {
       // Client state must still be cleared if the refresh cookie is absent.
     } finally {
       setAccessToken(null);
-      queryClient.clear();
-      setSession(EMPTY_SESSION);
+      await queryClient.cancelQueries({ queryKey: ["auth", "session"] });
+      queryClient.setQueryData(["auth", "session"], EMPTY_SESSION);
+      queryClient.removeQueries({
+        predicate: (query) => query.queryKey[0] !== "auth",
+      });
       toast.success("Signed out");
     }
-  }, [queryClient, setSession]);
+  }, [queryClient]);
 
   const createOrganization = useCallback(
     async (payload) => {
