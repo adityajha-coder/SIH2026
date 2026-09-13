@@ -9,9 +9,20 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { Skeleton } from "@/components/ui/skeleton";
+import { useProblems } from "@/hooks/useProblems";
+import { ProblemCard } from "@/components/common/ProblemCard";
 import heroSectionImg from "@/assets/hero_section.png";
 
 export function LandingPage() {
+  const { data: problemsData, isLoading: isLoadingProblems } = useProblems({
+    page: 1,
+    limit: 3,
+  });
+
+  const liveProblems = problemsData?.items || [];
+  const totalProblems = problemsData?.pagination?.totalItems || 0;
+
   return (
     <div className="space-y-16 pb-20">
       {/* Full-Screen Hero Section with Background Artwork */}
@@ -127,6 +138,59 @@ export function LandingPage() {
             </CardHeader>
           </Card>
         </div>
+      </section>
+
+      {/* Live Opportunity Feed Section */}
+      <section className="mx-auto max-w-6xl px-4 sm:px-8 space-y-6">
+        <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4">
+          <div className="space-y-1">
+            <span className="text-xs uppercase tracking-wider text-[#2563EB] font-bold">
+              Active Procurement Pipeline
+            </span>
+            <h2 className="text-2xl sm:text-3xl font-bold text-[#10233F]">
+              Live Departmental Challenges
+            </h2>
+            <p className="text-xs sm:text-sm text-[#64748B]">
+              Open outcome-based challenges across Maharashtra with statutory prior-turnover exemptions for eligible startups.
+            </p>
+          </div>
+          <Link to="/challenges">
+            <Button variant="outline" size="sm" className="gap-1.5 text-xs font-semibold shrink-0">
+              Browse All Challenges {totalProblems > 0 ? `(${totalProblems})` : ""}
+              <ArrowRight className="h-3.5 w-3.5" />
+            </Button>
+          </Link>
+        </div>
+
+        {/* Dynamic Cards or Skeletons */}
+        {isLoadingProblems ? (
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {[1, 2, 3].map((i) => (
+              <div key={i} className="p-5 rounded-2xl border border-slate-200 bg-white space-y-3">
+                <Skeleton className="h-4 w-1/3" />
+                <Skeleton className="h-6 w-3/4" />
+                <Skeleton className="h-16 w-full" />
+              </div>
+            ))}
+          </div>
+        ) : liveProblems.length > 0 ? (
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {liveProblems.map((prob) => (
+              <ProblemCard key={prob._id} problem={prob} />
+            ))}
+          </div>
+        ) : (
+          <div className="p-8 rounded-2xl border border-slate-200 bg-white text-center space-y-3">
+            <p className="text-xs text-[#64748B]">
+              New challenge statements from Maharashtra state departments are being finalized for publication.
+            </p>
+            <Link to="/challenges">
+              <Button size="sm" variant="outline" className="text-xs">
+                Check Challenges Directory
+              </Button>
+            </Link>
+          </div>
+        )}
       </section>
 
       <section className="mx-auto max-w-6xl px-4 sm:px-8">

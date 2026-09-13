@@ -17,6 +17,8 @@ import { LoginPage } from "@/pages/public/LoginPage";
 import { RegisterPage } from "@/pages/public/RegisterPage";
 import { ResetPasswordPage } from "@/pages/public/ResetPasswordPage";
 import { VerifyEmailPage } from "@/pages/public/VerifyEmailPage";
+import { ChallengeCatalogPage } from "@/pages/public/ChallengeCatalogPage";
+import { ChallengeDetailPage } from "@/pages/public/ChallengeDetailPage";
 
 function PublicPlaceholder({ title, phase }) {
   return (
@@ -43,15 +45,8 @@ export function App() {
               <Route path="/forgot-password" element={<ForgotPasswordPage />} />
               <Route path="/reset-password" element={<ResetPasswordPage />} />
               <Route path="/auth/callback" element={<AuthCallbackPage />} />
-              <Route
-                path="/challenges"
-                element={
-                  <PublicPlaceholder
-                    title="Challenges Catalog"
-                    phase="Phase F2"
-                  />
-                }
-              />
+              <Route path="/challenges" element={<ChallengeCatalogPage />} />
+              <Route path="/challenges/:id" element={<ChallengeDetailPage />} />
               <Route
                 path="/policy"
                 element={
