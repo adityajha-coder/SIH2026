@@ -1,10 +1,12 @@
-import React from "react";
+import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import { Shield, CheckCircle2, Lock } from "lucide-react";
 import logoImg from "@/assets/logo.png";
+import { LegalCharterModal } from "@/components/common/LegalCharterModal";
 
 export function Footer() {
   const currentYear = new Date().getFullYear();
+  const [activeLegalTerm, setActiveLegalTerm] = useState(null);
 
   return (
     <footer className="w-full border-t border-[#E2E8F0] bg-white mt-auto text-sm text-[#64748B]">
@@ -24,7 +26,7 @@ export function Footer() {
             </p>
             <div className="flex items-center gap-2 pt-1 text-[11px] text-[#0F766E] font-medium">
               <CheckCircle2 className="h-3.5 w-3.5" />
-              <span>MSInS & GeM Compatible Architecture</span>
+              <span>MSInS &amp; GeM Compatible Architecture</span>
             </div>
           </div>
 
@@ -40,7 +42,7 @@ export function Footer() {
               </li>
               <li>
                 <Link to="/pilot-framework" className="hover:text-[#2563EB] transition-colors">
-                  Sandbox & Pilot Protocols
+                  Sandbox &amp; Pilot Protocols
                 </Link>
               </li>
               <li>
@@ -58,28 +60,44 @@ export function Footer() {
 
           <div className="space-y-2.5">
             <h4 className="text-xs font-bold uppercase tracking-wider text-[#10233F]">
-              Governance & Legal
+              Governance &amp; Legal
             </h4>
             <ul className="space-y-2 text-xs">
               <li>
-                <span className="hover:text-[#2563EB] cursor-pointer">
+                <button
+                  type="button"
+                  onClick={() => setActiveLegalTerm("maharashtra-policy")}
+                  className="hover:text-[#2563EB] text-left cursor-pointer transition-colors"
+                >
                   Maharashtra Innovative Startup Policy
-                </span>
+                </button>
               </li>
               <li>
-                <span className="hover:text-[#2563EB] cursor-pointer">
-                  IP Rights & Data Governance Compact
-                </span>
+                <button
+                  type="button"
+                  onClick={() => setActiveLegalTerm("ip-governance")}
+                  className="hover:text-[#2563EB] text-left cursor-pointer transition-colors"
+                >
+                  IP Rights &amp; Data Governance Compact
+                </button>
               </li>
               <li>
-                <span className="hover:text-[#2563EB] cursor-pointer">
+                <button
+                  type="button"
+                  onClick={() => setActiveLegalTerm("dpdp-compliance")}
+                  className="hover:text-[#2563EB] text-left cursor-pointer transition-colors"
+                >
                   DPDP Act 2023 Compliance
-                </span>
+                </button>
               </li>
               <li>
-                <span className="hover:text-[#2563EB] cursor-pointer">
+                <button
+                  type="button"
+                  onClick={() => setActiveLegalTerm("coi-charter")}
+                  className="hover:text-[#2563EB] text-left cursor-pointer transition-colors"
+                >
                   Conflict-of-Interest (COI) Charter
-                </span>
+                </button>
               </li>
             </ul>
           </div>
@@ -116,6 +134,13 @@ export function Footer() {
           </div>
         </div>
       </div>
+
+      {/* Interactive Sovereign Legal Charter Modal */}
+      <LegalCharterModal
+        termKey={activeLegalTerm}
+        isOpen={!!activeLegalTerm}
+        onClose={() => setActiveLegalTerm(null)}
+      />
     </footer>
   );
 }

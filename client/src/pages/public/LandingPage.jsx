@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import { 
@@ -15,10 +15,67 @@ import {
   Check,
   FileCheck,
   Activity,
-  Award
+  Award,
+  ChevronRight,
+  Scale
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import heroSectionImg from "@/assets/hero_section.png";
+import { LegalCharterModal } from "@/components/common/LegalCharterModal";
+
+const PROCUREMENT_PATHWAYS = [
+  {
+    key: "open-challenges",
+    title: "Open Department Challenges",
+    desc: "Problem statements and KPIs formulated by state departments with prior-turnover waivers.",
+    ref: "GR No. MAT-2024/CR-88",
+  },
+  {
+    key: "sandbox-protocols",
+    title: "Sandbox & Pilot Protocols",
+    desc: "90-day controlled municipal testbed deployments with air-gapped data boundaries.",
+    ref: "MSInS Sandbox Guidelines",
+  },
+  {
+    key: "turnover-exemption",
+    title: "DPIIT Turnover Exemption Rule",
+    desc: "100% waiver of minimum turnover and EMD deposit criteria for DPIIT startups.",
+    ref: "GFR Rule 149 & 173(i)",
+  },
+  {
+    key: "direct-pilots",
+    title: "Direct Innovation Pilots",
+    desc: "Fast-tracked municipal trial onboarding for high-TRL proprietary technologies.",
+    ref: "Make in India Procurement Order",
+  },
+];
+
+const GOVERNANCE_LEGAL = [
+  {
+    key: "maharashtra-policy",
+    title: "Maharashtra Innovative Startup Policy",
+    desc: "Statewide umbrella framework for public procurement quotas and patent fee subsidies.",
+    ref: "GR No. 2018/CR-101/Ind-7",
+  },
+  {
+    key: "ip-governance",
+    title: "IP Rights & Data Governance Compact",
+    desc: "Binding tripartite covenant ensuring startups retain 100% patent title and algorithms.",
+    ref: "Section 9 Standard IP Compact",
+  },
+  {
+    key: "dpdp-compliance",
+    title: "DPDP Act 2023 Compliance",
+    desc: "Cryptographic anonymization and lawful consent protocols for municipal citizen telemetry.",
+    ref: "Act No. 22 of 2023",
+  },
+  {
+    key: "coi-charter",
+    title: "Conflict-of-Interest (COI) Charter",
+    desc: "Mandatory double-blind evaluation integrity code with automated recusal protocols.",
+    ref: "Public Procurement Ethics Code",
+  },
+];
 
 const WORKFLOW_PAGES = [
   {
@@ -192,6 +249,8 @@ const WORKFLOW_PAGES = [
 ];
 
 export function LandingPage() {
+  const [activeLegalTerm, setActiveLegalTerm] = useState(null);
+
   return (
     <div className="space-y-16 pb-20">
       {/* Full-Screen Hero Section with Background Artwork */}
@@ -446,6 +505,90 @@ export function LandingPage() {
         </div>
       </section>
 
+      {/* Procurement Pathways & Governance Architecture Section */}
+      <section className="mx-auto max-w-6xl px-4 sm:px-8 py-6">
+        <div className="text-center space-y-2 mb-10">
+          <p className="text-xs font-semibold text-blue-600 tracking-widest uppercase">
+            Legal Foundations &amp; Sovereign Mandates
+          </p>
+          <h2 className="text-2xl sm:text-3xl font-extrabold text-[#10233F] tracking-tight">
+            Procurement Pathways &amp; Governance Charter
+          </h2>
+          <p className="text-xs sm:text-sm text-slate-600 max-w-2xl mx-auto leading-relaxed">
+            Statutory frameworks, exemption rules, and data governance compacts protecting startups and enabling rapid civic procurement across Maharashtra.
+          </p>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+          {/* Column 1: Procurement Pathways */}
+          <div className="space-y-4">
+            <div className="flex items-center justify-between pb-2.5 border-b border-slate-200">
+              <h3 className="text-xs sm:text-sm font-bold tracking-wider text-[#10233F] uppercase">
+                Procurement Pathways
+              </h3>
+              <span className="text-[11px] font-medium text-slate-400">4 Active Windows</span>
+            </div>
+
+            <div className="space-y-3">
+              {PROCUREMENT_PATHWAYS.map((item) => (
+                <div
+                  key={item.key}
+                  onClick={() => setActiveLegalTerm(item.key)}
+                  className="group p-4 rounded-xl border border-slate-200/80 bg-white hover:border-blue-300 hover:bg-blue-50/20 transition-all shadow-sm cursor-pointer space-y-1.5"
+                >
+                  <div className="flex items-center justify-between">
+                    <h4 className="text-sm font-semibold text-[#10233F] group-hover:text-blue-600 transition-colors">
+                      {item.title}
+                    </h4>
+                    <ChevronRight className="h-4 w-4 text-slate-300 group-hover:text-blue-600 group-hover:translate-x-0.5 transition-all" />
+                  </div>
+                  <p className="text-xs text-slate-500 leading-relaxed">
+                    {item.desc}
+                  </p>
+                  <div className="pt-1 flex items-center gap-1.5 text-[10px] font-mono text-slate-400">
+                    <Scale className="h-3 w-3 text-slate-400" />
+                    <span>{item.ref}</span>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Column 2: Governance & Legal */}
+          <div className="space-y-4">
+            <div className="flex items-center justify-between pb-2.5 border-b border-slate-200">
+              <h3 className="text-xs sm:text-sm font-bold tracking-wider text-[#10233F] uppercase">
+                Governance &amp; Legal
+              </h3>
+              <span className="text-[11px] font-medium text-slate-400">Statutory Charters</span>
+            </div>
+
+            <div className="space-y-3">
+              {GOVERNANCE_LEGAL.map((item) => (
+                <div
+                  key={item.key}
+                  onClick={() => setActiveLegalTerm(item.key)}
+                  className="group p-4 rounded-xl border border-slate-200/80 bg-white hover:border-teal-300 hover:bg-teal-50/20 transition-all shadow-sm cursor-pointer space-y-1.5"
+                >
+                  <div className="flex items-center justify-between">
+                    <h4 className="text-sm font-semibold text-[#10233F] group-hover:text-teal-700 transition-colors">
+                      {item.title}
+                    </h4>
+                    <ChevronRight className="h-4 w-4 text-slate-300 group-hover:text-teal-700 group-hover:translate-x-0.5 transition-all" />
+                  </div>
+                  <p className="text-xs text-slate-500 leading-relaxed">
+                    {item.desc}
+                  </p>
+                  <div className="pt-1 flex items-center gap-1.5 text-[10px] font-mono text-slate-400">
+                    <ShieldCheck className="h-3 w-3 text-slate-400" />
+                    <span>{item.ref}</span>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </section>
 
       <section className="mx-auto max-w-6xl px-4 sm:px-8">
         <div className="rounded-2xl bg-gradient-to-r from-[#10233F] to-[#1E3A65] p-8 sm:p-12 text-white shadow-xl flex flex-col md:flex-row items-center justify-between gap-8">
@@ -474,6 +617,13 @@ export function LandingPage() {
           </div>
         </div>
       </section>
+
+      {/* Interactive Sovereign Legal Charter Modal */}
+      <LegalCharterModal
+        termKey={activeLegalTerm}
+        isOpen={!!activeLegalTerm}
+        onClose={() => setActiveLegalTerm(null)}
+      />
     </div>
   );
 }
