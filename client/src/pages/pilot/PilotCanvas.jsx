@@ -44,6 +44,7 @@ import {
   Landmark,
   FilePlus,
   Send,
+  Sparkles,
 } from "lucide-react";
 import { toast } from "sonner";
 
