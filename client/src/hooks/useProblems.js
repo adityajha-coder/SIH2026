@@ -2,10 +2,10 @@ import { useQuery } from "@tanstack/react-query";
 import apiClient from "@/lib/api/client";
 
 export function useProblems(filters = {}) {
-  const { page = 1, limit = 12, sector, status = "PUBLISHED", search } = filters;
+  const { page = 1, limit = 12, sector, status = "PUBLISHED", search, sortBy = "newest" } = filters;
 
   return useQuery({
-    queryKey: ["problems", { page, limit, sector, status, search }],
+    queryKey: ["problems", { page, limit, sector, status, search, sortBy }],
     queryFn: async () => {
       const params = {};
       if (page) params.page = page;
@@ -13,6 +13,7 @@ export function useProblems(filters = {}) {
       if (sector && sector !== "ALL") params.sector = sector;
       if (status && status !== "ALL") params.status = status;
       if (search && search.trim()) params.search = search.trim();
+      if (sortBy) params.sortBy = sortBy;
 
       const response = await apiClient.get("/problems", { params });
       return {
