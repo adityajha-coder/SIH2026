@@ -21,26 +21,13 @@ import {
   Pie,
   Cell,
 } from "recharts";
-import {
-  Plus,
-  ArrowRight,
-  FileText,
-  Users,
-  CheckCircle2,
-  Clock,
-  ExternalLink,
-  Sparkles,
-  Building2,
-  Calendar,
-  AlertCircle,
-  TrendingUp,
-} from "lucide-react";
 
 const PIE_COLORS = ["#2563EB", "#0F766E", "#B45309", "#7C3AED", "#0284C7"];
 
 export function DepartmentDashboard() {
   const { user, organization } = useAuth();
   const [filterStatus, setFilterStatus] = useState("ALL");
+  const [selectedProblemFilter, setSelectedProblemFilter] = useState("ALL");
 
   const {
     data: problems = [],
@@ -120,16 +107,24 @@ export function DepartmentDashboard() {
     return problems.filter((p) => p.status === filterStatus);
   }, [problems, filterStatus]);
 
+  // Filtered submissions by challenge
+  const filteredSubmissions = useMemo(() => {
+    if (selectedProblemFilter === "ALL") return submissions;
+    return submissions.filter(
+      (s) => (s.problemId?._id || s.problemId) === selectedProblemFilter
+    );
+  }, [submissions, selectedProblemFilter]);
+
   return (
     <div className="space-y-8 pb-16">
       {/* Header Banner */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-2 border-b border-slate-200">
         <div className="space-y-1">
-          <div className="flex items-center gap-2">
-            <span className="text-xs font-bold uppercase tracking-wider text-[#2563EB]">
+          <div className="flex items-center gap-2 text-xs">
+            <span className="font-bold uppercase tracking-wider text-[#2563EB]">
               Department Command Center
             </span>
-            <span className="text-xs text-[#64748B]">• Maharashtra Sovereign Sandbox</span>
+            <span className="text-[#64748B]">• Maharashtra Sovereign Sandbox</span>
           </div>
           <h1 className="text-2xl sm:text-3xl font-extrabold text-[#10233F] tracking-tight">
             {organization?.name || "Government Department Workspace"}
@@ -140,23 +135,20 @@ export function DepartmentDashboard() {
         </div>
 
         <Link to="/government/challenges/new">
-          <Button className="gap-2 bg-[#2563EB] hover:bg-blue-700 text-white font-semibold shadow-sm">
-            <Plus className="h-4 w-4" />
-            Create Challenge
+          <Button className="text-xs font-medium bg-[#10233F] hover:bg-slate-800 text-white rounded shadow-sm h-9 px-4">
+            + Create Challenge
           </Button>
         </Link>
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         {/* Metric 1 */}
-        <Card className="border border-slate-200 bg-white shadow-2xs rounded-2xl">
+        <Card className="border border-slate-200 bg-white shadow-xs rounded-xl">
           <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
             <CardTitle className="text-xs font-semibold text-[#64748B]">
               Published Challenges
             </CardTitle>
-            <div className="h-8 w-8 rounded-lg bg-blue-50 text-[#2563EB] flex items-center justify-center">
-              <FileText className="h-4 w-4" />
-            </div>
+            <span className="text-xs font-bold text-[#2563EB]">Active</span>
           </CardHeader>
           <CardContent>
             {loadingProblems ? (
@@ -173,14 +165,12 @@ export function DepartmentDashboard() {
         </Card>
 
         {/* Metric 2 */}
-        <Card className="border border-slate-200 bg-white shadow-2xs rounded-2xl">
+        <Card className="border border-slate-200 bg-white shadow-xs rounded-xl">
           <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
             <CardTitle className="text-xs font-semibold text-[#64748B]">
               Candidate Submissions
             </CardTitle>
-            <div className="h-8 w-8 rounded-lg bg-teal-50 text-[#0F766E] flex items-center justify-center">
-              <Users className="h-4 w-4" />
-            </div>
+            <span className="text-xs font-bold text-teal-700">Total</span>
           </CardHeader>
           <CardContent>
             {loadingSubmissions ? (
@@ -197,14 +187,12 @@ export function DepartmentDashboard() {
         </Card>
 
         {/* Metric 3 */}
-        <Card className="border border-slate-200 bg-white shadow-2xs rounded-2xl">
+        <Card className="border border-slate-200 bg-white shadow-xs rounded-xl">
           <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
             <CardTitle className="text-xs font-semibold text-[#64748B]">
               Pending Evaluation
             </CardTitle>
-            <div className="h-8 w-8 rounded-lg bg-amber-50 text-amber-700 flex items-center justify-center">
-              <Clock className="h-4 w-4" />
-            </div>
+            <span className="text-xs font-bold text-amber-700">Queue</span>
           </CardHeader>
           <CardContent>
             {loadingSubmissions ? (
@@ -221,14 +209,12 @@ export function DepartmentDashboard() {
         </Card>
 
         {/* Metric 4 */}
-        <Card className="border border-slate-200 bg-white shadow-2xs rounded-2xl">
+        <Card className="border border-slate-200 bg-white shadow-xs rounded-xl">
           <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
             <CardTitle className="text-xs font-semibold text-[#64748B]">
               Active Field Pilots
             </CardTitle>
-            <div className="h-8 w-8 rounded-lg bg-purple-50 text-purple-700 flex items-center justify-center">
-              <TrendingUp className="h-4 w-4" />
-            </div>
+            <span className="text-xs font-bold text-purple-700">Sandbox</span>
           </CardHeader>
           <CardContent>
             {loadingSubmissions ? (
@@ -249,7 +235,7 @@ export function DepartmentDashboard() {
       {(sectorData.length > 0 || statusData.length > 0) && (
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           {/* Chart 1: Sector Distribution */}
-          <Card className="border border-slate-200 bg-white shadow-2xs rounded-2xl">
+          <Card className="border border-slate-200 bg-white shadow-xs rounded-xl">
             <CardHeader className="pb-2 border-b border-slate-100">
               <CardTitle className="text-sm font-bold text-[#10233F]">
                 Challenges by Sector Focus
@@ -263,7 +249,7 @@ export function DepartmentDashboard() {
                   <Tooltip
                     contentStyle={{
                       backgroundColor: "#10233F",
-                      borderRadius: "8px",
+                      borderRadius: "6px",
                       color: "#FFFFFF",
                       fontSize: "12px",
                     }}
@@ -275,7 +261,7 @@ export function DepartmentDashboard() {
           </Card>
 
           {/* Chart 2: Submissions Status Distribution */}
-          <Card className="border border-slate-200 bg-white shadow-2xs rounded-2xl">
+          <Card className="border border-slate-200 bg-white shadow-xs rounded-xl">
             <CardHeader className="pb-2 border-b border-slate-100">
               <CardTitle className="text-sm font-bold text-[#10233F]">
                 Applicant Pipeline Lifecycle
@@ -304,7 +290,7 @@ export function DepartmentDashboard() {
                     <Tooltip
                       contentStyle={{
                         backgroundColor: "#10233F",
-                        borderRadius: "8px",
+                        borderRadius: "6px",
                         color: "#FFFFFF",
                         fontSize: "12px",
                       }}
@@ -323,11 +309,11 @@ export function DepartmentDashboard() {
       <div className="space-y-4">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
           <div>
-            <h2 className="text-lg font-bold text-[#10233F]">
+            <h2 className="text-base font-bold text-[#10233F]">
               Department Challenge Statements
             </h2>
             <p className="text-xs text-[#64748B]">
-              Review status, publish drafts, and run Explainable AI match evaluations.
+              Review status, publish drafts, and evaluate candidate match rankings.
             </p>
           </div>
 
@@ -338,9 +324,9 @@ export function DepartmentDashboard() {
                 key={st}
                 type="button"
                 onClick={() => setFilterStatus(st)}
-                className={`px-3 py-1.5 rounded-md transition-all ${
+                className={`px-3 py-1.5 rounded-md transition-all cursor-pointer ${
                   filterStatus === st
-                    ? "bg-white text-[#10233F] shadow-2xs font-bold"
+                    ? "bg-white text-[#10233F] shadow-xs font-bold"
                     : "text-[#64748B] hover:text-[#10233F]"
                 }`}
               >
@@ -358,7 +344,7 @@ export function DepartmentDashboard() {
             ))}
           </div>
         ) : filteredProblems.length === 0 ? (
-          <Card className="border border-dashed border-slate-300 p-8 text-center rounded-2xl bg-white">
+          <Card className="border border-dashed border-slate-300 p-8 text-center rounded-xl bg-white">
             <p className="text-sm font-semibold text-[#10233F]">
               No challenge statements found in this view.
             </p>
@@ -366,9 +352,8 @@ export function DepartmentDashboard() {
               Draft a new problem statement to invite innovative pilot proposals from certified startups.
             </p>
             <Link to="/government/challenges/new" className="inline-block mt-4">
-              <Button size="sm" className="gap-1.5 bg-[#2563EB] hover:bg-blue-700">
-                <Plus className="h-3.5 w-3.5" />
-                Draft Problem Statement
+              <Button size="sm" className="text-xs font-medium bg-[#10233F] hover:bg-slate-800 text-white rounded h-8 px-3">
+                + Draft Problem Statement
               </Button>
             </Link>
           </Card>
@@ -388,18 +373,16 @@ export function DepartmentDashboard() {
               return (
                 <div
                   key={prob._id}
-                  className="p-5 rounded-xl border border-slate-200 bg-white hover:border-blue-300 hover:shadow-xs transition-all flex flex-col md:flex-row items-start md:items-center justify-between gap-4"
+                  className="p-5 rounded-xl border border-slate-200 bg-white hover:border-blue-300 transition-all flex flex-col md:flex-row items-start md:items-center justify-between gap-4"
                 >
                   <div className="space-y-1 max-w-2xl">
                     <div className="flex items-center gap-2 text-xs">
                       <span
                         className={`font-semibold ${
-                          isPublished
-                            ? "text-emerald-700"
-                            : "text-amber-700"
+                          isPublished ? "text-emerald-700" : "text-amber-700"
                         }`}
                       >
-                        {isPublished ? "● Published" : "○ Draft"}
+                        {isPublished ? "Published" : "Draft"}
                       </span>
                       <span className="text-slate-300">•</span>
                       <span className="font-medium text-[#2563EB]">
@@ -412,7 +395,7 @@ export function DepartmentDashboard() {
                     </div>
 
                     <Link to={`/challenges/${prob._id}`}>
-                      <h3 className="font-bold text-base text-[#10233F] hover:text-[#2563EB] transition-colors line-clamp-1">
+                      <h3 className="font-bold text-sm sm:text-base text-[#10233F] hover:text-[#2563EB] transition-colors line-clamp-1">
                         {prob.title}
                       </h3>
                     </Link>
@@ -432,7 +415,6 @@ export function DepartmentDashboard() {
                         disabled={publishMutation.isPending}
                         className="text-xs font-semibold border-emerald-300 text-emerald-700 hover:bg-emerald-50 h-8"
                       >
-                        <CheckCircle2 className="h-3.5 w-3.5 mr-1" />
                         Publish Now
                       </Button>
                     )}
@@ -440,20 +422,19 @@ export function DepartmentDashboard() {
                     <Link to={`/government/challenges/${prob._id}/matching`}>
                       <Button
                         size="sm"
-                        className="text-xs font-semibold bg-[#2563EB] hover:bg-blue-700 text-white h-8 gap-1"
+                        className="text-xs font-medium bg-[#10233F] hover:bg-slate-800 text-white h-8 px-3 rounded"
                       >
-                        <Sparkles className="h-3.5 w-3.5" />
-                        AI Match
+                        AI Candidate Matching
                       </Button>
                     </Link>
 
                     <Link to={`/challenges/${prob._id}`}>
                       <Button
-                        variant="ghost"
+                        variant="outline"
                         size="sm"
-                        className="text-xs text-[#64748B] hover:text-[#10233F] h-8"
+                        className="text-xs text-[#64748B] hover:text-[#10233F] border-slate-300 h-8 px-2.5 rounded"
                       >
-                        <ExternalLink className="h-3.5 w-3.5" />
+                        View &rarr;
                       </Button>
                     </Link>
                   </div>
@@ -464,30 +445,55 @@ export function DepartmentDashboard() {
         )}
       </div>
 
-      {/* Recent Submissions Feed */}
+      {/* Submissions Section with Challenge Filter */}
       <div className="space-y-4 pt-4 border-t border-slate-200">
-        <div>
-          <h2 className="text-lg font-bold text-[#10233F]">
-            Recent Candidate Submissions
-          </h2>
-          <p className="text-xs text-[#64748B]">
-            Proposals received across your department's open innovation challenges.
-          </p>
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+          <div>
+            <h2 className="text-base font-bold text-[#10233F]">
+              Candidate Submissions by Challenge
+            </h2>
+            <p className="text-xs text-[#64748B]">
+              Filter and evaluate proposals submitted across your department's innovation challenges.
+            </p>
+          </div>
+
+          {/* Quick Filter Dropdown */}
+          <div className="flex items-center gap-2">
+            <select
+              value={selectedProblemFilter}
+              onChange={(e) => setSelectedProblemFilter(e.target.value)}
+              className="h-9 px-3 rounded-lg border border-slate-200 bg-white text-xs font-medium text-[#10233F] focus:outline-none focus:ring-1 focus:ring-blue-500 max-w-[280px] truncate"
+            >
+              <option value="ALL">All Challenges ({submissions.length} proposals)</option>
+              {problems.map((p) => {
+                const count = submissions.filter(
+                  (s) => (s.problemId?._id || s.problemId) === p._id
+                ).length;
+                return (
+                  <option key={p._id} value={p._id}>
+                    {p.title} ({count})
+                  </option>
+                );
+              })}
+            </select>
+          </div>
         </div>
 
         {loadingSubmissions ? (
           <Skeleton className="h-32 w-full rounded-xl" />
-        ) : submissions.length === 0 ? (
-          <Card className="border border-slate-200 p-6 text-center rounded-2xl bg-slate-50">
+        ) : filteredSubmissions.length === 0 ? (
+          <Card className="border border-slate-200 p-6 text-center rounded-xl bg-slate-50">
             <p className="text-xs text-[#64748B]">
-              No proposals submitted by startups yet. Published challenges are open on the public catalog.
+              {selectedProblemFilter === "ALL"
+                ? "No proposals submitted by startups yet. Published challenges are active on the public portal."
+                : "No proposals submitted for this selected challenge statement yet."}
             </p>
           </Card>
         ) : (
           <div className="grid gap-3">
-            {submissions.slice(0, 5).map((sub) => {
+            {filteredSubmissions.map((sub) => {
               const orgName = sub.organizationId?.name || "Verified Startup";
-              const probTitle = sub.problemId?.title || "Challenge";
+              const probTitle = sub.problemId?.title || "Challenge Statement";
               const submittedDate = new Date(sub.createdAt).toLocaleDateString("en-IN", {
                 day: "numeric",
                 month: "short",
@@ -497,13 +503,13 @@ export function DepartmentDashboard() {
               return (
                 <div
                   key={sub._id}
-                  className="p-4 rounded-xl border border-slate-200 bg-white hover:border-blue-200 transition-all flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3"
+                  className="p-4 rounded-xl border border-slate-200 bg-white hover:border-blue-200 transition-all flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 text-xs"
                 >
                   <div className="space-y-0.5 max-w-xl">
                     <div className="flex items-center gap-2 text-xs">
                       <span className="font-semibold text-[#10233F]">{orgName}</span>
                       <span className="text-slate-300">•</span>
-                      <span className="font-semibold text-[#2563EB]">
+                      <span className="font-medium text-[#2563EB]">
                         {sub.status.replace("_", " ")}
                       </span>
                       <span className="text-slate-300">•</span>
@@ -519,9 +525,12 @@ export function DepartmentDashboard() {
                     to={`/government/challenges/${sub.problemId?._id || sub.problemId}/matching`}
                     className="shrink-0"
                   >
-                    <Button variant="outline" size="sm" className="text-xs font-semibold gap-1 h-8">
-                      Evaluate Match
-                      <ArrowRight className="h-3 w-3" />
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="text-xs font-medium border-slate-300 hover:bg-slate-50 h-8 px-3 rounded"
+                    >
+                      Evaluate Match &rarr;
                     </Button>
                   </Link>
                 </div>
