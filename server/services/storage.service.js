@@ -3,7 +3,13 @@ import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 
 const AWS_REGION = process.env.AWS_REGION || "ap-south-1";
 const AWS_BUCKET_NAME = process.env.AWS_BUCKET_NAME || "sih2026-evidence-vault";
-const hasAwsCredentials = Boolean(process.env.AWS_ACCESS_KEY_ID && process.env.AWS_SECRET_ACCESS_KEY);
+const hasAwsCredentials = Boolean(
+    process.env.AWS_ACCESS_KEY_ID &&
+    process.env.AWS_SECRET_ACCESS_KEY &&
+    !process.env.AWS_ACCESS_KEY_ID.includes("...") &&
+    !process.env.AWS_ACCESS_KEY_ID.includes("your_access_key") &&
+    !process.env.AWS_ACCESS_KEY_ID.includes("your_supabase_")
+);
 
 let s3Client = null;
 

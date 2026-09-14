@@ -14,6 +14,8 @@ export const ALLOWED_MIME_TYPES = [
     "application/zip",
     "application/x-zip-compressed",
     "application/octet-stream",
+    "text/csv",
+    "application/json",
 ];
 
 const MAX_FILE_SIZE = 25 * 1024 * 1024; // 25 MB

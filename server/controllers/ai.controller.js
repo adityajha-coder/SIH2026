@@ -14,7 +14,7 @@ export const aiController = {
             const cleanInput = aiPolicy.sanitizeInput(userInput);
             const cleanEvidence = (evidence || []).map((e) => aiPolicy.sanitizeInput(e));
 
-            aiPolicy.validateCall({ provider: "google", model: "gemini-3.5-flash-lite" });
+            aiPolicy.validateCall({ provider: "google", model: "gemini-3.6-flash" });
             const result = await geminiProvider.execute({
                 task,
                 userInput: cleanInput,

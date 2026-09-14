@@ -47,6 +47,23 @@ import {
   Sparkles,
 } from "lucide-react";
 import { toast } from "sonner";
+import { apiClient } from "@/lib/api/client";
+
+function formatFileSize(bytes, decimals = 2) {
+  if (!+bytes) return "0 Bytes";
+  const k = 1024;
+  const dm = decimals < 0 ? 0 : decimals;
+  const sizes = ["Bytes", "KB", "MB", "GB"];
+  const i = Math.floor(Math.log(bytes) / Math.log(k));
+  return `${parseFloat((bytes / Math.pow(k, i)).toFixed(dm))} ${sizes[i]}`;
+}
+
+async function computeFileSHA256(file) {
+  const buffer = await file.arrayBuffer();
+  const hashBuffer = await crypto.subtle.digest("SHA-256", buffer);
+  const hashArray = Array.from(new Uint8Array(hashBuffer));
+  return hashArray.map((b) => b.toString(16).padStart(2, "0")).join("");
+}
 
 // FSM Pilot Lifecycle Stages
 const PILOT_LIFECYCLE_STAGES = [
@@ -160,6 +177,8 @@ export function PilotCanvas() {
   const [selectedTrancheForEvidence, setSelectedTrancheForEvidence] = useState(null);
   const [evidenceFileName, setEvidenceFileName] = useState("");
   const [evidenceDescription, setEvidenceDescription] = useState("");
+  const [evidenceFile, setEvidenceFile] = useState(null);
+  const [isUploadingEvidence, setIsUploadingEvidence] = useState(false);
 
   const [tranches, setTranches] = useState(DEFAULT_TRANCHES);
 
@@ -221,37 +240,136 @@ export function PilotCanvas() {
     setSelectedTrancheForEvidence(tranche);
     setEvidenceFileName("");
     setEvidenceDescription("");
+    setEvidenceFile(null);
+    setIsUploadingEvidence(false);
     setIsEvidenceModalOpen(true);
   };
 
-  const handleAttachEvidence = (e) => {
+  const handleAttachEvidence = async (e) => {
     e.preventDefault();
-    if (!evidenceFileName.trim()) {
-      toast.error("Please enter a deliverable title or filename");
+    if (!evidenceFile && !evidenceFileName.trim()) {
+      toast.error("Please select an evidence document or enter a deliverable title");
       return;
     }
 
-    const newDoc = {
-      name: evidenceFileName.trim().endsWith(".pdf") ? evidenceFileName.trim() : `${evidenceFileName.trim()}.pdf`,
-      size: "3.2 MB",
-      hash: `sha256:${Math.random().toString(16).substring(2, 10)}9f83b1657ff1fc53b92dc18148a1d65d`,
-    };
+    const MAX_SIZE = 25 * 1024 * 1024; // 25 MB
+    if (evidenceFile && evidenceFile.size > MAX_SIZE) {
+      toast.error(`"${evidenceFile.name}" exceeds the 25 MB limit.`);
+      return;
+    }
 
-    setTranches((prev) =>
-      prev.map((t) => {
-        if (t.id === selectedTrancheForEvidence?.id) {
-          return {
-            ...t,
-            status: "IN_VERIFICATION",
-            evidence: [...t.evidence, newDoc],
-          };
-        }
-        return t;
-      })
+    setIsUploadingEvidence(true);
+    const toastId = toast.loading(
+      evidenceFile ? `Uploading "${evidenceFile.name}" to Sovereign Evidence Vault...` : "Attaching deliverable..."
     );
 
-    setIsEvidenceModalOpen(false);
-    toast.success("Deliverable evidence attached and dispatched for sovereign review!");
+    try {
+      let docHash = `sha256:${Math.random().toString(16).substring(2, 10)}9f83b1657ff1fc53b92dc18148a1d65d`;
+      let docSize = "3.2 MB";
+      let docName = evidenceFileName.trim() || (evidenceFile ? evidenceFile.name : "Deliverable_Document.pdf");
+      let downloadUrl = null;
+      let evidenceId = null;
+
+      if (evidenceFile) {
+        toast.loading(`Computing SHA-256 integrity hash for "${evidenceFile.name}"...`, { id: toastId });
+        const sha256 = await computeFileSHA256(evidenceFile);
+        docHash = `sha256:${sha256}`;
+        docSize = formatFileSize(evidenceFile.size);
+        docName = evidenceFileName.trim() || evidenceFile.name;
+
+        // Detect MIME type
+        let mimeType = evidenceFile.type;
+        const lower = evidenceFile.name.toLowerCase();
+        if (lower.endsWith(".pdf")) mimeType = "application/pdf";
+        else if (lower.endsWith(".csv")) mimeType = "text/csv";
+        else if (lower.endsWith(".json")) mimeType = "application/json";
+        else if (lower.endsWith(".zip")) mimeType = "application/zip";
+        else if (lower.endsWith(".doc")) mimeType = "application/msword";
+        else if (lower.endsWith(".docx")) mimeType = "application/vnd.openxmlformats-officedocument.wordprocessingml.document";
+        else if (lower.endsWith(".png")) mimeType = "image/png";
+        else if (lower.endsWith(".jpg") || lower.endsWith(".jpeg")) mimeType = "image/jpeg";
+        else if (!mimeType) mimeType = "application/octet-stream";
+
+        // Valid 24-char ObjectId for entityId
+        const validEntityId = (submission?._id || id)?.match(/^[0-9a-fA-F]{24}$/)
+          ? (submission?._id || id)
+          : "66f000000000000000000001";
+
+        // Request upload intent from backend
+        const intentRes = await apiClient.post("/evidence/upload-intent", {
+          fileName: evidenceFile.name,
+          mimeType,
+          sizeBytes: evidenceFile.size,
+          entityType: "SUBMISSION",
+          entityId: validEntityId,
+        });
+
+        const intentData = intentRes.data?.data || intentRes.data;
+        evidenceId = intentData?.evidenceId || intentData?.id;
+        const uploadUrl = intentData?.uploadUrl;
+
+        // Direct S3/Supabase upload if URL is live
+        if (uploadUrl && !intentData?.isMock) {
+          toast.loading(`Uploading directly to Sovereign Cloud Vault...`, { id: toastId });
+          await fetch(uploadUrl, {
+            method: "PUT",
+            headers: {
+              "Content-Type": mimeType,
+            },
+            body: evidenceFile,
+          });
+        }
+
+        // Finalize evidence record
+        if (evidenceId) {
+          await apiClient.post(`/evidence/${evidenceId}/finalize`, {
+            checksumSHA256: docHash,
+            actualSizeBytes: evidenceFile.size,
+          });
+
+          // Fetch download link
+          try {
+            const dlRes = await apiClient.get(`/evidence/${evidenceId}`);
+            downloadUrl = dlRes.data?.data?.downloadUrl;
+          } catch {
+            downloadUrl = uploadUrl;
+          }
+        }
+      }
+
+      const newDoc = {
+        id: evidenceId || `ev_${Date.now()}`,
+        name: docName,
+        fileName: evidenceFile?.name || docName,
+        size: docSize,
+        hash: docHash,
+        description: evidenceDescription.trim(),
+        downloadUrl,
+      };
+
+      setTranches((prev) =>
+        prev.map((t) => {
+          if (t.id === selectedTrancheForEvidence?.id) {
+            return {
+              ...t,
+              status: "IN_VERIFICATION",
+              evidence: [...t.evidence, newDoc],
+            };
+          }
+          return t;
+        })
+      );
+
+      toast.success("Deliverable evidence attached and dispatched for sovereign review!", { id: toastId });
+      setIsEvidenceModalOpen(false);
+      setEvidenceFile(null);
+      setEvidenceFileName("");
+      setEvidenceDescription("");
+    } catch (err) {
+      toast.error(err.response?.data?.message || err.message || "Failed to upload deliverable evidence", { id: toastId });
+    } finally {
+      setIsUploadingEvidence(false);
+    }
   };
 
   const handleApproveTranche = (trancheId) => {
@@ -585,22 +703,49 @@ export function PilotCanvas() {
                               </p>
                             ) : (
                               <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 pt-1">
-                                {tranche.evidence.map((doc, i) => (
-                                  <div
-                                    key={i}
-                                    className="flex items-center justify-between rounded border border-[#E2E8F0] bg-[#F8FAFC] p-2 text-[11px]"
-                                  >
-                                    <div className="truncate pr-2">
-                                      <div className="font-medium text-[#10233F] truncate">
-                                        {doc.name}
+                                {tranche.evidence.map((doc, i) => {
+                                  const cardContent = (
+                                    <div
+                                      className={`flex items-center justify-between rounded border border-[#E2E8F0] bg-[#F8FAFC] p-2 text-[11px] transition-colors ${
+                                        doc.downloadUrl ? "hover:border-[#3B82F6] hover:bg-blue-50/50 cursor-pointer" : ""
+                                      }`}
+                                    >
+                                      <div className="truncate pr-2">
+                                        <div className="font-medium text-[#10233F] truncate flex items-center gap-1.5">
+                                          {doc.name}
+                                          {doc.downloadUrl && (
+                                            <span className="inline-flex items-center px-1 py-0.5 text-[9px] font-mono font-medium text-emerald-700 bg-emerald-50 border border-emerald-200 rounded">
+                                              VAULT-S3
+                                            </span>
+                                          )}
+                                        </div>
+                                        <div className="font-mono text-[10px] text-[#64748B]">
+                                          {doc.size} &bull; {doc.hash ? doc.hash.slice(0, 14) : "sha256"}...
+                                        </div>
                                       </div>
-                                      <div className="font-mono text-[10px] text-[#64748B]">
-                                        {doc.size} &bull; {doc.hash.slice(0, 14)}...
-                                      </div>
+                                      {doc.downloadUrl ? (
+                                        <ExternalLink className="h-3.5 w-3.5 text-blue-600 shrink-0" />
+                                      ) : (
+                                        <FileText className="h-4 w-4 text-blue-600 shrink-0" />
+                                      )}
                                     </div>
-                                    <FileText className="h-4 w-4 text-blue-600 shrink-0" />
-                                  </div>
-                                ))}
+                                  );
+
+                                  return doc.downloadUrl ? (
+                                    <a
+                                      key={i}
+                                      href={doc.downloadUrl}
+                                      target="_blank"
+                                      rel="noopener noreferrer"
+                                      title="Download and inspect verified deliverable artifact from Sovereign S3 Vault"
+                                      className="block no-underline"
+                                    >
+                                      {cardContent}
+                                    </a>
+                                  ) : (
+                                    <div key={i}>{cardContent}</div>
+                                  );
+                                })}
                               </div>
                             )}
                           </div>
@@ -961,7 +1106,69 @@ export function PilotCanvas() {
 
             <form onSubmit={handleAttachEvidence} className="space-y-4 text-xs">
               <div className="bg-blue-50 border border-blue-200 rounded p-2.5 text-[11px] text-blue-900">
-                Submitting evidence for: <strong>{selectedTrancheForEvidence?.name}</strong> ({selectedTrancheForEvidence?.amount})
+                Submitting deliverable proof for: <strong>{selectedTrancheForEvidence?.name}</strong> ({selectedTrancheForEvidence?.amount})
+              </div>
+
+              {/* S3 Vault Dropzone / File Picker */}
+              <div>
+                <label className="font-semibold text-[#10233F] block mb-1">
+                  Deliverable Artifact (Supabase S3 Cloud Vault):
+                </label>
+                <div
+                  onClick={() => document.getElementById("pilot-evidence-file-input")?.click()}
+                  className={`border-2 border-dashed rounded-lg p-4 text-center cursor-pointer transition-colors ${
+                    evidenceFile
+                      ? "border-emerald-500 bg-emerald-50/40"
+                      : "border-slate-300 hover:border-blue-500 bg-slate-50/50 hover:bg-blue-50/30"
+                  }`}
+                >
+                  <input
+                    id="pilot-evidence-file-input"
+                    type="file"
+                    className="hidden"
+                    accept=".pdf,.csv,.json,.zip,.doc,.docx,image/*"
+                    onChange={(e) => {
+                      const file = e.target.files?.[0];
+                      if (file) {
+                        setEvidenceFile(file);
+                        if (!evidenceFileName) {
+                          setEvidenceFileName(file.name);
+                        }
+                      }
+                    }}
+                  />
+                  {evidenceFile ? (
+                    <div className="space-y-1">
+                      <div className="flex items-center justify-center gap-2 text-emerald-700 font-semibold">
+                        <FileCheck className="h-4 w-4" />
+                        <span className="truncate max-w-[280px]">{evidenceFile.name}</span>
+                      </div>
+                      <div className="text-[10px] font-mono text-slate-500">
+                        {formatFileSize(evidenceFile.size)} &bull; Ready for SHA-256 & S3 Presigned Upload
+                      </div>
+                      <button
+                        type="button"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setEvidenceFile(null);
+                        }}
+                        className="text-[10px] text-red-600 hover:underline pt-1"
+                      >
+                        Change / remove file
+                      </button>
+                    </div>
+                  ) : (
+                    <div className="space-y-1 py-1">
+                      <Upload className="h-6 w-6 text-slate-400 mx-auto" />
+                      <p className="font-medium text-slate-700 text-xs">
+                        Click to select deliverable file or drag & drop here
+                      </p>
+                      <p className="text-[10px] text-slate-400 font-mono">
+                        PDF, CSV, JSON, ZIP, DOC, DOCX, or Images up to 25 MB
+                      </p>
+                    </div>
+                  )}
+                </div>
               </div>
 
               <div>
@@ -971,7 +1178,7 @@ export function PilotCanvas() {
                 <Input
                   value={evidenceFileName}
                   onChange={(e) => setEvidenceFileName(e.target.value)}
-                  placeholder="e.g. PMC_Field_Trial_Telemetry_Report_v2.pdf"
+                  placeholder={evidenceFile ? evidenceFile.name : "e.g. PMC_Field_Trial_Telemetry_Report_v2.pdf"}
                   className="text-xs"
                 />
               </div>
@@ -994,6 +1201,7 @@ export function PilotCanvas() {
                   type="button"
                   variant="outline"
                   size="sm"
+                  disabled={isUploadingEvidence}
                   onClick={() => setIsEvidenceModalOpen(false)}
                 >
                   Cancel
@@ -1001,9 +1209,20 @@ export function PilotCanvas() {
                 <Button
                   type="submit"
                   size="sm"
-                  className="bg-[#0F766E] hover:bg-[#0D655E] text-white font-semibold"
+                  disabled={isUploadingEvidence || (!evidenceFile && !evidenceFileName.trim())}
+                  className="bg-[#0F766E] hover:bg-[#0D655E] text-white font-semibold flex items-center gap-1.5"
                 >
-                  Submit for 30-Day SLA Verification
+                  {isUploadingEvidence ? (
+                    <>
+                      <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                      Uploading to Vault...
+                    </>
+                  ) : (
+                    <>
+                      <Upload className="h-3.5 w-3.5" />
+                      Submit for 30-Day SLA Verification
+                    </>
+                  )}
                 </Button>
               </div>
             </form>

@@ -21,8 +21,8 @@ export const verificationService = {
             .update(cleanInput + JSON.stringify(cleanEvidence))
             .digest("hex");
 
-        // LAYER 1: Generator (Gemini 3.5 Flash Lite)
-        aiPolicy.validateCall({ provider: "google", model: "gemini-3.5-flash-lite" });
+        // LAYER 1: Generator (Gemini 3.6 Flash)
+        aiPolicy.validateCall({ provider: "google", model: "gemini-3.6-flash" });
         let generatorResult;
         try {
             generatorResult = await geminiProvider.execute({
