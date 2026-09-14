@@ -1,7 +1,7 @@
 import { GoogleGenAI, Type } from "@google/genai";
 import { BaseAIAdapter } from "../aiAdapter.js";
 
-const DEFAULT_MODEL = "gemini-3.5-flash-lite";
+const DEFAULT_MODEL = "gemini-3.6-flash";
 
 let aiClient = null;
 function getClient() {
@@ -21,11 +21,11 @@ export class GeminiProvider extends BaseAIAdapter {
         return Boolean(process.env.GEMINI_API_KEY);
     }
 
-    async execute({ task, userInput, evidence = [] }) {
+    async execute({ task, userInput, evidence = [], customPrompt = null }) {
         const startTime = Date.now();
         const client = getClient();
 
-        //  fallback if no API key is provided
+        // Fallback if no API key is provided
         if (!client) {
             return {
                 conclusion: `[SIMULATED GEMINI ADVISORY] Evaluated task: ${task}. Solution demonstrates technical alignment based on provided data.`,
@@ -40,7 +40,7 @@ export class GeminiProvider extends BaseAIAdapter {
             };
         }
 
-        const prompt = `
+        const prompt = customPrompt || `
 You are the Primary Advisory Model (Model 1) for a Government Procurement & Startup Matching Platform.
 TASK: ${task}
 USER INPUT: ${userInput}
@@ -57,30 +57,19 @@ Adhere strictly to evidence. Do not extrapolate unsupported legal or financial g
                 contents: prompt,
                 config: {
                     responseMimeType: "application/json",
-                    responseSchema: {
-                        type: Type.OBJECT,
-                        properties: {
-                            conclusion: { type: Type.STRING },
-                            claims: { type: Type.ARRAY, items: { type: Type.STRING } },
-                            evidenceUsed: { type: Type.ARRAY, items: { type: Type.STRING } },
-                            uncertainties: { type: Type.ARRAY, items: { type: Type.STRING } },
-                            issues: { type: Type.ARRAY, items: { type: Type.STRING } },
-                            confidence: { type: Type.NUMBER },
-                        },
-                        required: ["conclusion", "claims", "evidenceUsed", "uncertainties", "issues", "confidence"],
-                    },
                 },
             });
 
             const parsed = JSON.parse(response.text.trim());
 
             return {
-                conclusion: parsed.conclusion || "",
-                claims: parsed.claims || [],
+                ...parsed,
+                conclusion: parsed.conclusion || parsed.executiveSummary || "",
+                claims: parsed.claims || (parsed.technicalPoints ? parsed.technicalPoints.map(p => `${p.title}: ${p.detailedExplanation}`) : []),
                 evidenceUsed: parsed.evidenceUsed || [],
-                uncertainties: parsed.uncertainties || [],
+                uncertainties: parsed.uncertainties || (parsed.scrutinyPoints ? parsed.scrutinyPoints.map(p => `${p.title}: ${p.detailedExplanation}`) : []),
                 issues: parsed.issues || [],
-                confidence: typeof parsed.confidence === "number" ? parsed.confidence : 0.85,
+                confidence: typeof parsed.confidence === "number" ? parsed.confidence : 0.88,
                 model: DEFAULT_MODEL,
                 provider: this.providerName,
                 latencyMs: Date.now() - startTime,
