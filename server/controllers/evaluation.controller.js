@@ -33,6 +33,21 @@ export const evaluationController = {
         }
     },
 
+    async getEvaluators(req, res, next) {
+        try {
+            const evaluators = await evaluationService.getEvaluators({
+                actor: req.user,
+            });
+            return res.status(200).json({
+                data: evaluators,
+                meta: { traceId: req.id, timestamp: new Date().toISOString() },
+                error: null,
+            });
+        } catch (error) {
+            next(error);
+        }
+    },
+
     async createAssignment(req, res, next) {
         try {
             const assignment = await evaluationService.createAssignment({

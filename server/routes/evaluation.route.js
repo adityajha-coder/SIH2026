@@ -20,6 +20,9 @@ evaluationRouter.post("/templates", requireAuth, requirePermission(PERMISSIONS.E
 evaluationRouter.get("/templates/problem/:problemId", requireAuth, evaluationController.getTemplates);
 
 
+// GET /v1/evaluations/evaluators
+evaluationRouter.get("/evaluators", requireAuth, requirePermission(PERMISSIONS.EVALUATION_DECIDE), evaluationController.getEvaluators);
+
 // POST /v1/evaluations/assignments
 evaluationRouter.post("/assignments", requireAuth, requirePermission(PERMISSIONS.EVALUATION_DECIDE), validate(createAssignmentSchema), evaluationController.createAssignment);
 
