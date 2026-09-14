@@ -7,20 +7,6 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { toast } from "sonner";
-import {
-  ResponsiveContainer,
-  RadarChart,
-  PolarGrid,
-  PolarAngleAxis,
-  PolarRadiusAxis,
-  Radar,
-  BarChart,
-  Bar,
-  XAxis,
-  YAxis,
-  Tooltip,
-} from "recharts";
-
 export function CandidateMatching() {
   const { id: problemId } = useParams();
 
@@ -92,32 +78,6 @@ export function CandidateMatching() {
       setIsSendingInvite(false);
     }
   };
-
-  // Prepare radar chart data
-  const radarData = matchResult?.scoreBreakdown
-    ? [
-        {
-          subject: "Sector Fit",
-          score: matchResult.scoreBreakdown.sectorAlignment.score,
-          fullMark: matchResult.scoreBreakdown.sectorAlignment.max,
-        },
-        {
-          subject: "Capability Overlap",
-          score: matchResult.scoreBreakdown.capabilityOverlap.score,
-          fullMark: matchResult.scoreBreakdown.capabilityOverlap.max,
-        },
-        {
-          subject: "Stage Maturity",
-          score: matchResult.scoreBreakdown.stageMaturity.score,
-          fullMark: matchResult.scoreBreakdown.stageMaturity.max,
-        },
-        {
-          subject: "DPIIT Recognition",
-          score: matchResult.scoreBreakdown.regulatoryRecognition.score,
-          fullMark: matchResult.scoreBreakdown.regulatoryRecognition.max,
-        },
-      ]
-    : [];
 
   return (
     <div className="max-w-6xl mx-auto space-y-8 pb-16">
@@ -199,7 +159,7 @@ export function CandidateMatching() {
               }`}
             >
               {inviteSent
-                ? "✓ Invitation Dispatched"
+                ? "Invitation Dispatched"
                 : isSendingInvite
                 ? "Dispatching..."
                 : "Invite to Apply"}
@@ -259,198 +219,337 @@ export function CandidateMatching() {
             </CardContent>
           </Card>
 
-          {/* 2-Column: Breakdown Details + Radar Visualization */}
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
-            {/* Left: Score Pillars */}
-            <div className="lg:col-span-7 space-y-4">
-              <Card className="border border-slate-200 bg-white rounded-xl shadow-xs">
-                <CardHeader className="pb-3 border-b border-slate-100">
-                  <CardTitle className="text-sm font-bold text-[#10233F]">
-                    Deterministic Score Breakdown
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="p-5 space-y-4 text-xs">
-                  {/* Pillar 1 */}
-                  <div className="space-y-1.5 pb-3 border-b border-slate-100">
-                    <div className="flex justify-between font-bold text-[#10233F]">
-                      <span>1. Sector Alignment</span>
-                      <span className="font-mono text-[#2563EB]">
-                        {matchResult.scoreBreakdown.sectorAlignment.score} /{" "}
-                        {matchResult.scoreBreakdown.sectorAlignment.max} pts
-                      </span>
-                    </div>
-                    <div className="w-full h-2 rounded-full bg-slate-100 overflow-hidden">
-                      <div
-                        className="h-full bg-[#2563EB]"
-                        style={{
-                          width: `${
-                            (matchResult.scoreBreakdown.sectorAlignment.score / 35) * 100
-                          }%`,
-                        }}
-                      />
-                    </div>
-                    <span className="text-[11px] text-[#64748B] block">
-                      Matched Sectors:{" "}
-                      {matchResult.scoreBreakdown.sectorAlignment.matched.join(", ") ||
-                        "None"}
-                    </span>
-                  </div>
-
-                  {/* Pillar 2 */}
-                  <div className="space-y-1.5 pb-3 border-b border-slate-100">
-                    <div className="flex justify-between font-bold text-[#10233F]">
-                      <span>2. Technical Capability Overlap</span>
-                      <span className="font-mono text-[#2563EB]">
-                        {matchResult.scoreBreakdown.capabilityOverlap.score} /{" "}
-                        {matchResult.scoreBreakdown.capabilityOverlap.max} pts
-                      </span>
-                    </div>
-                    <div className="w-full h-2 rounded-full bg-slate-100 overflow-hidden">
-                      <div
-                        className="h-full bg-teal-600"
-                        style={{
-                          width: `${
-                            (matchResult.scoreBreakdown.capabilityOverlap.score / 35) * 100
-                          }%`,
-                        }}
-                      />
-                    </div>
-                    <span className="text-[11px] text-[#64748B] block">
-                      Matched Keywords:{" "}
-                      {matchResult.scoreBreakdown.capabilityOverlap.matched.join(", ") ||
-                        "None detected in profile"}
-                    </span>
-                  </div>
-
-                  {/* Pillar 3 */}
-                  <div className="space-y-1.5 pb-3 border-b border-slate-100">
-                    <div className="flex justify-between font-bold text-[#10233F]">
-                      <span>3. Maturity Stage Suitability</span>
-                      <span className="font-mono text-[#2563EB]">
-                        {matchResult.scoreBreakdown.stageMaturity.score} /{" "}
-                        {matchResult.scoreBreakdown.stageMaturity.max} pts
-                      </span>
-                    </div>
-                    <span className="text-[11px] text-[#64748B] block">
-                      Startup Stage: {matchResult.scoreBreakdown.stageMaturity.currentStage}
-                    </span>
-                  </div>
-
-                  {/* Pillar 4 */}
-                  <div className="space-y-1.5">
-                    <div className="flex justify-between font-bold text-[#10233F]">
-                      <span>4. Regulatory DPIIT Exemption</span>
-                      <span className="font-mono text-[#2563EB]">
-                        {matchResult.scoreBreakdown.regulatoryRecognition.score} /{" "}
-                        {matchResult.scoreBreakdown.regulatoryRecognition.max} pts
-                      </span>
-                    </div>
-                    <span className="text-[11px] text-[#64748B] block">
-                      Status:{" "}
-                      {matchResult.scoreBreakdown.regulatoryRecognition.hasDpiit
-                        ? "DPIIT Recognized (Turnover & Prior Experience Exempt)"
-                        : "Unverified / Self-Certified"}
-                    </span>
-                  </div>
-                </CardContent>
-              </Card>
-            </div>
-
-            {/* Right: Radar Chart */}
-            <div className="lg:col-span-5">
-              <Card className="border border-slate-200 bg-white rounded-xl shadow-xs">
-                <CardHeader className="pb-2 border-b border-slate-100">
-                  <CardTitle className="text-xs font-bold text-[#10233F]">
-                    Capability Radar
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="pt-4 h-72">
-                  <ResponsiveContainer width="100%" height="100%">
-                    <RadarChart data={radarData}>
-                      <PolarGrid stroke="#E2E8F0" />
-                      <PolarAngleAxis
-                        dataKey="subject"
-                        stroke="#64748B"
-                        fontSize={11}
-                      />
-                      <PolarRadiusAxis
-                        angle={30}
-                        domain={[0, 35]}
-                        stroke="#94A3B8"
-                        fontSize={9}
-                      />
-                      <Radar
-                        name="Candidate"
-                        dataKey="score"
-                        stroke="#2563EB"
-                        fill="#2563EB"
-                        fillOpacity={0.3}
-                      />
-                    </RadarChart>
-                  </ResponsiveContainer>
-                </CardContent>
-              </Card>
-            </div>
-          </div>
-
-          {/* Explainable AI Advisory Card */}
+          {/* Deterministic Score Breakdown */}
           <Card className="border border-slate-200 bg-white rounded-xl shadow-xs">
-            <CardHeader className="pb-3 border-b border-slate-100 bg-slate-50">
-              <div className="flex items-center justify-between">
-                <CardTitle className="text-xs font-bold text-[#10233F]">
-                  Explainable AI Advisory Report
-                </CardTitle>
-                <span className="text-xs font-mono font-semibold text-[#0F766E]">
-                  Confidence: {Math.round((matchResult.aiAdvisory.confidence || 0.85) * 100)}%
-                </span>
+            <CardHeader className="pb-3 border-b border-slate-100">
+              <CardTitle className="text-sm font-bold text-[#10233F]">
+                Deterministic Score Breakdown
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="p-5 text-xs">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                {/* Pillar 1 */}
+                <div className="space-y-2 p-3.5 rounded-lg border border-slate-200 bg-[#F8FAFC]">
+                  <div className="flex justify-between font-bold text-[#10233F]">
+                    <span>1. Sector Alignment</span>
+                    <span className="font-mono text-[#2563EB]">
+                      {matchResult.scoreBreakdown.sectorAlignment.score} /{" "}
+                      {matchResult.scoreBreakdown.sectorAlignment.max} pts
+                    </span>
+                  </div>
+                  <div className="w-full h-2 rounded-full bg-slate-200 overflow-hidden">
+                    <div
+                      className="h-full bg-[#2563EB]"
+                      style={{
+                        width: `${
+                          (matchResult.scoreBreakdown.sectorAlignment.score / 35) * 100
+                        }%`,
+                      }}
+                    />
+                  </div>
+                  <span className="text-[11px] text-[#64748B] block">
+                    Matched Sectors:{" "}
+                    {matchResult.scoreBreakdown.sectorAlignment.matched.join(", ") ||
+                      "None"}
+                  </span>
+                </div>
+
+                {/* Pillar 2 */}
+                <div className="space-y-2 p-3.5 rounded-lg border border-slate-200 bg-[#F8FAFC]">
+                  <div className="flex justify-between font-bold text-[#10233F]">
+                    <span>2. Technical Capability Overlap</span>
+                    <span className="font-mono text-[#2563EB]">
+                      {matchResult.scoreBreakdown.capabilityOverlap.score} /{" "}
+                      {matchResult.scoreBreakdown.capabilityOverlap.max} pts
+                    </span>
+                  </div>
+                  <div className="w-full h-2 rounded-full bg-slate-200 overflow-hidden">
+                    <div
+                      className="h-full bg-teal-600"
+                      style={{
+                        width: `${
+                          (matchResult.scoreBreakdown.capabilityOverlap.score / 35) * 100
+                        }%`,
+                      }}
+                    />
+                  </div>
+                  <span className="text-[11px] text-[#64748B] block">
+                    Matched Keywords:{" "}
+                    {matchResult.scoreBreakdown.capabilityOverlap.matched.join(", ") ||
+                      "None detected in profile"}
+                  </span>
+                </div>
+
+                {/* Pillar 3 */}
+                <div className="space-y-2 p-3.5 rounded-lg border border-slate-200 bg-[#F8FAFC]">
+                  <div className="flex justify-between font-bold text-[#10233F]">
+                    <span>3. Maturity Stage Suitability</span>
+                    <span className="font-mono text-[#2563EB]">
+                      {matchResult.scoreBreakdown.stageMaturity.score} /{" "}
+                      {matchResult.scoreBreakdown.stageMaturity.max} pts
+                    </span>
+                  </div>
+                  <span className="text-[11px] text-[#64748B] block">
+                    Startup Stage: {matchResult.scoreBreakdown.stageMaturity.currentStage}
+                  </span>
+                </div>
+
+                {/* Pillar 4 */}
+                <div className="space-y-2 p-3.5 rounded-lg border border-slate-200 bg-[#F8FAFC]">
+                  <div className="flex justify-between font-bold text-[#10233F]">
+                    <span>4. Regulatory DPIIT Exemption</span>
+                    <span className="font-mono text-[#2563EB]">
+                      {matchResult.scoreBreakdown.regulatoryRecognition.score} /{" "}
+                      {matchResult.scoreBreakdown.regulatoryRecognition.max} pts
+                    </span>
+                  </div>
+                  <span className="text-[11px] text-[#64748B] block">
+                    Status:{" "}
+                    {matchResult.scoreBreakdown.regulatoryRecognition.hasDpiit
+                      ? "DPIIT Recognized (Turnover & Prior Experience Exempt)"
+                      : "Unverified / Self-Certified"}
+                  </span>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Explainable AI Advisory Card - Point-Wise Detailed Report */}
+          <Card className="border border-slate-200 bg-white rounded-xl shadow-xs">
+            <CardHeader className="pb-3 border-b border-slate-200 bg-slate-50">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                <div>
+                  <CardTitle className="text-sm font-bold text-[#10233F]">
+                    Explainable AI Advisory Report
+                  </CardTitle>
+                  <p className="text-[11px] text-[#64748B] mt-0.5">
+                    Statutory multi-pillar evaluation report formulated under GFR Rule 173(i) transparency directives
+                  </p>
+                </div>
+                <div>
+                  <span className="font-mono text-xs font-bold text-[#0F766E] bg-teal-50 px-2.5 py-1 rounded border border-teal-200 block sm:inline-block">
+                    Confidence: {Math.round((matchResult.aiAdvisory?.confidence || 0.88) * 100)}%
+                  </span>
+                </div>
               </div>
             </CardHeader>
-            <CardContent className="p-6 space-y-5 text-xs">
-              {/* Conclusion Summary */}
-              <div className="space-y-1">
-                <span className="font-bold text-xs text-[#10233F] block">
-                  Executive Synthesis:
+
+            <CardContent className="p-6 space-y-6 text-xs">
+              {/* Executive Evaluation Synthesis */}
+              <div className="p-4 rounded-lg bg-slate-50 border border-slate-200 space-y-1.5">
+                <span className="text-xs font-bold uppercase tracking-wider text-[#2563EB] block">
+                  Executive Evaluation Synthesis
                 </span>
-                <p className="text-slate-700 leading-relaxed text-xs sm:text-sm">
-                  {matchResult.aiAdvisory.summary ||
-                    "Strong alignment identified between the startup's proven telemetry capabilities and municipal pipeline specifications."}
+                <p className="text-slate-800 text-xs sm:text-sm leading-relaxed font-normal">
+                  {matchResult.aiAdvisory?.executiveSummary ||
+                    matchResult.aiAdvisory?.summary ||
+                    "Comprehensive procurement evaluation evaluated against statutory sandbox constraints."}
                 </p>
               </div>
 
-              {/* Key Fit Points */}
-              {matchResult.aiAdvisory.keyFitPoints?.length > 0 && (
-                <div className="space-y-2">
-                  <span className="font-bold text-xs text-[#10233F] block">
-                    Key Fit Points (Claims):
-                  </span>
-                  <div className="space-y-1.5">
-                    {matchResult.aiAdvisory.keyFitPoints.map((claim, idx) => (
+              {/* Section 1: Point-Wise Technical Architecture Alignment */}
+              {((matchResult.aiAdvisory?.technicalPoints && matchResult.aiAdvisory.technicalPoints.length > 0) ||
+                (matchResult.aiAdvisory?.keyFitPoints && matchResult.aiAdvisory.keyFitPoints.length > 0)) && (
+                <div className="space-y-3 pt-2">
+                  <div className="space-y-0.5">
+                    <h3 className="text-xs font-bold uppercase tracking-wider text-[#10233F]">
+                      1. Technical Architecture & Capability Alignment
+                    </h3>
+                    <p className="text-[11px] text-[#64748B]">
+                      Point-by-point technical fit analysis of the candidate's software stack, data models, and system throughput
+                    </p>
+                  </div>
+
+                  <div className="space-y-2.5">
+                    {(matchResult.aiAdvisory.technicalPoints || matchResult.aiAdvisory.keyFitPoints).map((pt, idx) => {
+                      const pointNum = pt.pointNumber || String(idx + 1).padStart(2, "0");
+                      const title =
+                        pt.title ||
+                        (typeof pt === "string" && pt.includes(":")
+                          ? pt.split(":")[0].trim()
+                          : `Technical Pillar ${pointNum}`);
+                      const explanation =
+                        pt.detailedExplanation ||
+                        (typeof pt === "string" && pt.includes(":")
+                          ? pt.split(":").slice(1).join(":").trim()
+                          : typeof pt === "string"
+                          ? pt
+                          : "");
+
+                      return (
+                        <div
+                          key={idx}
+                          className="p-3.5 rounded-lg border border-slate-200 bg-[#F8FAFC] space-y-1.5"
+                        >
+                          <div className="flex items-baseline gap-2 flex-wrap">
+                            <span className="font-mono text-[10px] font-bold text-[#2563EB] bg-blue-50 px-2 py-0.5 rounded border border-blue-200/70 shrink-0">
+                              Point {pointNum}
+                            </span>
+                            <span className="text-xs font-bold text-[#10233F]">
+                              {title}
+                            </span>
+                          </div>
+                          <p className="text-xs text-slate-700 leading-relaxed pl-0.5">
+                            {explanation}
+                          </p>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              )}
+
+              {/* Section 2: Point-Wise Statutory & Regulatory Compliance */}
+              {matchResult.aiAdvisory?.statutoryPoints?.length > 0 && (
+                <div className="space-y-3 pt-3 border-t border-slate-200">
+                  <div className="space-y-0.5">
+                    <h3 className="text-xs font-bold uppercase tracking-wider text-[#10233F]">
+                      2. Statutory & Public Procurement Compliance (GFR 173(i) & DPIIT)
+                    </h3>
+                    <p className="text-[11px] text-[#64748B]">
+                      Point-by-point verification of prior-experience exemptions, turnover waivers, and state data sovereignty
+                    </p>
+                  </div>
+
+                  <div className="space-y-2.5">
+                    {matchResult.aiAdvisory.statutoryPoints.map((pt, idx) => (
                       <div
                         key={idx}
-                        className="flex items-start gap-2 text-slate-700"
+                        className="p-3.5 rounded-lg border border-slate-200 bg-[#F8FAFC] space-y-1.5"
                       >
-                        <span className="text-emerald-700">✓</span>
-                        <span>{claim}</span>
+                        <div className="flex items-baseline gap-2 flex-wrap">
+                          <span className="font-mono text-[10px] font-bold text-teal-700 bg-teal-50 px-2 py-0.5 rounded border border-teal-200/70 shrink-0">
+                            Point {pt.pointNumber || String(idx + 1).padStart(2, "0")}
+                          </span>
+                          <span className="text-xs font-bold text-[#10233F]">
+                            {pt.title}
+                          </span>
+                        </div>
+                        <p className="text-xs text-slate-700 leading-relaxed pl-0.5">
+                          {pt.detailedExplanation}
+                        </p>
                       </div>
                     ))}
                   </div>
                 </div>
               )}
 
-              {/* Uncertainties */}
-              {matchResult.aiAdvisory.uncertainties?.length > 0 && (
-                <div className="space-y-2 pt-2 border-t border-slate-100">
-                  <span className="font-bold text-xs text-amber-800 block">
-                    Identified Uncertainties / Questions for Evaluator:
-                  </span>
-                  <div className="space-y-1.5">
-                    {matchResult.aiAdvisory.uncertainties.map((unc, idx) => (
+              {/* Section 3: Point-Wise 90-Day Sandbox Pilot Viability */}
+              {matchResult.aiAdvisory?.pilotPoints?.length > 0 && (
+                <div className="space-y-3 pt-3 border-t border-slate-200">
+                  <div className="space-y-0.5">
+                    <h3 className="text-xs font-bold uppercase tracking-wider text-[#10233F]">
+                      3. 90-Day Field Sandbox Pilot Deployment Feasibility
+                    </h3>
+                    <p className="text-[11px] text-[#64748B]">
+                      Point-by-point assessment of milestone milestones, API retrofits, sensor hardware, and deployment schedules
+                    </p>
+                  </div>
+
+                  <div className="space-y-2.5">
+                    {matchResult.aiAdvisory.pilotPoints.map((pt, idx) => (
                       <div
                         key={idx}
-                        className="flex items-start gap-2 text-slate-600"
+                        className="p-3.5 rounded-lg border border-slate-200 bg-[#F8FAFC] space-y-1.5"
                       >
-                        <span className="text-amber-600">!</span>
-                        <span>{unc}</span>
+                        <div className="flex items-baseline gap-2 flex-wrap">
+                          <span className="font-mono text-[10px] font-bold text-purple-700 bg-purple-50 px-2 py-0.5 rounded border border-purple-200/70 shrink-0">
+                            Point {pt.pointNumber || String(idx + 1).padStart(2, "0")}
+                          </span>
+                          <span className="text-xs font-bold text-[#10233F]">
+                            {pt.title}
+                          </span>
+                        </div>
+                        <p className="text-xs text-slate-700 leading-relaxed pl-0.5">
+                          {pt.detailedExplanation}
+                        </p>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Section 4: Point-Wise Technical Evaluator Committee Scrutiny */}
+              {((matchResult.aiAdvisory?.scrutinyPoints && matchResult.aiAdvisory.scrutinyPoints.length > 0) ||
+                (matchResult.aiAdvisory?.uncertainties && matchResult.aiAdvisory.uncertainties.length > 0)) && (
+                <div className="space-y-3 pt-3 border-t border-slate-200">
+                  <div className="space-y-0.5">
+                    <h3 className="text-xs font-bold uppercase tracking-wider text-[#10233F]">
+                      4. Technical Committee Interrogation & Scrutiny Items
+                    </h3>
+                    <p className="text-[11px] text-[#64748B]">
+                      Point-by-point critical technical questions the departmental evaluation committee must interrogate before pilot award
+                    </p>
+                  </div>
+
+                  <div className="space-y-2.5">
+                    {(matchResult.aiAdvisory.scrutinyPoints || matchResult.aiAdvisory.uncertainties).map((pt, idx) => {
+                      const pointNum = pt.pointNumber || String(idx + 1).padStart(2, "0");
+                      const title =
+                        pt.title ||
+                        (typeof pt === "string" && pt.includes(":")
+                          ? pt.split(":")[0].trim()
+                          : `Scrutiny Inquiry ${pointNum}`);
+                      const explanation =
+                        pt.detailedExplanation ||
+                        (typeof pt === "string" && pt.includes(":")
+                          ? pt.split(":").slice(1).join(":").trim()
+                          : typeof pt === "string"
+                          ? pt
+                          : "");
+
+                      return (
+                        <div
+                          key={idx}
+                          className="p-3.5 rounded-lg border border-amber-200 bg-amber-50/40 space-y-1.5"
+                        >
+                          <div className="flex items-baseline gap-2 flex-wrap">
+                            <span className="font-mono text-[10px] font-bold text-amber-800 bg-amber-100/70 px-2 py-0.5 rounded border border-amber-300/70 shrink-0">
+                              Point {pointNum}
+                            </span>
+                            <span className="text-xs font-bold text-[#10233F]">
+                              {title}
+                            </span>
+                          </div>
+                          <p className="text-xs text-slate-700 leading-relaxed pl-0.5">
+                            {explanation}
+                          </p>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              )}
+
+              {/* Section 5: Point-Wise Recommended Officer Directives */}
+              {matchResult.aiAdvisory?.actionDirectives?.length > 0 && (
+                <div className="space-y-3 pt-3 border-t border-slate-200">
+                  <div className="space-y-0.5">
+                    <h3 className="text-xs font-bold uppercase tracking-wider text-[#10233F]">
+                      5. Recommended Procurement Directives & Next Steps
+                    </h3>
+                    <p className="text-[11px] text-[#64748B]">
+                      Point-by-point actionable directives for the nodal procurement officer
+                    </p>
+                  </div>
+
+                  <div className="space-y-2.5">
+                    {matchResult.aiAdvisory.actionDirectives.map((pt, idx) => (
+                      <div
+                        key={idx}
+                        className="p-3.5 rounded-lg border border-slate-200 bg-[#F8FAFC] space-y-1.5"
+                      >
+                        <div className="flex items-baseline gap-2 flex-wrap">
+                          <span className="font-mono text-[10px] font-bold text-[#10233F] bg-slate-200/80 px-2 py-0.5 rounded border border-slate-300 shrink-0">
+                            Point {pt.pointNumber || String(idx + 1).padStart(2, "0")}
+                          </span>
+                          <span className="text-xs font-bold text-[#10233F]">
+                            {pt.title}
+                          </span>
+                        </div>
+                        <p className="text-xs text-slate-700 leading-relaxed pl-0.5">
+                          {pt.detailedExplanation}
+                        </p>
                       </div>
                     ))}
                   </div>
@@ -458,8 +557,8 @@ export function CandidateMatching() {
               )}
 
               {/* Statutory Disclaimer */}
-              <div className="rounded-lg bg-slate-50 p-3 text-[11px] text-slate-700 border border-slate-200">
-                <strong>Legal Disclaimer:</strong> {matchResult.aiAdvisory.disclaimer}
+              <div className="rounded-lg bg-slate-50 p-3 text-[11px] text-slate-700 border border-slate-200 pt-3">
+                <strong>Statutory Notice:</strong> {matchResult.aiAdvisory?.disclaimer || "AI advisory reports provide auditable, explainable analytical evidence under GFR 173(i). Final procurement decisions remain solely with designated departmental evaluation authorities."}
               </div>
             </CardContent>
           </Card>
