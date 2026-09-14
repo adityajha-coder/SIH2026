@@ -112,11 +112,13 @@ export function EvaluationRoom() {
   const { user } = useAuth();
 
   const submitScoresMutation = useSubmitScores();
+  const aiVerifyMutation = useAiVerify();
   const { data: serverAssignments = [] } = useMyAssignments();
 
   // Conflict of Interest (COI) Gate State
   const [coiDeclared, setCoiDeclared] = useState(false);
   const [coiAcknowledged, setCoiAcknowledged] = useState(false);
+  const [liveAiResult, setLiveAiResult] = useState(null);
 
   // Proposal Dossier and Rubric Resolution
   const dossier = useMemo(() => {
@@ -264,6 +266,29 @@ export function EvaluationRoom() {
       navigate("/evaluator/queue");
     } catch (err) {
       toast.error(err.response?.data?.error?.message || "Failed to submit evaluation scorecard");
+    }
+  };
+
+  const handleRunLiveAiVerification = async () => {
+    try {
+      const assignmentRecord = serverAssignments.find((a) => a._id === assignmentId);
+      const subId = assignmentRecord?.submissionId?._id || assignmentRecord?.submissionId || "6aa727d6d7548c3f68a6719e";
+
+      const evidenceTexts = (dossier.evidenceLinks || []).map((e) => e.name);
+      if (evidenceTexts.length === 0) evidenceTexts.push("Standard Proposal Submission Dossier");
+
+      const res = await aiVerifyMutation.mutateAsync({
+        task: `Evaluation Audit: ${dossier.problemTitle}`,
+        userInput: `${dossier.solutionTitle}. Executive Summary: ${dossier.executiveSummary}. Baseline: ${dossier.baselineOutcome}. Target: ${dossier.targetOutcome}`,
+        evidence: evidenceTexts,
+        entityType: "SUBMISSION",
+        entityId: typeof subId === "string" && subId.length === 24 ? subId : "6aa727d6d7548c3f68a6719e",
+      });
+
+      setLiveAiResult(res);
+      toast.success("Live 3-Model AI Anti-Cascade Verification completed!");
+    } catch (err) {
+      toast.error(err?.message || "Failed to execute AI verification");
     }
   };
 
@@ -460,50 +485,120 @@ export function EvaluationRoom() {
           </Card>
 
           {/* AI Multi-Model Claims Verification Inspector */}
-          {dossier.aiClaimsCheck && (
-            <Card className="border border-blue-200 bg-gradient-to-br from-blue-50/40 via-white to-white rounded-2xl shadow-sm">
-              <CardHeader className="pb-3 border-b border-blue-100">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2">
-                    <Sparkles className="h-4 w-4 text-[#2563EB]" />
-                    <CardTitle className="text-sm font-bold text-[#10233F]">
-                      AI Factual Consistency Verification
-                    </CardTitle>
-                  </div>
-                  <span className="text-xs font-mono font-semibold text-[#0F766E]">
-                    Confidence: {Math.round(dossier.aiClaimsCheck.confidence * 100)}%
-                  </span>
+          <Card className="border border-blue-200 bg-gradient-to-br from-blue-50/40 via-white to-white rounded-2xl shadow-sm overflow-hidden">
+            <CardHeader className="pb-3 border-b border-blue-100 bg-blue-50/20">
+              <div className="flex flex-wrap items-center justify-between gap-2">
+                <div className="flex items-center gap-2">
+                  <Sparkles className="h-4 w-4 text-[#2563EB]" />
+                  <CardTitle className="text-sm font-bold text-[#10233F]">
+                    AI Multi-Model Consensus Audit
+                  </CardTitle>
                 </div>
-              </CardHeader>
-              <CardContent className="p-5 space-y-3 text-xs">
-                <div className="space-y-1.5">
-                  <span className="font-bold text-[#10233F] block">
-                    Verified Technical Claims:
-                  </span>
-                  {dossier.aiClaimsCheck.verifiedClaims.map((claim, idx) => (
-                    <div key={idx} className="flex items-start gap-1.5 text-emerald-800">
-                      <CheckCircle2 className="h-3.5 w-3.5 text-emerald-600 shrink-0 mt-0.5" />
-                      <span>{claim}</span>
-                    </div>
-                  ))}
-                </div>
-
-                {dossier.aiClaimsCheck.potentialRisks?.length > 0 && (
-                  <div className="space-y-1.5 pt-2 border-t border-blue-100">
-                    <span className="font-bold text-amber-800 block">
-                      Operational Risk Flags:
+                <div className="flex items-center gap-2">
+                  {liveAiResult ? (
+                    <span className="text-[11px] font-mono font-bold px-2 py-0.5 rounded bg-emerald-100 text-emerald-800">
+                      {liveAiResult.verdict} ({liveAiResult.totalLatencyMs}ms)
                     </span>
-                    {dossier.aiClaimsCheck.potentialRisks.map((risk, idx) => (
-                      <div key={idx} className="flex items-start gap-1.5 text-amber-800">
-                        <AlertTriangle className="h-3.5 w-3.5 text-amber-600 shrink-0 mt-0.5" />
-                        <span>{risk}</span>
+                  ) : dossier.aiClaimsCheck ? (
+                    <span className="text-xs font-mono font-semibold text-[#0F766E]">
+                      Confidence: {Math.round(dossier.aiClaimsCheck.confidence * 100)}%
+                    </span>
+                  ) : null}
+                </div>
+              </div>
+            </CardHeader>
+            <CardContent className="p-5 space-y-4 text-xs">
+              {liveAiResult ? (
+                <div className="space-y-3">
+                  <div className="p-3 rounded-xl bg-slate-50 border border-slate-200 space-y-1">
+                    <span className="font-bold text-[#10233F] block">Tri-Model Synthesis:</span>
+                    <p className="text-[#334155] leading-relaxed">{liveAiResult.summary}</p>
+                    <div className="pt-1 flex items-center gap-2 text-[10px] text-slate-500 font-mono">
+                      <span>Chain: {liveAiResult.providerChain?.join(" → ") || "google → groq → openrouter"}</span>
+                      {liveAiResult.runId && <span>• Run ID: {liveAiResult.runId.slice(-6)}</span>}
+                    </div>
+                  </div>
+
+                  {liveAiResult.auditedClaims?.length > 0 && (
+                    <div className="space-y-1.5">
+                      <span className="font-bold text-[#10233F] block">Audited Claims:</span>
+                      {liveAiResult.auditedClaims.map((claim, idx) => (
+                        <div key={idx} className="flex items-start gap-1.5 text-emerald-800">
+                          <CheckCircle2 className="h-3.5 w-3.5 text-emerald-600 shrink-0 mt-0.5" />
+                          <span>{claim}</span>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+
+                  {(liveAiResult.disagreements?.length > 0 || liveAiResult.flags?.length > 0) && (
+                    <div className="space-y-1.5 pt-2 border-t border-blue-100">
+                      <span className="font-bold text-amber-800 block">Identified Inconsistencies & Flags:</span>
+                      {[...(liveAiResult.disagreements || []), ...(liveAiResult.flags || [])].map((item, idx) => (
+                        <div key={idx} className="flex items-start gap-1.5 text-amber-800">
+                          <AlertTriangle className="h-3.5 w-3.5 text-amber-600 shrink-0 mt-0.5" />
+                          <span>{item}</span>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              ) : dossier.aiClaimsCheck ? (
+                <div className="space-y-3">
+                  <div className="space-y-1.5">
+                    <span className="font-bold text-[#10233F] block">
+                      Verified Technical Claims:
+                    </span>
+                    {dossier.aiClaimsCheck.verifiedClaims.map((claim, idx) => (
+                      <div key={idx} className="flex items-start gap-1.5 text-emerald-800">
+                        <CheckCircle2 className="h-3.5 w-3.5 text-emerald-600 shrink-0 mt-0.5" />
+                        <span>{claim}</span>
                       </div>
                     ))}
                   </div>
-                )}
-              </CardContent>
-            </Card>
-          )}
+
+                  {dossier.aiClaimsCheck.potentialRisks?.length > 0 && (
+                    <div className="space-y-1.5 pt-2 border-t border-blue-100">
+                      <span className="font-bold text-amber-800 block">
+                        Operational Risk Flags:
+                      </span>
+                      {dossier.aiClaimsCheck.potentialRisks.map((risk, idx) => (
+                        <div key={idx} className="flex items-start gap-1.5 text-amber-800">
+                          <AlertTriangle className="h-3.5 w-3.5 text-amber-600 shrink-0 mt-0.5" />
+                          <span>{risk}</span>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              ) : null}
+
+              <div className="pt-2 border-t border-slate-100 flex items-center justify-between">
+                <span className="text-[11px] text-slate-500">
+                  Google Gemini ➔ Groq ➔ OpenRouter
+                </span>
+                <Button
+                  size="sm"
+                  variant="outline"
+                  onClick={handleRunLiveAiVerification}
+                  disabled={aiVerifyMutation.isPending}
+                  className="h-8 text-xs font-semibold gap-1.5 border-blue-200 text-[#2563EB] hover:bg-blue-50"
+                >
+                  {aiVerifyMutation.isPending ? (
+                    <>
+                      <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                      Running Anti-Cascade AI...
+                    </>
+                  ) : (
+                    <>
+                      <Sparkles className="h-3.5 w-3.5 text-blue-600" />
+                      {liveAiResult ? "Re-Run Live AI Verification" : "Run Live AI Anti-Cascade Verification"}
+                    </>
+                  )}
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
         </div>
 
         {/* RIGHT COLUMN: Weighted Rubric Scorecard */}

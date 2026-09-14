@@ -99,7 +99,8 @@ export function requireRole(...allowedRoles) {
                 error: { code: "UNAUTHORIZED", message: "Authentication required" },
             });
         }
-        if (!allowedRoles.includes(req.user.role)) {
+        const flatRoles = allowedRoles.flat();
+        if (!flatRoles.includes(req.user.role)) {
             return res
             .status(403)
             .json({

@@ -79,8 +79,11 @@ export function SubmissionDetail() {
     problemId,
     createdAt,
     updatedAt,
+    transitionHistory = [],
     history = [],
   } = submission;
+
+  const transitions = transitionHistory.length > 0 ? transitionHistory : history;
 
   const currentStageIndex = FSM_STAGES.findIndex((s) => s.key === status);
   const problemTitle = problemId?.title || "Department Outcome Challenge";
@@ -296,28 +299,35 @@ export function SubmissionDetail() {
         </Card>
 
         {/* Audit & Transition History */}
-        {history.length > 0 && (
+        {transitions.length > 0 && (
           <Card className="border border-slate-200 bg-white rounded-2xl shadow-sm p-6 space-y-4">
             <div className="flex items-center gap-2 font-bold text-sm text-[#10233F]">
               <Clock className="h-4 w-4 text-slate-500" />
               Forensic Audit & Lifecycle Log
             </div>
             <div className="space-y-3">
-              {history.map((entry, idx) => (
+              {transitions.map((entry, idx) => (
                 <div
                   key={idx}
                   className="p-3 rounded-xl border border-slate-100 bg-slate-50 text-xs flex items-center justify-between gap-3"
                 >
                   <div className="space-y-0.5">
                     <span className="font-bold text-[#10233F]">
-                      {entry.fromStatus || "START"} $\rightarrow$ {entry.toStatus}
+                      {(entry.from || entry.fromStatus || "START").replace(/_/g, " ")} → {(entry.to || entry.toStatus || "").replace(/_/g, " ")}
                     </span>
                     {entry.note && (
                       <p className="text-[#64748B] italic">"{entry.note}"</p>
                     )}
                   </div>
                   <span className="text-[11px] text-slate-400 shrink-0">
-                    {new Date(entry.timestamp).toLocaleTimeString("en-IN", { hour: "2-digit", minute: "2-digit" })}
+                    {new Date(entry.timestamp).toLocaleDateString("en-IN", {
+                      day: "numeric",
+                      month: "short",
+                    })}{" "}
+                    {new Date(entry.timestamp).toLocaleTimeString("en-IN", {
+                      hour: "2-digit",
+                      minute: "2-digit",
+                    })}
                   </span>
                 </div>
               ))}

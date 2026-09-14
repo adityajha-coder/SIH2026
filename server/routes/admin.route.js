@@ -7,7 +7,7 @@ const adminRouter = Router();
 
 // require ADMIN role
 adminRouter.use(requireAuth);
-adminRouter.use(requireRole([ROLES.ADMIN]));
+adminRouter.use(requireRole(ROLES.ADMIN));
 
 // Platform overview stats
 adminRouter.get("/stats", adminController.getPlatformStats);
