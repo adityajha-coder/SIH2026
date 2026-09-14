@@ -104,6 +104,9 @@ jobs:
             });
           "
 
+      - name: Run Backend Unit Tests (Vitest)
+        run: npm test
+
   frontend-build:
     name: Frontend Build Verification (Auto-detect)
     runs-on: ubuntu-latest
