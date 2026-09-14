@@ -101,7 +101,7 @@ export function DepartmentDashboard() {
       countMap[st] = (countMap[st] || 0) + 1;
     });
     return Object.entries(countMap).map(([name, value]) => ({
-      name: name.replace("_", " "),
+      name: name.replace(/_/g, " "),
       value,
     }));
   }, [submissions]);
@@ -159,13 +159,13 @@ export function DepartmentDashboard() {
             {loadingProblems ? (
               <Skeleton className="h-8 w-16" />
             ) : (
-              <div className="text-2xl font-extrabold text-[#10233F]">
-                {metrics.publishedProblems}
+              <div>
+                <p className="text-2xl font-bold text-[#10233F]">{metrics.publishedProblems}</p>
+                <p className="text-[11px] text-[#64748B] mt-1">
+                  {metrics.draftProblems} in draft preparation
+                </p>
               </div>
             )}
-            <p className="text-[11px] text-[#64748B] mt-1">
-              {metrics.draftProblems} in draft preparation
-            </p>
           </CardContent>
         </Card>
 
@@ -181,13 +181,11 @@ export function DepartmentDashboard() {
             {loadingSubmissions ? (
               <Skeleton className="h-8 w-16" />
             ) : (
-              <div className="text-2xl font-extrabold text-[#10233F]">
-                {metrics.totalSubmissions}
+              <div>
+                <p className="text-2xl font-bold text-[#10233F]">{metrics.totalSubmissions}</p>
+                <p className="text-[11px] text-[#64748B] mt-1">Across all open problem statements</p>
               </div>
             )}
-            <p className="text-[11px] text-[#64748B] mt-1">
-              Across all open problem statements
-            </p>
           </CardContent>
         </Card>
 
@@ -203,13 +201,11 @@ export function DepartmentDashboard() {
             {loadingSubmissions ? (
               <Skeleton className="h-8 w-16" />
             ) : (
-              <div className="text-2xl font-extrabold text-[#10233F]">
-                {metrics.pendingReview}
+              <div>
+                <p className="text-2xl font-bold text-[#10233F]">{metrics.pendingReview}</p>
+                <p className="text-[11px] text-[#64748B] mt-1">Awaiting double-blind scoring</p>
               </div>
             )}
-            <p className="text-[11px] text-[#64748B] mt-1">
-              Awaiting double-blind scoring
-            </p>
           </CardContent>
         </Card>
 
@@ -225,21 +221,19 @@ export function DepartmentDashboard() {
             {loadingSubmissions ? (
               <Skeleton className="h-8 w-16" />
             ) : (
-              <div className="text-2xl font-extrabold text-[#10233F]">
-                {metrics.activePilots}
+              <div>
+                <p className="text-2xl font-bold text-[#10233F]">{metrics.activePilots}</p>
+                <p className="text-[11px] text-[#64748B] mt-1">Live sandbox trials in progress</p>
               </div>
             )}
-            <p className="text-[11px] text-[#64748B] mt-1">
-              Live sandbox trials in progress
-            </p>
           </CardContent>
         </Card>
       </div>
 
-      {/* Visual Analytics Row */}
-      {(sectorData.length > 0 || statusData.length > 0) && (
+      {/* Visual Analytics Charts */}
+      {!loadingProblems && !loadingSubmissions && (problems.length > 0 || submissions.length > 0) && (
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          {/* Chart 1: Sector Distribution */}
+          {/* Chart 1: Problems by Sector */}
           <Card className="border border-slate-200 bg-white shadow-xs rounded-xl">
             <CardHeader className="pb-2 border-b border-slate-100">
               <CardTitle className="text-sm font-bold text-[#10233F]">
@@ -247,21 +241,34 @@ export function DepartmentDashboard() {
               </CardTitle>
             </CardHeader>
             <CardContent className="pt-4 h-64">
-              <ResponsiveContainer width="100%" height="100%">
-                <BarChart data={sectorData}>
-                  <XAxis dataKey="name" stroke="#64748B" fontSize={11} />
-                  <YAxis stroke="#64748B" fontSize={11} allowDecimals={false} />
-                  <Tooltip
-                    contentStyle={{
-                      backgroundColor: "#10233F",
-                      borderRadius: "6px",
-                      color: "#FFFFFF",
-                      fontSize: "12px",
-                    }}
-                  />
-                  <Bar dataKey="count" fill="#2563EB" radius={[4, 4, 0, 0]} />
-                </BarChart>
-              </ResponsiveContainer>
+              {sectorData.length > 0 ? (
+                <ResponsiveContainer width="100%" height="100%">
+                  <BarChart data={sectorData} margin={{ top: 10, right: 10, left: -20, bottom: 20 }}>
+                    <XAxis
+                      dataKey="name"
+                      tick={{ fontSize: 11, fill: "#64748B" }}
+                      interval={0}
+                    />
+                    <YAxis
+                      allowDecimals={false}
+                      tick={{ fontSize: 11, fill: "#64748B" }}
+                    />
+                    <Tooltip
+                      contentStyle={{
+                        backgroundColor: "#10233F",
+                        borderRadius: "6px",
+                        color: "#FFFFFF",
+                        fontSize: "12px",
+                      }}
+                    />
+                    <Bar dataKey="count" fill="#2563EB" radius={[4, 4, 0, 0]} />
+                  </BarChart>
+                </ResponsiveContainer>
+              ) : (
+                <div className="h-full flex items-center justify-center">
+                  <p className="text-xs text-[#64748B]">No sector data available yet.</p>
+                </div>
+              )}
             </CardContent>
           </Card>
 
@@ -282,8 +289,10 @@ export function DepartmentDashboard() {
                       nameKey="name"
                       cx="50%"
                       cy="50%"
-                      outerRadius={80}
-                      label={({ name, value }) => `${name}: ${value}`}
+                      innerRadius={42}
+                      outerRadius={68}
+                      paddingAngle={2}
+                      label={({ name, value }) => `${name} (${value})`}
                     >
                       {statusData.map((entry, index) => (
                         <Cell

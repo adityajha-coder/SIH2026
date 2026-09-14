@@ -272,7 +272,7 @@ export function LandingPage() {
           <div className="max-w-2xl space-y-6 text-left">
             <h1 className="text-3xl sm:text-5xl lg:text-6xl font-extrabold text-[#10233F] tracking-tight leading-[1.12]">
               Sovereign Innovation Procurement <br />
-              <span className="bg-gradient-to-r from-[#2563EB] to-[#0F766E] bg-clip-text text-transparent">
+              <span className="text-[#2563EB]">
                 Designed for Startups.
               </span>
             </h1>
