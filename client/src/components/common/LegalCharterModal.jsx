@@ -5,10 +5,8 @@ import {
   DialogContent,
   DialogHeader,
   DialogTitle,
-  DialogDescription,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { ShieldCheck, Check, ArrowRight, ExternalLink } from "lucide-react";
 
 export const SOVEREIGN_TERMS = {
   // PROCUREMENT PATHWAYS
@@ -17,7 +15,7 @@ export const SOVEREIGN_TERMS = {
     category: "Procurement Pathways",
     statutoryRef: "Maharashtra Innovation Mandate GR No. MAT-2024/CR-88/Ind-7",
     summary:
-      "State departments and municipal corporations publish clear problem statements and quantifiable KPIs rather than restrictive 200-page technical specifications. This opens government procurement directly to innovative startups.",
+      "State departments and municipal corporations publish clear problem statements and quantifiable KPIs rather than restrictive technical specifications. This opens government procurement directly to innovative startups.",
     provisions: [
       "Outcome-based functional targets replace rigid hardware brand specifications.",
       "Statutory waiver of 3-year prior-turnover and historical revenue prerequisites.",
@@ -57,7 +55,7 @@ export const SOVEREIGN_TERMS = {
       "Department tender committees prohibited from inserting indirect restrictive covenants.",
     ],
     safeguard: "Legally enforceable under General Financial Rules (GFR) Section 173(i).",
-    ctaLink: "/policy",
+    ctaLink: "/policy?section=turnover-exemption",
     ctaLabel: "Read Full DPIIT Exemption Framework",
   },
   "direct-pilots": {
@@ -91,8 +89,8 @@ export const SOVEREIGN_TERMS = {
       "Inter-municipal reciprocity recognizing pilot certifications statewide without re-tendering.",
     ],
     safeguard: "Enacted by the Government of Maharashtra to foster sovereign civic innovation.",
-    ctaLink: "/policy",
-    ctaLabel: "View Policy Details",
+    ctaLink: "/policy?section=maharashtra-policy",
+    ctaLabel: "Open Full Policy Document",
   },
   "ip-governance": {
     title: "IP Rights & Data Governance Compact",
@@ -107,8 +105,8 @@ export const SOVEREIGN_TERMS = {
       "Government bodies are strictly prohibited from proprietary code replication or reverse engineering.",
     ],
     safeguard: "Legally binding tripartite covenant signed before municipal infrastructure access.",
-    ctaLink: "/pilot-framework",
-    ctaLabel: "Inspect IP Compact Framework",
+    ctaLink: "/policy?section=ip-governance",
+    ctaLabel: "Open Full Policy Document",
   },
   "dpdp-compliance": {
     title: "DPDP Act 2023 Compliance",
@@ -123,8 +121,8 @@ export const SOVEREIGN_TERMS = {
       "Tamper-evident audit logs tracking all data queries with SHA-256 cryptographic verification.",
     ],
     safeguard: "Supervised by the State Data Governance Directorate in compliance with national law.",
-    ctaLink: "/audit-public",
-    ctaLabel: "Inspect Public Transparency Audit",
+    ctaLink: "/policy?section=dpdp-compliance",
+    ctaLabel: "Open Full Policy Document",
   },
   "coi-charter": {
     title: "Conflict-of-Interest (COI) Charter",
@@ -139,8 +137,8 @@ export const SOVEREIGN_TERMS = {
       "Immutable consensus voting logs stored with SHA-256 integrity to ensure forensic auditability.",
     ],
     safeguard: "Zero-tolerance ethics mandate with mandatory whistleblower reporting channels.",
-    ctaLink: "/audit-public",
-    ctaLabel: "View Transparency & Audit Trail",
+    ctaLink: "/policy?section=coi-charter",
+    ctaLabel: "Open Full Policy Document",
   },
 };
 
@@ -151,58 +149,68 @@ export function LegalCharterModal({ termKey, isOpen, onClose }) {
 
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
-      <DialogContent className="max-w-xl p-6 sm:p-8 bg-white border border-slate-200 shadow-2xl rounded-2xl">
-        <DialogHeader className="space-y-1.5 pb-4 border-b border-slate-100">
-          <span className="text-[11px] font-semibold text-blue-600 uppercase tracking-wider block">
-            {term.category}
-          </span>
-          <DialogTitle className="text-xl font-bold text-[#10233F] leading-snug">
+      <DialogContent className="max-w-2xl max-h-[85vh] overflow-y-auto p-6 sm:p-8 bg-white border border-slate-200 shadow-xl rounded-lg space-y-6">
+        <DialogHeader className="border-b border-slate-200 pb-4 space-y-1 text-left">
+          <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-slate-500">
+            <span>Government of Maharashtra</span>
+            <span>•</span>
+            <span className="text-[#10233F]">{term.category}</span>
+          </div>
+          <DialogTitle className="text-xl sm:text-2xl font-bold text-slate-900 leading-tight">
             {term.title}
           </DialogTitle>
-          <DialogDescription className="text-xs text-slate-500 font-mono">
-            {term.statutoryRef}
-          </DialogDescription>
+          <div className="text-xs font-mono text-slate-500 pt-1">
+            Statutory Citation: {term.statutoryRef}
+          </div>
         </DialogHeader>
 
-        <div className="space-y-4 py-2">
-          <p className="text-xs sm:text-sm text-slate-600 leading-relaxed">
-            {term.summary}
+        {/* Overview Section */}
+        <section className="space-y-2 text-xs sm:text-sm text-slate-700 leading-relaxed">
+          <h3 className="text-xs font-bold uppercase tracking-wider text-slate-900">
+            Overview &amp; Statutory Intent
+          </h3>
+          <p>{term.summary}</p>
+        </section>
+
+        {/* Core Provisions */}
+        <section className="space-y-2 text-xs sm:text-sm text-slate-700 leading-relaxed">
+          <h3 className="text-xs font-bold uppercase tracking-wider text-slate-900">
+            Core Policy Provisions
+          </h3>
+          <ul className="list-disc pl-5 space-y-2 text-slate-700">
+            {term.provisions.map((prov, i) => (
+              <li key={i}>{prov}</li>
+            ))}
+          </ul>
+        </section>
+
+        {/* Safeguard Notice */}
+        <div className="bg-slate-50 border border-slate-200 rounded-lg p-3.5 space-y-1">
+          <p className="text-xs font-bold text-slate-900">
+            Legal Enforceability &amp; Sovereign Safeguard
           </p>
-
-          <div className="space-y-2 bg-slate-50/80 border border-slate-200/80 rounded-xl p-4">
-            <span className="text-[11px] font-bold text-[#10233F] uppercase tracking-wider block">
-              Core Statutory Provisions
-            </span>
-            <div className="space-y-2 pt-1">
-              {term.provisions.map((prov, i) => (
-                <div key={i} className="flex items-start gap-2.5 text-xs text-slate-700">
-                  <Check className="h-4 w-4 text-blue-600 shrink-0 mt-0.5" />
-                  <span className="leading-snug">{prov}</span>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          <div className="flex items-start gap-2 text-xs text-slate-500 pt-1">
-            <ShieldCheck className="h-4 w-4 text-emerald-600 shrink-0 mt-0.5" />
-            <span>{term.safeguard}</span>
-          </div>
+          <p className="text-xs text-slate-600 leading-relaxed">
+            {term.safeguard}
+          </p>
         </div>
 
-        <div className="flex items-center justify-between pt-4 border-t border-slate-100 gap-3">
+        {/* Action Buttons */}
+        <div className="flex items-center justify-between pt-4 border-t border-slate-200 gap-3">
           <Button
-            variant="ghost"
+            variant="outline"
             size="sm"
             onClick={onClose}
-            className="text-xs text-slate-500 hover:text-slate-800"
+            className="text-xs border-slate-300 text-slate-700 hover:bg-slate-50 h-8"
           >
             Close
           </Button>
           {term.ctaLink && (
             <Link to={term.ctaLink} onClick={onClose}>
-              <Button size="sm" className="gap-2 text-xs font-semibold shadow-sm">
-                <span>{term.ctaLabel}</span>
-                <ArrowRight className="h-3.5 w-3.5" />
+              <Button
+                size="sm"
+                className="text-xs font-medium bg-[#10233F] hover:bg-slate-800 text-white h-8 px-3 rounded shadow-none"
+              >
+                {term.ctaLabel || "Read Full Policy"} &rarr;
               </Button>
             </Link>
           )}
@@ -211,3 +219,6 @@ export function LegalCharterModal({ termKey, isOpen, onClose }) {
     </Dialog>
   );
 }
+
+export default LegalCharterModal;
+

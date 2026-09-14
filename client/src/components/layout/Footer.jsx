@@ -1,6 +1,5 @@
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
-import { Shield, CheckCircle2, Lock } from "lucide-react";
 import logoImg from "@/assets/logo.png";
 import { LegalCharterModal } from "@/components/common/LegalCharterModal";
 
@@ -24,8 +23,7 @@ export function Footer() {
             <p className="text-xs leading-relaxed text-[#64748B]">
               State-level innovation procurement gateway bridging Government of Maharashtra departments with DPIIT-recognized startups for controlled pilots, milestone contracting, and sovereign scale.
             </p>
-            <div className="flex items-center gap-2 pt-1 text-[11px] text-[#0F766E] font-medium">
-              <CheckCircle2 className="h-3.5 w-3.5" />
+            <div className="pt-1 text-[11px] text-[#0F766E] font-medium">
               <span>MSInS &amp; GeM Compatible Architecture</span>
             </div>
           </div>
@@ -110,8 +108,7 @@ export function Footer() {
               Department of Skills, Employment, Entrepreneurship & Innovation, Government of Maharashtra.
             </p>
             <div className="rounded-lg border border-[#E2E8F0] bg-[#F7F9FC] p-3 text-xs space-y-1.5">
-              <div className="flex items-center gap-1.5 text-[#10233F] font-semibold text-[11px]">
-                <Shield className="h-3.5 w-3.5 text-[#2563EB]" />
+              <div className="text-[#10233F] font-semibold text-[11px]">
                 Forensic Audit Trail Active
               </div>
               <p className="text-[11px] text-[#64748B]">
@@ -127,8 +124,7 @@ export function Footer() {
         <div className="mx-auto max-w-7xl flex flex-col sm:flex-row items-center justify-between gap-2 text-xs text-[#94A3B8]">
           <p>© {currentYear} Pragati-GovX • Smart India Hackathon 2026 Problem Statement 26136.</p>
           <div className="flex items-center gap-4 text-xs">
-            <span className="flex items-center gap-1">
-              <Lock className="h-3 w-3" />
+            <span>
               AES-256 Encrypted
             </span>
           </div>
