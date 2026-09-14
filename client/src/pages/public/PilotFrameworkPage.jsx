@@ -1,370 +1,348 @@
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import {
-  Rocket,
-  ShieldCheck,
-  Scale,
-  Clock,
-  Layers,
-  Coins,
-  FileText,
-  CheckCircle2,
-  ChevronRight,
-  Landmark,
-  Sparkles,
-  ArrowRight,
-  TrendingUp,
-  AlertCircle,
-  Download,
-  Building2,
-} from "lucide-react";
 
 export function PilotFrameworkPage() {
-  const [activeTab, setActiveTab] = useState("overview");
-  const [budgetSlider, setBudgetSlider] = useState(25); // Lakhs
+  const [budgetLakhs, setBudgetLakhs] = useState(25);
+  const [delayDays, setDelayDays] = useState(0);
 
-  const tranche1 = (budgetSlider * 0.3).toFixed(1);
-  const tranche2 = (budgetSlider * 0.4).toFixed(1);
-  const tranche3 = (budgetSlider * 0.3).toFixed(1);
+  // 3-Tranche Calculations
+  const tranche1 = (budgetLakhs * 0.3).toFixed(2);
+  const tranche2 = (budgetLakhs * 0.4).toFixed(2);
+  const tranche3 = (budgetLakhs * 0.3).toFixed(2);
+
+  // Statutory Compounding Interest Simulation (MSMED Act Sec. 16: 3x RBI Bank Rate ~19.5% per annum)
+  const annualInterestRate = 0.195;
+  const delayedTrancheAmount = budgetLakhs * 0.4 * 100000; // Tranche 2 in Rupees
+  const statutoryInterestRupees =
+    delayDays > 0
+      ? Math.round(delayedTrancheAmount * (Math.pow(1 + annualInterestRate / 12, delayDays / 30) - 1))
+      : 0;
 
   return (
-    <div className="min-h-screen bg-[#F7F9FC] text-[#10233F]">
-      {/* Breadcrumb Header */}
-      <section className="border-b border-[#E2E8F0] bg-white">
-        <div className="mx-auto max-w-7xl px-4 py-4 sm:px-6 lg:px-8">
-          <div className="flex flex-wrap items-center justify-between gap-2">
-            <div className="flex items-center gap-2 text-xs text-[#64748B]">
-              <Link to="/" className="hover:text-[#2563EB] transition-colors">
-                Home
-              </Link>
-              <ChevronRight className="h-3.5 w-3.5" />
-              <Link to="/challenges" className="hover:text-[#2563EB] transition-colors">
-                Public Discovery
-              </Link>
-              <ChevronRight className="h-3.5 w-3.5" />
-              <span className="font-semibold text-[#10233F]">Sandbox Pilot Framework</span>
-            </div>
-            <div className="flex items-center gap-2 text-xs">
-              <span className="font-mono text-[#0F766E] font-medium flex items-center gap-1.5">
-                <ShieldCheck className="h-4 w-4" />
-                MAH-SANDBOX-REG-2024
-              </span>
-            </div>
+    <div className="min-h-screen bg-[#F7F9FC] text-slate-800">
+      {/* Breadcrumb Navigation */}
+      <div className="border-b border-slate-200 bg-white">
+        <div className="mx-auto max-w-4xl px-4 py-3 sm:px-6">
+          <div className="text-xs text-slate-500 flex items-center gap-2">
+            <Link to="/" className="hover:text-[#2563EB] hover:underline">
+              Home
+            </Link>
+            <span>/</span>
+            <Link to="/challenges" className="hover:text-[#2563EB] hover:underline">
+              Challenges
+            </Link>
+            <span>/</span>
+            <span className="text-slate-900 font-medium">Pilot Sandbox Framework</span>
           </div>
         </div>
-      </section>
+      </div>
 
-      {/* Hero Section */}
-      <section className="relative overflow-hidden border-b border-[#E2E8F0] bg-gradient-to-b from-white via-[#F8FAFC] to-[#F1F5F9] py-16">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <div className="max-w-3xl space-y-4">
-            <div className="inline-flex items-center gap-2 rounded-full border border-blue-200 bg-blue-50 px-3 py-1 text-xs font-semibold uppercase tracking-wider text-blue-800">
-              <Landmark className="h-3.5 w-3.5" />
-              Government of Maharashtra Sovereign Sandbox
-            </div>
-            <h1 className="text-3xl font-extrabold tracking-tight sm:text-4xl text-[#10233F]">
-              Field Pilot Sandbox & Statutory Milestone SLA Framework
+      {/* Main Document Body */}
+      <main className="mx-auto max-w-4xl px-4 py-10 sm:px-6">
+        <div className="bg-white border border-slate-200 rounded-lg p-6 sm:p-10 space-y-8 shadow-sm">
+          
+          {/* Header */}
+          <header className="border-b border-slate-200 pb-6 space-y-2">
+            <p className="text-xs font-semibold uppercase tracking-wider text-slate-500">
+              Government of Maharashtra • Department of Industries, Energy and Labour
+            </p>
+            <h1 className="text-2xl sm:text-3xl font-bold text-slate-900">
+              Sovereign Innovation Sandbox &amp; Field Pilot Policy Framework
             </h1>
-            <p className="text-base text-[#64748B] leading-relaxed">
-              Under the Maharashtra State Innovation Procurement Sandbox Regulations, approved startups deploy live solutions in real municipal and district environments with protected intellectual property, ring-fenced liability, and a legally binding 30-day milestone payment guarantee.
+            <p className="text-sm text-slate-600 leading-relaxed">
+              Operational regulations governing live municipal field trials, the 3-tranche milestone payment ledger, 30-day statutory disbursement SLA guarantees, and non-competitive commercial scale-out under Maharashtra Rule 14-A.
             </p>
-
-            <div className="pt-2 flex flex-wrap gap-3">
-              <Link to="/challenges">
-                <Button className="bg-[#2563EB] hover:bg-[#1D4ED8] text-white text-xs font-semibold h-10 px-5 shadow-sm">
-                  Explore Active Sandbox Challenges
-                  <ArrowRight className="ml-2 h-4 w-4" />
-                </Button>
-              </Link>
-              <a href="#calculator">
-                <Button variant="outline" className="border-[#CBD5E1] text-[#10233F] text-xs font-semibold h-10 px-4">
-                  Tranche Disbursement Calculator
-                </Button>
-              </a>
+            <div className="pt-2 text-xs font-mono text-slate-500 flex flex-wrap gap-4">
+              <span>Order No: MAT-2024/CR-88/Ind-7</span>
+              <span>•</span>
+              <span>MSInS Sandbox Reg. 2024</span>
+              <span>•</span>
+              <span>MSMED Act 2006: Sec. 15 &amp; 16</span>
             </div>
-          </div>
-        </div>
-      </section>
+          </header>
 
-      <section className="py-12">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
-            {/* Card 1 */}
-            <Card className="border-[#E2E8F0] shadow-sm bg-white hover:border-blue-300 transition-colors">
-              <CardHeader className="pb-3">
-                <div className="h-10 w-10 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center mb-2">
-                  <Clock className="h-5 w-5" />
-                </div>
-                <CardTitle className="text-base font-bold text-[#10233F]">
-                  30-Day Statutory Payment SLA
-                </CardTitle>
-                <CardDescription className="text-xs text-[#64748B]">
-                  MSMED Act Sec. 15 & State GR Enforced
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="text-xs text-[#475569] space-y-2.5">
-                <p>
-                  Once an agreed sandbox deliverable is audited and accepted by the Nodal Officer, Maharashtra state treasury rules mandate disbursement within <strong>30 calendar days</strong>.
-                </p>
-                <div className="rounded border border-blue-100 bg-blue-50/50 p-2.5 font-mono text-[11px] text-blue-900">
-                  Compounded monthly interest at 3x RBI bank rate applies to departmental payment delays beyond 45 days.
-                </div>
-              </CardContent>
-            </Card>
-
-            {/* Card 2 */}
-            <Card className="border-[#E2E8F0] shadow-sm bg-white hover:border-teal-300 transition-colors">
-              <CardHeader className="pb-3">
-                <div className="h-10 w-10 rounded-lg bg-teal-50 text-teal-600 flex items-center justify-center mb-2">
-                  <ShieldCheck className="h-5 w-5" />
-                </div>
-                <CardTitle className="text-base font-bold text-[#10233F]">
-                  Ring-Fenced IP Protection
-                </CardTitle>
-                <CardDescription className="text-xs text-[#64748B]">
-                  100% Startup Patent & Code Sovereignty
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="text-xs text-[#475569] space-y-2.5">
-                <p>
-                  Deploying inside state infrastructure does not forfeit your proprietary algorithms. The Government receives a non-exclusive pilot evaluation license while background IP remains 100% startup property.
-                </p>
-                <div className="rounded border border-teal-100 bg-teal-50/50 p-2.5 font-mono text-[11px] text-teal-900">
-                  Standard Innovation Compact Section 7: Safe-harbor from regulatory penalties during sandbox testing.
-                </div>
-              </CardContent>
-            </Card>
-
-            {/* Card 3 */}
-            <Card className="border-[#E2E8F0] shadow-sm bg-white hover:border-emerald-300 transition-colors">
-              <CardHeader className="pb-3">
-                <div className="h-10 w-10 rounded-lg bg-emerald-50 text-emerald-600 flex items-center justify-center mb-2">
-                  <TrendingUp className="h-5 w-5" />
-                </div>
-                <CardTitle className="text-base font-bold text-[#10233F]">
-                  Direct Scale-Up Pathway
-                </CardTitle>
-                <CardDescription className="text-xs text-[#64748B]">
-                  GeM & State Public Procurement Transition
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="text-xs text-[#475569] space-y-2.5">
-                <p>
-                  Successful pilots fulfilling all baseline KPIs receive an official <strong>State Innovation Certificate</strong>, unlocking non-competitive direct procurement contracts up to ₹50 Lakhs across 36 districts.
-                </p>
-                <div className="rounded border border-emerald-100 bg-emerald-50/50 p-2.5 font-mono text-[11px] text-emerald-900">
-                  Eligible under Maharashtra Procurement Rule 14(a) for single-source replication in other municipal bodies.
-                </div>
-              </CardContent>
-            </Card>
-          </div>
-        </div>
-      </section>
-
-      {/* 4-Stage Lifecycle Process */}
-      <section className="py-8 bg-white border-y border-[#E2E8F0]">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <div className="text-center max-w-2xl mx-auto mb-10">
-            <span className="text-xs font-mono font-semibold uppercase tracking-wider text-[#2563EB]">
-              Sandbox Architecture
-            </span>
-            <h2 className="text-2xl font-bold text-[#10233F] mt-1">
-              The 4-Stage Pilot Sandbox Lifecycle
+          {/* Section 1: Overview & Authority */}
+          <section className="space-y-3 text-sm leading-relaxed">
+            <h2 className="text-lg font-bold text-slate-900">
+              1. Statutory Mandate &amp; Regulatory Safe Harbor
             </h2>
-            <p className="text-xs text-[#64748B] mt-2">
-              From contract sanction to live civic deployment and district-wide commercial scaling.
+            <p>
+              Under Maharashtra Government Resolution No. MAT-2024/CR-88/Ind-7 and the Maharashtra State Innovation Procurement Sandbox Regulations, recognized startups are provided a legally ring-fenced sandbox to test and validate novel technologies within real public infrastructure.
             </p>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-            <div className="relative rounded-lg border border-[#E2E8F0] bg-[#F8FAFC] p-5">
-              <div className="text-xs font-mono font-bold text-blue-600 mb-1">STAGE 01</div>
-              <h3 className="text-sm font-bold text-[#10233F]">Pilot Proposed & Charter</h3>
-              <p className="text-xs text-[#64748B] mt-2 leading-relaxed">
-                Department Nodal Officer and Startup finalize the Sandbox Charter, locking baseline vs target KPIs, test geography, and data integration boundaries.
-              </p>
-              <div className="mt-4 text-[11px] font-mono text-[#0F766E] font-medium">
-                Milestone 1: 30% Advance
-              </div>
-            </div>
-
-            <div className="relative rounded-lg border border-[#E2E8F0] bg-[#F8FAFC] p-5">
-              <div className="text-xs font-mono font-bold text-teal-600 mb-1">STAGE 02</div>
-              <h3 className="text-sm font-bold text-[#10233F]">Active Field Deployment</h3>
-              <p className="text-xs text-[#64748B] mt-2 leading-relaxed">
-                Live field hardware/software deployment across target Maharashtra districts. Real-time telemetry, user trial telemetry, and mid-term audit.
-              </p>
-              <div className="mt-4 text-[11px] font-mono text-[#0F766E] font-medium">
-                Milestone 2: 40% Tranche
-              </div>
-            </div>
-
-            <div className="relative rounded-lg border border-[#E2E8F0] bg-[#F8FAFC] p-5">
-              <div className="text-xs font-mono font-bold text-indigo-600 mb-1">STAGE 03</div>
-              <h3 className="text-sm font-bold text-[#10233F]">Verification & Audit</h3>
-              <p className="text-xs text-[#64748B] mt-2 leading-relaxed">
-                Empaneled Technical Evaluators and Department Officers audit telemetry against promised KPIs and CERT-In security sign-off.
-              </p>
-              <div className="mt-4 text-[11px] font-mono text-[#0F766E] font-medium">
-                Milestone 3: 30% Final
-              </div>
-            </div>
-
-            <div className="relative rounded-lg border border-[#E2E8F0] bg-[#F8FAFC] p-5">
-              <div className="text-xs font-mono font-bold text-emerald-600 mb-1">STAGE 04</div>
-              <h3 className="text-sm font-bold text-[#10233F]">State-Wide Scale</h3>
-              <p className="text-xs text-[#64748B] mt-2 leading-relaxed">
-                Issue of State Procurement Clearance Memo. Integration with GeM Sahay and fast-tracked rollout to all 36 Maharashtra administrative divisions.
-              </p>
-              <div className="mt-4 text-[11px] font-mono text-[#059669] font-medium">
-                Commercial Contract Scale
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Interactive Tranche Calculator */}
-      <section id="calculator" className="py-12">
-        <div className="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8">
-          <Card className="border-[#E2E8F0] shadow-sm bg-white">
-            <CardHeader className="border-b border-[#E2E8F0] bg-[#F8FAFC]">
-              <div className="flex items-center gap-2">
-                <Coins className="h-5 w-5 text-blue-600" />
-                <CardTitle className="text-base font-bold text-[#10233F]">
-                  Interactive Milestone Tranche & 30-Day SLA Simulator
-                </CardTitle>
-              </div>
-              <CardDescription className="text-xs text-[#64748B]">
-                Calculate exact statutory disbursements and SLA release triggers based on your pilot contract value.
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="p-6 space-y-6">
-              <div>
-                <div className="flex justify-between items-center mb-2">
-                  <label className="text-xs font-semibold text-[#10233F]">
-                    Total Pilot Sandbox Budget (Corpus):
-                  </label>
-                  <span className="text-base font-mono font-bold text-[#2563EB]">
-                    ₹{budgetSlider} Lakhs
-                  </span>
-                </div>
-                <input
-                  type="range"
-                  min="5"
-                  max="100"
-                  step="5"
-                  value={budgetSlider}
-                  onChange={(e) => setBudgetSlider(Number(e.target.value))}
-                  className="w-full accent-blue-600 cursor-pointer"
-                />
-                <div className="flex justify-between text-[11px] text-[#64748B] font-mono mt-1">
-                  <span>₹5 Lakhs (Micro-pilot)</span>
-                  <span>₹50 Lakhs (Standard Sandbox)</span>
-                  <span>₹100 Lakhs (Flagship Mission)</span>
-                </div>
-              </div>
-
-              {/* Tranche Breakdown */}
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 pt-2">
-                <div className="rounded-lg border border-blue-100 bg-blue-50/50 p-4">
-                  <div className="flex items-center justify-between text-xs text-blue-700 font-semibold mb-1">
-                    <span>Tranche 1 (M1)</span>
-                    <span className="font-mono">30%</span>
-                  </div>
-                  <div className="text-xl font-bold font-mono text-[#10233F]">₹{tranche1}L</div>
-                  <div className="text-[11px] text-[#64748B] mt-2">
-                    <strong>Trigger:</strong> Sandbox Charter signing & cloud/hardware provisioning.
-                  </div>
-                  <div className="mt-3 inline-flex items-center gap-1 text-[10px] font-mono text-blue-800 bg-blue-100/70 px-2 py-0.5 rounded">
-                    <Clock className="h-3 w-3" /> Day 1–15 SLA
-                  </div>
-                </div>
-
-                <div className="rounded-lg border border-teal-100 bg-teal-50/50 p-4">
-                  <div className="flex items-center justify-between text-xs text-teal-700 font-semibold mb-1">
-                    <span>Tranche 2 (M2)</span>
-                    <span className="font-mono">40%</span>
-                  </div>
-                  <div className="text-xl font-bold font-mono text-[#10233F]">₹{tranche2}L</div>
-                  <div className="text-[11px] text-[#64748B] mt-2">
-                    <strong>Trigger:</strong> Live field test telemetry verification with &ge;100 users.
-                  </div>
-                  <div className="mt-3 inline-flex items-center gap-1 text-[10px] font-mono text-teal-800 bg-teal-100/70 px-2 py-0.5 rounded">
-                    <Clock className="h-3 w-3" /> 30-Day SLA Window
-                  </div>
-                </div>
-
-                <div className="rounded-lg border border-indigo-100 bg-indigo-50/50 p-4">
-                  <div className="flex items-center justify-between text-xs text-indigo-700 font-semibold mb-1">
-                    <span>Tranche 3 (M3)</span>
-                    <span className="font-mono">30%</span>
-                  </div>
-                  <div className="text-xl font-bold font-mono text-[#10233F]">₹{tranche3}L</div>
-                  <div className="text-[11px] text-[#64748B] mt-2">
-                    <strong>Trigger:</strong> Final KPI audit verification & CERT-In security sign-off.
-                  </div>
-                  <div className="mt-3 inline-flex items-center gap-1 text-[10px] font-mono text-indigo-800 bg-indigo-100/70 px-2 py-0.5 rounded">
-                    <Clock className="h-3 w-3" /> 30-Day SLA Window
-                  </div>
-                </div>
-              </div>
-
-              <div className="rounded-lg border border-amber-200 bg-amber-50/70 p-4 text-xs text-amber-900 space-y-1">
-                <div className="font-bold flex items-center gap-1.5">
-                  <AlertCircle className="h-4 w-4 text-amber-600" />
-                  Statutory Non-Discretionary Payment Guarantee
-                </div>
-                <p className="text-[11px] leading-relaxed">
-                  In accordance with Maharashtra Finance Department Circular FIN-2023/SLA-30, once deliverables are marked verified by the designated nodal officer, financial approval and NEFT/RTGS release is automated through the sovereign treasury integration.
-                </p>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-      </section>
-
-      {/* Official Gazette Legal References */}
-      <section className="py-10 bg-white border-t border-[#E2E8F0]">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <div className="max-w-2xl mb-6">
-            <h3 className="text-lg font-bold text-[#10233F]">Official Gazette & Statutory References</h3>
-            <p className="text-xs text-[#64748B]">
-              Legal citations under which the Pragati-GovX sandbox pilot framework operates.
+            <p>
+              <strong>Regulatory Safe Harbor:</strong> During the authorized sandbox trial period, startups and participating municipal officers are granted regulatory safe harbor from legacy vendor qualification rules, allowing experimental deployments without liability for bureaucratic non-standard procurement formats.
             </p>
-          </div>
+          </section>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="rounded-lg border border-[#E2E8F0] p-4 text-xs space-y-2">
-              <div className="font-bold text-[#10233F] flex items-center gap-2">
-                <FileText className="h-4 w-4 text-blue-600" />
-                Maharashtra State Innovation Society Sandbox Policy
-              </div>
-              <p className="text-[#64748B]">
-                Government Resolution No. MAT-2024/CR-88/Ind-7 dated 14th June 2024. Establishes the legal sandbox framework for public sector pilot procurement.
+          {/* Section 2: 4-Stage Sandbox Lifecycle */}
+          <section className="space-y-3 text-sm leading-relaxed">
+            <h2 className="text-lg font-bold text-slate-900">
+              2. The 4-Stage Sandbox Pilot Lifecycle
+            </h2>
+            <p className="text-slate-700">
+              Every sandbox pilot follows a strict 4-stage sovereign finite-state machine (FSM) to ensure structured delivery and clear accountability:
+            </p>
+            <ol className="list-decimal pl-5 space-y-2 text-slate-700">
+              <li>
+                <strong>Stage 1 — Pilot Proposed &amp; Sandbox Charter Lock:</strong> The departmental nodal officer and selected startup formulate the Sandbox Charter, locking in measurable baseline metrics, target impact KPIs, designated test geography, and container boundaries.
+              </li>
+              <li>
+                <strong>Stage 2 — Active Field Deployment:</strong> Live hardware or software deployment in the test district. Real-time telemetry monitoring, user trial data collection, and mid-term field audit inspection.
+              </li>
+              <li>
+                <strong>Stage 3 — Joint Verification &amp; Final Audit:</strong> Department officers and empaneled technical evaluators audit telemetry data against promised outcome KPIs and verify CERT-In cybersecurity clearance.
+              </li>
+              <li>
+                <strong>Stage 4 — State-Wide Commercial Scale-Out:</strong> Upon meeting all milestone criteria, the startup receives an official State Innovation Sanction Order unlocking direct commercial procurement across all 36 Maharashtra districts.
+              </li>
+            </ol>
+          </section>
+
+          {/* Section 3: 3-Tranche Milestone Payment Structure */}
+          <section className="space-y-3 text-sm leading-relaxed">
+            <h2 className="text-lg font-bold text-slate-900">
+              3. The 3-Tranche Milestone Payment Ledger
+            </h2>
+            <p className="text-slate-700">
+              To eliminate working-capital bottlenecks for startups while safeguarding public funds, sandbox budgets are divided into three non-negotiable statutory tranches:
+            </p>
+            <ul className="list-disc pl-5 space-y-2 text-slate-700">
+              <li>
+                <strong>Tranche 1 (30% — Mobilization &amp; Sandbox Provisioning):</strong> Disbursed upon formal execution of the Innovation Compact Charter and container provisioning.
+              </li>
+              <li>
+                <strong>Tranche 2 (40% — Mid-Term Field Validation):</strong> Disbursed upon achieving verifiable 50% target KPI impact and joint field inspection approval.
+              </li>
+              <li>
+                <strong>Tranche 3 (30% — Final Acceptance &amp; Handover):</strong> Disbursed upon 100% KPI fulfillment, final technical evaluation signoff, and deliverable SHA-256 evidence vault archiving.
+              </li>
+            </ul>
+          </section>
+
+          {/* Section 4: Interactive Milestone Tranche & SLA Simulator (Extra Touch) */}
+          <section className="space-y-4 text-sm leading-relaxed p-5 bg-slate-50 border border-slate-200 rounded-lg">
+            <div className="space-y-1">
+              <h2 className="text-base font-bold text-slate-900">
+                4. Interactive Milestone Tranche &amp; Statutory SLA Calculator
+              </h2>
+              <p className="text-xs text-slate-600">
+                Simulate exact milestone disbursements and compute statutory interest liabilities under Section 16 of the MSMED Act:
               </p>
-              <div className="text-[11px] font-mono text-[#2563EB]">
-                Citation: MSInS / Reg. 2024 / Sec 4(2)
+            </div>
+
+            {/* Slider 1: Total Pilot Corpus */}
+            <div className="space-y-2 bg-white p-4 rounded border border-slate-200">
+              <div className="flex justify-between items-center text-xs">
+                <span className="font-semibold text-slate-900">Total Pilot Sandbox Budget (Corpus):</span>
+                <span className="font-mono text-sm font-bold text-[#2563EB]">₹{budgetLakhs} Lakhs</span>
+              </div>
+              <input
+                type="range"
+                min="5"
+                max="100"
+                step="5"
+                value={budgetLakhs}
+                onChange={(e) => setBudgetLakhs(Number(e.target.value))}
+                className="w-full accent-blue-600 cursor-pointer"
+              />
+              <div className="flex justify-between text-[11px] text-slate-500 font-mono">
+                <span>₹5 Lakhs (Micro-pilot)</span>
+                <span>₹25 Lakhs (Standard)</span>
+                <span>₹50 Lakhs (Advanced)</span>
+                <span>₹100 Lakhs (Flagship)</span>
               </div>
             </div>
 
-            <div className="rounded-lg border border-[#E2E8F0] p-4 text-xs space-y-2">
-              <div className="font-bold text-[#10233F] flex items-center gap-2">
-                <Scale className="h-4 w-4 text-teal-600" />
-                MSMED Act Section 15 — Payment Protection
+            {/* Dynamic Tranche Breakdown Table */}
+            <div className="overflow-x-auto rounded border border-slate-200 bg-white">
+              <table className="w-full text-left text-xs border-collapse">
+                <thead>
+                  <tr className="bg-slate-100 border-b border-slate-200 text-slate-900">
+                    <th className="p-2.5 font-bold">Milestone Tranche</th>
+                    <th className="p-2.5 font-bold">Ratio</th>
+                    <th className="p-2.5 font-bold">Disbursement Amount</th>
+                    <th className="p-2.5 font-bold">Statutory Release Trigger</th>
+                    <th className="p-2.5 font-bold">Payment SLA</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-slate-100 text-slate-800">
+                  <tr>
+                    <td className="p-2.5 font-semibold">Tranche 1 (M1)</td>
+                    <td className="p-2.5 font-mono">30%</td>
+                    <td className="p-2.5 font-mono font-bold text-slate-900">₹{tranche1} Lakhs</td>
+                    <td className="p-2.5 text-slate-600">Charter signing &amp; test container provisioning</td>
+                    <td className="p-2.5 font-mono text-[#0F766E]">15 Days from signing</td>
+                  </tr>
+                  <tr>
+                    <td className="p-2.5 font-semibold">Tranche 2 (M2)</td>
+                    <td className="p-2.5 font-mono">40%</td>
+                    <td className="p-2.5 font-mono font-bold text-slate-900">₹{tranche2} Lakhs</td>
+                    <td className="p-2.5 text-slate-600">Mid-term field validation &amp; 50% KPI achievement</td>
+                    <td className="p-2.5 font-mono text-[#0F766E]">30 Days from signoff</td>
+                  </tr>
+                  <tr>
+                    <td className="p-2.5 font-semibold">Tranche 3 (M3)</td>
+                    <td className="p-2.5 font-mono">30%</td>
+                    <td className="p-2.5 font-mono font-bold text-slate-900">₹{tranche3} Lakhs</td>
+                    <td className="p-2.5 text-slate-600">100% KPI fulfillment &amp; final security audit</td>
+                    <td className="p-2.5 font-mono text-[#0F766E]">30 Days from signoff</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            {/* Slider 2: Statutory Delay Interest Penalty Simulator */}
+            <div className="space-y-2 bg-white p-4 rounded border border-slate-200">
+              <div className="flex justify-between items-center text-xs">
+                <span className="font-semibold text-slate-900">Simulate Department Delay Beyond 30-Day SLA:</span>
+                <span className="font-mono text-sm font-bold text-amber-700">
+                  {delayDays === 0 ? "Zero Delay (Compliant)" : `${delayDays} Days Delayed`}
+                </span>
               </div>
-              <p className="text-[#64748B]">
-                Mandatory statutory provision imposing a 45-day outer limit and 30-day departmental SLA for payments to micro and small enterprises, with mandatory compound interest for delays.
-              </p>
-              <div className="text-[11px] font-mono text-[#0F766E]">
-                Citation: Central Act No. 27 of 2006
+              <input
+                type="range"
+                min="0"
+                max="90"
+                step="5"
+                value={delayDays}
+                onChange={(e) => setDelayDays(Number(e.target.value))}
+                className="w-full accent-amber-600 cursor-pointer"
+              />
+              <div className="flex justify-between text-[11px] text-slate-500 font-mono">
+                <span>0 Days (On-Time)</span>
+                <span>30 Days Late</span>
+                <span>60 Days Late</span>
+                <span>90 Days Late</span>
+              </div>
+
+              {delayDays > 0 && (
+                <div className="mt-3 p-3 bg-amber-50 border border-amber-200 rounded text-xs text-amber-900 space-y-1">
+                  <div className="font-bold flex justify-between">
+                    <span>Mandatory Compounding Interest Penalty (MSMED Act Sec. 16):</span>
+                    <span className="font-mono text-sm text-red-700">+₹{statutoryInterestRupees.toLocaleString("en-IN")}</span>
+                  </div>
+                  <p className="text-[11px] text-amber-800 leading-relaxed">
+                    Calculated on Tranche 2 (₹{tranche2}L) at 3x RBI Bank Rate (~19.5% p.a.) compounded monthly. Department treasuries are legally liable to pay this interest directly to the startup account without discretionary waiver.
+                  </p>
+                </div>
+              )}
+            </div>
+          </section>
+
+          {/* Section 5: Mandatory 30-Day Payment SLA */}
+          <section className="space-y-3 text-sm leading-relaxed">
+            <h2 className="text-lg font-bold text-slate-900">
+              5. Statutory 30-Day Milestone Payment SLA
+            </h2>
+            <p className="text-slate-700">
+              Under Section 15 of the Micro, Small and Medium Enterprises Development (MSMED) Act, 2006, payment releases for approved sandbox milestones must occur within <strong>30 calendar days</strong> of joint field verification signoff.
+            </p>
+            <ul className="list-disc pl-5 space-y-1.5 text-slate-700">
+              <li>
+                <strong>Automated Treasury Direct Credit:</strong> Once the designated nodal officer submits verification credentials, the payment voucher is dispatched directly via state treasury NEFT/RTGS rails.
+              </li>
+              <li>
+                <strong>Audit Immunity for Prompt Payment:</strong> Department accounts officers are granted audit safe harbor for honoring milestone disbursements within 30 days without secondary scrutiny of startup balance sheets.
+              </li>
+            </ul>
+          </section>
+
+          {/* Section 6: Intellectual Property Sovereignty */}
+          <section className="space-y-3 text-sm leading-relaxed">
+            <h2 className="text-lg font-bold text-slate-900">
+              6. Intellectual Property (IP) Sovereignty
+            </h2>
+            <ul className="list-disc pl-5 space-y-2 text-slate-700">
+              <li>
+                <strong>100% Startup Property:</strong> Deploying inside state infrastructure does not forfeit proprietary software, algorithms, or hardware designs. All background and foreground IP remains 100% startup property.
+              </li>
+              <li>
+                <strong>Limited Evaluation License:</strong> The government receives solely a non-exclusive, temporary license to test and evaluate the solution for the agreed sandbox duration.
+              </li>
+              <li>
+                <strong>Data Sovereignty:</strong> Citizen, spatial, and administrative data generated during the pilot must reside on State Data Centre (SDC) or MeitY-empanelled sovereign cloud infrastructure within India.
+              </li>
+            </ul>
+          </section>
+
+          {/* Section 7: Commercial Procurement Scale-Out */}
+          <section className="space-y-3 text-sm leading-relaxed">
+            <h2 className="text-lg font-bold text-slate-900">
+              7. Commercial Procurement Scale-Out (Rule 14-A &amp; GeM)
+            </h2>
+            <p className="text-slate-700">
+              A critical bottleneck in civic innovation is that successful pilots often stall in repetitive tender cycles. Under this framework:
+            </p>
+            <ul className="list-disc pl-5 space-y-2 text-slate-700">
+              <li>
+                <strong>Maharashtra Rule 14-A Exemption:</strong> Solutions that satisfy all target KPIs in a state sandbox receive an official Sanction Order Memo, granting exemption from open tendering for direct commercial procurement up to ₹1.5 Crores.
+              </li>
+              <li>
+                <strong>GeM Startup Runway Fast-Track:</strong> Proven solutions are onboarded to the Government e-Marketplace (GeM) catalog for single-source direct procurement by any public authority nationwide.
+              </li>
+              <li>
+                <strong>Statewide District Replication:</strong> Any of the 36 Maharashtra district collectorates or 29 municipal corporations may adopt the validated solution using pre-negotiated unit rates.
+              </li>
+            </ul>
+          </section>
+
+          {/* Section 8: Legal Citations & Directory */}
+          <section className="space-y-3 text-sm leading-relaxed">
+            <h2 className="text-lg font-bold text-slate-900">
+              8. Official Gazette References &amp; Legal Citations
+            </h2>
+            <div className="border border-slate-200 rounded divide-y divide-slate-200 text-xs">
+              <div className="p-3 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1">
+                <span className="font-semibold text-slate-900">Maharashtra GR No. MAT-2024/CR-88/Ind-7</span>
+                <span className="text-slate-500">Legal Sandbox Policy for Public Sector Procurement</span>
+              </div>
+              <div className="p-3 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1">
+                <span className="font-semibold text-slate-900">MSMED Act 2006 • Section 15 &amp; 16</span>
+                <span className="text-slate-500">Statutory 30-day payment timeline and 3x RBI compounding interest</span>
+              </div>
+              <div className="p-3 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1">
+                <span className="font-semibold text-slate-900">Maharashtra Public Procurement Rule 14-A</span>
+                <span className="text-slate-500">Direct commercial procurement exemption for sandbox-validated innovations</span>
+              </div>
+              <div className="p-3 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1">
+                <span className="font-semibold text-slate-900">Information Technology Act 2000 • Sec. 65B</span>
+                <span className="text-slate-500">Electronic record admissibility for SHA-256 evidence vaults</span>
               </div>
             </div>
-          </div>
+          </section>
+
+          {/* Section 9: Actions & Directory */}
+          <section className="pt-4 border-t border-slate-200 space-y-3 text-xs text-slate-600">
+            <h2 className="text-sm font-bold text-slate-900">
+              9. Related Resources &amp; Support
+            </h2>
+            <p>
+              For guidance on sandbox charters, field trial agreements, or treasury milestone claims, contact the Maharashtra State Innovation Society (MSInS) Sandbox Desk at <span className="font-mono text-slate-800">sandbox.msins@maharashtra.gov.in</span>.
+            </p>
+            <div className="pt-2 flex flex-wrap items-center gap-3">
+              <Link
+                to="/challenges"
+                className="inline-block rounded bg-[#2563EB] px-4 py-2 text-xs font-semibold text-white hover:bg-[#1D4ED8] transition-colors"
+              >
+                Browse Active Sandbox Challenges
+              </Link>
+              <Link
+                to="/policy"
+                className="inline-block rounded border border-slate-300 px-4 py-2 text-xs font-semibold text-slate-800 hover:bg-slate-50 transition-colors"
+              >
+                DPIIT Exemption Policy
+              </Link>
+              <Link
+                to="/audit-public"
+                className="inline-block rounded border border-slate-300 px-4 py-2 text-xs font-semibold text-slate-800 hover:bg-slate-50 transition-colors"
+              >
+                Audit &amp; Transparency
+              </Link>
+            </div>
+          </section>
+
         </div>
-      </section>
+      </main>
     </div>
   );
 }

@@ -1,505 +1,224 @@
-import React, { useState } from "react";
+import React from "react";
 import { Link } from "react-router-dom";
-import { Card, CardContent } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import {
-  ShieldCheck,
-  Scale,
-  Landmark,
-  CheckCircle2,
-  ChevronRight,
-  TrendingUp,
-  Coins,
-  FileText,
-  Clock,
-  ExternalLink,
-  ArrowRight,
-  Eye,
-  FileCheck,
-  Sparkles,
-  Lock,
-  Binary,
-  Check,
-  Zap,
-  RotateCcw,
-} from "lucide-react";
-
-const PROTOCOL_GUARANTEES = [
-  {
-    id: "audit",
-    num: "01",
-    title: "Cryptographic Audit Immutability",
-    subtitle: "SHA-256 Digital Signatures & Non-Repudiation",
-    icon: FileCheck,
-    color: "#2563EB",
-    lightColor: "bg-blue-50 text-blue-700 border-blue-200",
-    description:
-      "Every administrative sanction, transition event, and evaluator scorecard generates an immutable SHA-256 hash locked with the issuing officer's sovereign token, preventing retroactive edits or covert tampering.",
-    statute: "Maharashtra Public Procurement Rules 2024 & IT Act 2000 Sec. 65B",
-    points: [
-      "Zero manual overwriting permitted after sovereign digital seal is applied",
-      "Cryptographic digest verifiable in real-time by citizens and state CAG auditors",
-      "Millisecond-precision UTC+05:30 timestamps with immutable forensic trace tokens",
-    ],
-  },
-  {
-    id: "sla",
-    num: "02",
-    title: "Mandatory 30-Day Payment SLA",
-    subtitle: "Statutory Interest Penalty under MSMED Act Sec. 15",
-    icon: Clock,
-    color: "#0F766E",
-    lightColor: "bg-teal-50 text-teal-700 border-teal-200",
-    description:
-      "Once a sandbox milestone deliverable is verified by the department nodal officer, treasury payment release is legally binding within 30 days. Delays automatically attract compounding interest at 3x the RBI bank rate.",
-    statute: "Central MSMED Act No. 27 of 2006 & Maharashtra Finance Circular FIN-2023",
-    points: [
-      "Strict 30-day outer limit enforced through automated treasury release triggers",
-      "Statutory monthly compounding interest automatically levied on department delays",
-      "Executive alert dispatched to Principal Secretary if invoice reaches Day 20 unpaid",
-    ],
-  },
-  {
-    id: "blind",
-    num: "03",
-    title: "Double-Blind Meritocracy",
-    subtitle: "Identity-Masked Proposal Dossiers for Evaluators",
-    icon: Scale,
-    color: "#7C3AED",
-    lightColor: "bg-purple-50 text-purple-700 border-purple-200",
-    description:
-      "Empaneled technical evaluators review candidate submissions with zero knowledge of company name, founder background, or commercial branding, ensuring evaluation is 100% focused on technical excellence.",
-    statute: "State Innovation Procurement Regulations 2024 (Rule 8: Bias-Free Scoring)",
-    points: [
-      "Venture names masked to sovereign codes (e.g. ANON-VENTURE-7829)",
-      "Mandatory Conflict-of-Interest (COI) statutory declaration before scoring unlocks",
-      "Weighted 4-criteria rubric with normalized percentile rank distribution",
-    ],
-  },
-  {
-    id: "xai",
-    num: "04",
-    title: "Explainable AI Decisions",
-    subtitle: "Deterministic 4-Pillar Scoring & Human-in-the-Loop",
-    icon: Sparkles,
-    color: "#D97706",
-    lightColor: "bg-amber-50 text-amber-700 border-amber-200",
-    description:
-      "Artificial intelligence operates strictly as an advisory co-pilot for departmental officers. Every match and evaluation recommendation is mathematically deterministic and fully cited.",
-    statute: "NITI Aayog National AI Strategy & Maharashtra AI Ethical Governance Compact",
-    points: [
-      "Deterministic 4-pillar breakdown (Sector 35%, Capability 35%, Stage 15%, DPIIT 15%)",
-      "Verifiable citation references linking problem requirements to startup IP",
-      "Statutory disclaimer preserving ultimate accountability with human nodal officers",
-    ],
-  },
-];
 
 export function PublicTransparencyPage() {
-  const [activeProtocol, setActiveProtocol] = useState("audit");
-  const [hashInput, setHashInput] = useState("SANCTION_ORDER_MAH_2026_WATER_LOSS_PILOT_01");
-  const [anonymizedView, setAnonymizedView] = useState(true);
-
-  const current = PROTOCOL_GUARANTEES.find((g) => g.id === activeProtocol) || PROTOCOL_GUARANTEES[0];
-  const Icon = current.icon;
-
-  // Simple deterministic hash simulation for interactive demo
-  const simulatedHash = React.useMemo(() => {
-    let hash = 0;
-    for (let i = 0; i < hashInput.length; i++) {
-      hash = (hash << 5) - hash + hashInput.charCodeAt(i);
-      hash |= 0;
-    }
-    const hex = Math.abs(hash).toString(16).padStart(8, "0");
-    return `9f8a2c11${hex}7b30aa447d912ef0881bc3${hex}`;
-  }, [hashInput]);
-
   return (
-    <div className="min-h-screen bg-[#F7F9FC] text-[#10233F]">
-      {/* Top Breadcrumb */}
-      <section className="border-b border-[#E2E8F0] bg-white">
-        <div className="mx-auto max-w-7xl px-4 py-4 sm:px-6 lg:px-8">
-          <div className="flex flex-wrap items-center justify-between gap-2">
-            <div className="flex items-center gap-2 text-xs text-[#64748B]">
-              <Link to="/" className="hover:text-[#2563EB] transition-colors">
-                Home
-              </Link>
-              <ChevronRight className="h-3.5 w-3.5" />
-              <span className="font-semibold text-[#10233F]">Public Audit & Transparency</span>
-            </div>
-            <div className="flex items-center gap-2 text-xs">
-              <span className="font-mono text-[#0F766E] font-medium flex items-center gap-1.5">
-                <ShieldCheck className="h-4 w-4" />
-                Open Government Data Registry
-              </span>
-            </div>
+    <div className="min-h-screen bg-[#F7F9FC] text-slate-800">
+      {/* Breadcrumb Navigation */}
+      <div className="border-b border-slate-200 bg-white">
+        <div className="mx-auto max-w-4xl px-4 py-3 sm:px-6">
+          <div className="text-xs text-slate-500 flex items-center gap-2">
+            <Link to="/" className="hover:text-[#2563EB] hover:underline">
+              Home
+            </Link>
+            <span>/</span>
+            <span className="text-slate-900 font-medium">Audit &amp; Transparency</span>
           </div>
         </div>
-      </section>
+      </div>
 
-      {/* Hero Section */}
-      <section className="border-b border-[#E2E8F0] bg-gradient-to-b from-white via-[#F8FAFC] to-[#F1F5F9] py-16">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <div className="max-w-3xl space-y-4">
-            <div className="inline-flex items-center gap-2 rounded-full border border-teal-200 bg-teal-50 px-3 py-1 text-xs font-semibold uppercase tracking-wider text-teal-800">
-              <Landmark className="h-3.5 w-3.5" />
-              Sovereign Accountability & Public Trust
-            </div>
-            <h1 className="text-3xl font-extrabold tracking-tight sm:text-4xl text-[#10233F]">
-              Maharashtra Sovereign Innovation Audit & Transparency Registry
+      {/* Main Document Body */}
+      <main className="mx-auto max-w-4xl px-4 py-10 sm:px-6">
+        <div className="bg-white border border-slate-200 rounded-lg p-6 sm:p-10 space-y-8 shadow-sm">
+          
+          {/* Header */}
+          <header className="border-b border-slate-200 pb-6 space-y-2">
+            <p className="text-xs font-semibold uppercase tracking-wider text-slate-500">
+              Government of Maharashtra • Maharashtra State Innovation Society (MSInS)
+            </p>
+            <h1 className="text-2xl sm:text-3xl font-bold text-slate-900">
+              Public Audit &amp; Transparency Governance Framework
             </h1>
-            <p className="text-base text-[#64748B] leading-relaxed">
-              Every innovation challenge, double-blind evaluation scorecard, and statutory milestone payment disbursed through Pragati-GovX is tracked on an immutable cryptographic ledger ensuring 100% public accountability.
+            <p className="text-sm text-slate-600 leading-relaxed">
+              Standard operating procedures on cryptographic audit logging, double-blind evaluation integrity, 30-day payment SLA monitoring, and open public scrutiny under the Pragati-GovX innovation sandbox.
             </p>
-
-            <div className="pt-2 flex flex-wrap gap-3">
-              <Link to="/challenges">
-                <Button className="bg-[#2563EB] hover:bg-[#1D4ED8] text-white text-xs font-semibold h-10 px-5 shadow-sm">
-                  View Public Challenges
-                  <ArrowRight className="ml-2 h-4 w-4" />
-                </Button>
-              </Link>
-              <Link to="/policy">
-                <Button variant="outline" className="border-[#CBD5E1] text-[#10233F] text-xs font-semibold h-10 px-4">
-                  DPIIT Statutory Policy
-                </Button>
-              </Link>
+            <div className="pt-2 text-xs font-mono text-slate-500 flex flex-wrap gap-4">
+              <span>Directive: MHA-AUDIT-2026-V1</span>
+              <span>•</span>
+              <span>IT Act 2000: Section 65B</span>
+              <span>•</span>
+              <span>RTI Act 2005: Section 4(1)(b)</span>
             </div>
-          </div>
-        </div>
-      </section>
+          </header>
 
-      {/* Sovereign Stats Rail */}
-      <section className="py-12 border-b border-[#E2E8F0] bg-white">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-            <div className="rounded-xl border border-[#E2E8F0] bg-[#F8FAFC] p-5">
-              <div className="text-xs text-[#64748B] font-mono uppercase">Innovation Capital Committed</div>
-              <div className="text-2xl font-bold font-mono text-[#10233F] mt-1.5">₹42.8 Crores</div>
-              <div className="text-[11px] text-[#0F766E] mt-1 flex items-center gap-1 font-semibold">
-                <CheckCircle2 className="h-3.5 w-3.5" /> 100% Treasury Verified
-              </div>
-            </div>
-
-            <div className="rounded-xl border border-[#E2E8F0] bg-[#F8FAFC] p-5">
-              <div className="text-xs text-[#64748B] font-mono uppercase">Statewide District Coverage</div>
-              <div className="text-2xl font-bold font-mono text-blue-700 mt-1.5">36 Districts</div>
-              <div className="text-[11px] text-[#64748B] mt-1">All administrative divisions</div>
-            </div>
-
-            <div className="rounded-xl border border-[#E2E8F0] bg-[#F8FAFC] p-5">
-              <div className="text-xs text-[#64748B] font-mono uppercase">30-Day Payment SLA Adherence</div>
-              <div className="text-2xl font-bold font-mono text-emerald-700 mt-1.5">98.4%</div>
-              <div className="text-[11px] text-[#64748B] mt-1">Zero startup cash-flow delays</div>
-            </div>
-
-            <div className="rounded-xl border border-[#E2E8F0] bg-[#F8FAFC] p-5">
-              <div className="text-xs text-[#64748B] font-mono uppercase">Double-Blind Evaluations</div>
-              <div className="text-2xl font-bold font-mono text-purple-700 mt-1.5">100% Bias-Free</div>
-              <div className="text-[11px] text-[#64748B] mt-1">Anonymized applicant dossiers</div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <section className="py-16 bg-[#F7F9FC]">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 space-y-8">
-          <div className="max-w-2xl">
-            <span className="text-xs font-mono font-bold uppercase tracking-wider text-[#2563EB]">
-              Sovereign Protocol Architecture
-            </span>
-            <h2 className="text-2xl sm:text-3xl font-extrabold text-[#10233F] mt-1 tracking-tight">
-              Four Guarantees of Sovereign Transparency
+          {/* Section 1: Overview */}
+          <section className="space-y-3 text-sm leading-relaxed">
+            <h2 className="text-lg font-bold text-slate-900">
+              1. Overview &amp; Sovereign Open Data Principles
             </h2>
-            <p className="text-xs sm:text-sm text-[#64748B] mt-2">
-              Select any core pillar below to inspect its operational mechanics, statutory citation, and real-time cryptographic verification proof.
+            <p>
+              Pragati-GovX operates on the principle that public procurement of technology and innovation must be subject to complete, uncompromised public accountability. Every challenge published, proposal evaluated, contract awarded, and milestone payment disbursed is tracked on an auditable digital registry.
             </p>
-          </div>
+            <p>
+              Under Section 4(1)(b) of the Right to Information (RTI) Act 2005, public authorities are mandated to provide suo motu disclosure of operational guidelines, decision-making norms, and public fund disbursements. This framework codifies those obligations into automated, tamper-evident digital workflows.
+            </p>
+          </section>
 
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
-            <div className="lg:col-span-5 space-y-3">
-              {PROTOCOL_GUARANTEES.map((g) => {
-                const isActive = g.id === activeProtocol;
-                const GIcon = g.icon;
+          {/* Section 2: Four Core Guarantees */}
+          <section className="space-y-4 text-sm leading-relaxed">
+            <h2 className="text-lg font-bold text-slate-900">
+              2. The Four Pillars of Sovereign Transparency
+            </h2>
 
-                return (
-                  <button
-                    key={g.id}
-                    type="button"
-                    onClick={() => setActiveProtocol(g.id)}
-                    className={`w-full text-left rounded-xl p-4 transition-all border flex items-start gap-4 ${
-                      isActive
-                        ? "bg-white border-[#2563EB] shadow-md ring-2 ring-blue-500/10"
-                        : "bg-white/80 border-[#E2E8F0] hover:bg-white hover:border-slate-300"
-                    }`}
-                  >
-                    <div
-                      className={`h-10 w-10 rounded-lg flex items-center justify-center shrink-0 mt-0.5 border ${
-                        isActive ? g.lightColor : "bg-slate-100 text-slate-500 border-slate-200"
-                      }`}
-                    >
-                      <GIcon className="h-5 w-5" />
-                    </div>
-
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-center justify-between">
-                        <span className="font-mono text-[10px] font-bold text-slate-400">
-                          PILLAR {g.num}
-                        </span>
-                        {isActive && (
-                          <span className="font-mono text-[10px] font-bold text-blue-700 bg-blue-50 px-2 py-0.2 rounded border border-blue-200">
-                            ACTIVE INSPECTION
-                          </span>
-                        )}
-                      </div>
-                      <h3 className={`text-sm font-bold truncate mt-0.5 ${isActive ? "text-[#10233F]" : "text-slate-700"}`}>
-                        {g.title}
-                      </h3>
-                      <p className="text-[11px] text-[#64748B] line-clamp-1 mt-0.5">
-                        {g.subtitle}
-                      </p>
-                    </div>
-                  </button>
-                );
-              })}
-            </div>
-
-            <div className="lg:col-span-7">
-              <div className="rounded-2xl border border-slate-200 bg-white p-6 sm:p-8 shadow-sm space-y-6">
-                {/* Header of Active Guarantee */}
-                <div className="flex items-start justify-between gap-4 border-b border-slate-100 pb-5">
-                  <div className="space-y-1">
-                    <div className="flex items-center gap-2">
-                      <span className="font-mono text-xs font-bold text-blue-600 bg-blue-50 border border-blue-200 px-2 py-0.5 rounded">
-                        Pillar {current.num}
-                      </span>
-                      <span className="font-mono text-[11px] text-slate-400">
-                        {current.id.toUpperCase()}_PROTOCOL_V1
-                      </span>
-                    </div>
-                    <h3 className="text-xl font-bold text-[#10233F]">
-                      {current.title}
-                    </h3>
-                    <p className="text-xs text-[#64748B]">
-                      {current.subtitle}
-                    </p>
-                  </div>
-
-                  <div className={`p-3 rounded-xl border shrink-0 ${current.lightColor}`}>
-                    <Icon className="h-6 w-6" />
-                  </div>
-                </div>
-
-                {/* Narrative Description */}
-                <p className="text-xs sm:text-sm text-[#475569] leading-relaxed">
-                  {current.description}
+            <div className="space-y-4 text-slate-700">
+              <div className="space-y-1.5 pb-3 border-b border-slate-200">
+                <h3 className="font-bold text-slate-900 text-base">
+                  2.1 Cryptographic Immutability &amp; Forensic Trace Logging
+                </h3>
+                <p>
+                  <strong>Standard:</strong> Every state mutation, challenge publication, evaluation score, and milestone signoff generates an immutable SHA-256 cryptographic hash accompanied by a unique Request Trace ID and millisecond-precision timestamp.
                 </p>
+                <p className="text-xs text-slate-600">
+                  <strong>Legal Evidentiary Value:</strong> System audit logs conform to Section 65B of the Indian Evidence Act / Information Technology Act 2000 for electronic record admissibility in judicial and Comptroller and Auditor General (CAG) scrutiny. Retroactive manual editing or log tampering is technically blocked.
+                </p>
+              </div>
 
-                <div className="rounded-xl border border-slate-200 bg-[#F8FAFC] p-4 space-y-3">
-                  <div className="flex items-center justify-between text-[11px] font-mono font-bold text-slate-500 uppercase tracking-wider">
-                    <span>Live Verification Engine</span>
-                    <span className="text-emerald-700 flex items-center gap-1">
-                      <ShieldCheck className="h-3.5 w-3.5" /> Cryptographically Validated
-                    </span>
-                  </div>
+              <div className="space-y-1.5 pb-3 border-b border-slate-200">
+                <h3 className="font-bold text-slate-900 text-base">
+                  2.2 Mandatory 30-Day Milestone Payment SLA
+                </h3>
+                <p>
+                  <strong>Standard:</strong> Upon joint field inspection and signoff of a completed sandbox milestone, departmental treasuries are legally required to disburse the agreed grant or contract tranche within thirty (30) calendar days.
+                </p>
+                <p className="text-xs text-slate-600">
+                  <strong>Statutory Interest Penalty:</strong> Pursuant to Sections 15 and 16 of the Micro, Small and Medium Enterprises Development (MSMED) Act, 2006, delayed disbursements automatically attract compound interest with monthly rests at three times (3x) the Reserve Bank of India (RBI) bank rate.
+                </p>
+              </div>
 
-                  {/* Widget 1: Cryptographic Hash Generator */}
-                  {current.id === "audit" && (
-                    <div className="space-y-3">
-                      <div>
-                        <label className="text-[11px] font-semibold text-[#10233F] block mb-1">
-                          Test Input Payload to Hash:
-                        </label>
-                        <input
-                          type="text"
-                          value={hashInput}
-                          onChange={(e) => setHashInput(e.target.value)}
-                          className="w-full text-xs font-mono rounded border border-slate-300 bg-white p-2 text-slate-800 focus:outline-blue-600"
-                        />
-                      </div>
-                      <div className="space-y-1">
-                        <span className="text-[11px] font-mono text-slate-500 block">
-                          Generated SHA-256 Immutable Signature:
-                        </span>
-                        <div className="p-2.5 rounded bg-[#10233F] text-emerald-400 font-mono text-[11px] break-all select-all">
-                          {simulatedHash}
-                        </div>
-                      </div>
-                    </div>
-                  )}
+              <div className="space-y-1.5 pb-3 border-b border-slate-200">
+                <h3 className="font-bold text-slate-900 text-base">
+                  2.3 Double-Blind Meritocratic Evaluation
+                </h3>
+                <p>
+                  <strong>Standard:</strong> During initial technical review, technical evaluators evaluate proposal dossiers with all commercial venture names, founder identities, and marketing branding strictly masked into sovereign anonymous identifiers (e.g., ANON-VENTURE-4921).
+                </p>
+                <p className="text-xs text-slate-600">
+                  <strong>Conflict of Interest (COI) Gate:</strong> Evaluators must execute a statutory digital declaration confirming zero financial, advisory, or familial relationship with applicants before scoring panels unlock. Any violation triggers immediate removal and disciplinary referral.
+                </p>
+              </div>
 
-                  {/* Widget 2: 30-Day SLA Countdown Simulator */}
-                  {current.id === "sla" && (
-                    <div className="space-y-3">
-                      <div className="flex justify-between items-center text-xs font-mono">
-                        <span className="font-bold text-[#0F766E]">Active Tranche 2 SLA Clock</span>
-                        <span className="text-slate-600">Day 18 of 30 (12 days remaining)</span>
-                      </div>
-                      <div className="h-2.5 w-full rounded-full bg-slate-200 overflow-hidden">
-                        <div className="h-full bg-gradient-to-r from-teal-500 to-emerald-600 rounded-full w-[60%]" />
-                      </div>
-                      <div className="grid grid-cols-2 gap-2 text-[11px] font-mono bg-white p-2.5 rounded border border-slate-200">
-                        <div>
-                          <span className="text-slate-400 block">Delay Penalty Clause:</span>
-                          <strong className="text-rose-700">3x RBI Bank Rate</strong>
-                        </div>
-                        <div>
-                          <span className="text-slate-400 block">Disbursement Route:</span>
-                          <strong className="text-emerald-700">State Treasury RTGS</strong>
-                        </div>
-                      </div>
-                    </div>
-                  )}
-
-                  {/* Widget 3: Double-Blind Anonymizer Mode */}
-                  {current.id === "blind" && (
-                    <div className="space-y-3">
-                      <div className="flex items-center justify-between">
-                        <span className="text-xs font-semibold text-[#10233F]">
-                          Proposal View Perspective:
-                        </span>
-                        <div className="inline-flex rounded-lg border border-slate-200 bg-white p-0.5 text-xs font-mono">
-                          <button
-                            type="button"
-                            onClick={() => setAnonymizedView(false)}
-                            className={`px-2.5 py-1 rounded ${!anonymizedView ? "bg-slate-800 text-white font-bold" : "text-slate-500"}`}
-                          >
-                            Raw Vendor
-                          </button>
-                          <button
-                            type="button"
-                            onClick={() => setAnonymizedView(true)}
-                            className={`px-2.5 py-1 rounded ${anonymizedView ? "bg-purple-600 text-white font-bold" : "text-slate-500"}`}
-                          >
-                            Double-Blind View
-                          </button>
-                        </div>
-                      </div>
-
-                      <div className="rounded border border-slate-200 bg-white p-3 space-y-1.5 text-xs">
-                        <div className="flex justify-between font-mono text-[11px]">
-                          <span className="text-slate-400">Applicant Entity:</span>
-                          <strong className={anonymizedView ? "text-purple-700 font-bold" : "text-slate-800"}>
-                            {anonymizedView ? "ANON-VENTURE-7829 (Masked)" : "AquaSovereign Technologies Ltd"}
-                          </strong>
-                        </div>
-                        <div className="flex justify-between font-mono text-[11px]">
-                          <span className="text-slate-400">Founding Team:</span>
-                          <strong className={anonymizedView ? "text-purple-700 font-bold" : "text-slate-800"}>
-                            {anonymizedView ? "[IDENTITY REDACTED PER STATUTE]" : "Dr. Vikram Mehta & Team"}
-                          </strong>
-                        </div>
-                        <div className="flex justify-between font-mono text-[11px]">
-                          <span className="text-slate-400">Technical Rubric Weight:</span>
-                          <strong className="text-emerald-700">100% Objective Merit</strong>
-                        </div>
-                      </div>
-                    </div>
-                  )}
-
-                  {/* Widget 4: Explainable AI 4-Pillar Score */}
-                  {current.id === "xai" && (
-                    <div className="space-y-2.5">
-                      <div className="flex justify-between text-xs font-mono">
-                        <span className="font-bold text-[#D97706]">Deterministic Algorithm Score</span>
-                        <strong className="text-slate-800">92 / 100 Benchmark</strong>
-                      </div>
-                      <div className="space-y-1.5 text-[11px] font-mono">
-                        <div className="flex justify-between">
-                          <span>Sector Alignment (Max 35)</span>
-                          <span className="font-bold">35 pts</span>
-                        </div>
-                        <div className="h-1.5 w-full bg-slate-200 rounded-full overflow-hidden">
-                          <div className="h-full bg-amber-500 w-full" />
-                        </div>
-
-                        <div className="flex justify-between pt-1">
-                          <span>Deep-Tech Capability Overlap (Max 35)</span>
-                          <span className="font-bold">32 pts</span>
-                        </div>
-                        <div className="h-1.5 w-full bg-slate-200 rounded-full overflow-hidden">
-                          <div className="h-full bg-amber-500 w-[91%]" />
-                        </div>
-                      </div>
-                    </div>
-                  )}
-                </div>
-
-                {/* Key Verifiable Guarantees (Checkmarks) */}
-                <div className="space-y-2">
-                  <span className="text-xs font-bold uppercase tracking-wider text-[#10233F]">
-                    Verifiable Sovereign Commitments:
-                  </span>
-                  <div className="space-y-1.5">
-                    {current.points.map((pt, i) => (
-                      <div key={i} className="flex items-start gap-2 text-xs text-[#475569]">
-                        <Check className="h-4 w-4 text-emerald-600 shrink-0 mt-0.5" />
-                        <span>{pt}</span>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-
-                {/* Official Statutory Citation */}
-                <div className="border-t border-slate-100 pt-4 flex items-center justify-between text-[11px] text-[#64748B]">
-                  <span className="font-semibold text-[#10233F]">Statutory Authority:</span>
-                  <span className="font-mono text-blue-700 bg-blue-50 border border-blue-200 px-2 py-0.5 rounded">
-                    {current.statute}
-                  </span>
-                </div>
+              <div className="space-y-1.5">
+                <h3 className="font-bold text-slate-900 text-base">
+                  2.4 Explainable AI Decision Support
+                </h3>
+                <p>
+                  <strong>Standard:</strong> Artificial intelligence operates strictly as an advisory matching and claims-verification co-pilot for departmental officers. Candidate suitability scoring uses a deterministic 4-pillar formula (Sector 35%, Capability 35%, Stage 15%, DPIIT Recognition 15%).
+                </p>
+                <p className="text-xs text-slate-600">
+                  <strong>Human Accountability:</strong> Under NITI Aayog guidelines on Responsible AI for All, automated scores never make binding procurement decisions. Human departmental nodal officers retain full constitutional responsibility for awarding pilot charters.
+                </p>
               </div>
             </div>
-          </div>
+          </section>
 
-          {/* Paradigm Comparison Matrix Table (Replaces generic cards with authoritative architectural proof) */}
-          <div className="pt-8 space-y-4">
-            <div className="text-center max-w-xl mx-auto">
-              <span className="text-xs font-mono font-bold uppercase tracking-wider text-slate-400">
-                Architectural Benchmark
-              </span>
-              <h3 className="text-xl font-bold text-[#10233F] mt-1">
-                Legacy Tenders vs. Pragati-GovX Sovereign Architecture
-              </h3>
+          {/* Section 3: Transparency Metrics */}
+          <section className="space-y-3 text-sm leading-relaxed">
+            <h2 className="text-lg font-bold text-slate-900">
+              3. Platform Audit Benchmarks &amp; Operating Standards
+            </h2>
+            <p className="text-slate-700">
+              The platform tracks the following key governance indicators across all public challenge operations:
+            </p>
+            <ul className="list-disc pl-5 space-y-1.5 text-slate-700">
+              <li>
+                <strong>Statewide Administrative Coverage:</strong> All 36 administrative districts and 6 revenue divisions of Maharashtra are eligible for decentralized sandbox trials.
+              </li>
+              <li>
+                <strong>SLA Compliance Rate Target:</strong> Minimum 95% of approved sandbox milestone deliverables disbursed within the 30-day statutory timeline.
+              </li>
+              <li>
+                <strong>Double-Blind Adherence:</strong> 100% of technical evaluation dossiers anonymized prior to committee scoring.
+              </li>
+              <li>
+                <strong>Public Challenge Records:</strong> 100% of problem statements, target KPIs, and evaluation rubrics published openly on the portal before proposal intake begins.
+              </li>
+            </ul>
+          </section>
+
+          {/* Section 4: Public Audit Log Inspection */}
+          <section className="space-y-3 text-sm leading-relaxed">
+            <h2 className="text-lg font-bold text-slate-900">
+              4. Citizen &amp; Auditor Inspection Protocol
+            </h2>
+            <p className="text-slate-700">
+              Citizens, civic researchers, state assembly representatives, and CAG auditors can inspect platform transaction integrity through the following procedures:
+            </p>
+            <ol className="list-decimal pl-5 space-y-2 text-slate-700">
+              <li>
+                <strong>Public Problem Catalog:</strong> All open, evaluating, active, and scaled challenges are publicly indexable under <span className="font-mono text-xs">/challenges</span>, complete with problem summaries, baseline metrics, and budget caps.
+              </li>
+              <li>
+                <strong>Administrative Audit Trail:</strong> Authorized state audit officials with <span className="font-mono text-xs">ADMIN</span> credentials access real-time raw transaction logs under <span className="font-mono text-xs">/admin/audit</span>, including user actor IDs, action verbs, timestamp digests, and entity payloads.
+              </li>
+              <li>
+                <strong>Right to Information (RTI) Applications:</strong> Any citizen may file an online RTI request for complete non-confidential pilot evaluation records under Maharashtra Right to Information Rules 2005.
+              </li>
+            </ol>
+          </section>
+
+          {/* Section 5: Grievance Redressal */}
+          <section className="space-y-3 text-sm leading-relaxed">
+            <h2 className="text-lg font-bold text-slate-900">
+              5. Grievance Redressal &amp; Whistleblower Ombudsman Desk
+            </h2>
+            <p className="text-slate-700">
+              To maintain the integrity of public procurement, any startup founder, evaluator, or citizen who observes an irregularity, unauthorized tender condition, bias in scoring, or payment delay may report the matter directly:
+            </p>
+            <div className="pl-4 border-l-2 border-slate-300 space-y-1 text-slate-600 text-xs">
+              <p>• <strong>Ombudsman Authority:</strong> Chief Executive Officer, Maharashtra State Innovation Society (MSInS)</p>
+              <p>• <strong>Direct Electronic Mail:</strong> <span className="font-mono text-slate-800">ombudsman.msins@maharashtra.gov.in</span></p>
+              <p>• <strong>Statutory Investigation Mandate:</strong> Inquiries must be initiated within 7 working days of grievance receipt, with a formal resolution order published within 21 calendar days.</p>
             </div>
+          </section>
 
-            <div className="rounded-2xl border border-[#E2E8F0] bg-white overflow-hidden shadow-xs">
-              <div className="overflow-x-auto">
-                <table className="w-full text-left text-xs border-collapse">
-                  <thead>
-                    <tr className="border-b border-[#E2E8F0] bg-[#F8FAFC] text-[#64748B] font-mono text-[11px]">
-                      <th className="py-3.5 px-5">Governance Dimension</th>
-                      <th className="py-3.5 px-5 text-rose-700">Traditional Public Tenders</th>
-                      <th className="py-3.5 px-5 text-[#0F766E] font-bold">Pragati-GovX Sovereign Standard</th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-[#E2E8F0] text-xs">
-                    <tr className="hover:bg-slate-50/70">
-                      <td className="py-3.5 px-5 font-semibold text-[#10233F]">Startup Financial Barrier</td>
-                      <td className="py-3.5 px-5 text-slate-500">Rigid prior turnover & EMD deposit requirements</td>
-                      <td className="py-3.5 px-5 font-semibold text-emerald-800">100% Statutory Exemption under GFR Rule 173(i)</td>
-                    </tr>
-                    <tr className="hover:bg-slate-50/70">
-                      <td className="py-3.5 px-5 font-semibold text-[#10233F]">Milestone Payment SLA</td>
-                      <td className="py-3.5 px-5 text-slate-500">120 to 180+ days indefinite treasury delays</td>
-                      <td className="py-3.5 px-5 font-semibold text-emerald-800">Statutory 30-Day SLA with mandatory 3x compound interest</td>
-                    </tr>
-                    <tr className="hover:bg-slate-50/70">
-                      <td className="py-3.5 px-5 font-semibold text-[#10233F]">Evaluator Bias Protection</td>
-                      <td className="py-3.5 px-5 text-slate-500">Subjective review with visible vendor identity</td>
-                      <td className="py-3.5 px-5 font-semibold text-emerald-800">100% Double-Blind Anonymized Proposal Dossiers</td>
-                    </tr>
-                    <tr className="hover:bg-slate-50/70">
-                      <td className="py-3.5 px-5 font-semibold text-[#10233F]">Forensic Audit Trail</td>
-                      <td className="py-3.5 px-5 text-slate-500">Physical paper files prone to retroactive alterations</td>
-                      <td className="py-3.5 px-5 font-semibold text-emerald-800">Cryptographic SHA-256 Non-Repudiation Ledger</td>
-                    </tr>
-                  </tbody>
-                </table>
+          {/* Section 6: Legal References */}
+          <section className="space-y-3 text-sm leading-relaxed">
+            <h2 className="text-lg font-bold text-slate-900">
+              6. Statutory References &amp; Governing Acts
+            </h2>
+            <div className="border border-slate-200 rounded divide-y divide-slate-200 text-xs">
+              <div className="p-3 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1">
+                <span className="font-semibold text-slate-900">Information Technology Act, 2000 • Section 65B</span>
+                <span className="text-slate-500">Admissibility of electronic records and cryptographic hashes</span>
+              </div>
+              <div className="p-3 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1">
+                <span className="font-semibold text-slate-900">Right to Information Act, 2005 • Section 4(1)(b)</span>
+                <span className="text-slate-500">Mandatory proactive public disclosure of administrative norms</span>
+              </div>
+              <div className="p-3 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1">
+                <span className="font-semibold text-slate-900">MSMED Act, 2006 • Sections 15 &amp; 16</span>
+                <span className="text-slate-500">Statutory 30-day payment timeline and compounding interest penalty</span>
+              </div>
+              <div className="p-3 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1">
+                <span className="font-semibold text-slate-900">Maharashtra Public Procurement Rules, 2024</span>
+                <span className="text-slate-500">Transparency, fair competition, and sandbox exemptions</span>
               </div>
             </div>
-          </div>
+          </section>
+
+          {/* Section 7: Inquiries */}
+          <section className="pt-4 border-t border-slate-200 space-y-3 text-xs text-slate-600">
+            <h2 className="text-sm font-bold text-slate-900">
+              7. Related Resources
+            </h2>
+            <div className="pt-2 flex flex-wrap items-center gap-3">
+              <Link
+                to="/challenges"
+                className="inline-block rounded bg-[#2563EB] px-4 py-2 text-xs font-semibold text-white hover:bg-[#1D4ED8] transition-colors"
+              >
+                Browse Public Challenges
+              </Link>
+              <Link
+                to="/policy"
+                className="inline-block rounded border border-slate-300 px-4 py-2 text-xs font-semibold text-slate-800 hover:bg-slate-50 transition-colors"
+              >
+                DPIIT Exemption Policy
+              </Link>
+            </div>
+          </section>
+
         </div>
-      </section>
+      </main>
     </div>
   );
 }
