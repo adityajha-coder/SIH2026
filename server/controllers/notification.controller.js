@@ -56,4 +56,25 @@ export const notificationController = {
             next(error);
         }
     },
+
+    // POST /v1/notifications/invite
+    async inviteStartup(req, res, next) {
+        try {
+            const { organizationId, problemId, customMessage } = req.body;
+            const result = await notificationService.inviteStartupToApply({
+                actor: req.user,
+                organizationId,
+                problemId,
+                customMessage,
+            });
+
+            return res.status(200).json({
+                data: result,
+                meta: { traceId: req.id, timestamp: new Date().toISOString() },
+                error: null,
+            });
+        } catch (error) {
+            next(error);
+        }
+    },
 };

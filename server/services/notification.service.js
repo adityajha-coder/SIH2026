@@ -1,6 +1,8 @@
 import Notification, { NOTIFICATION_TYPES } from "../models/notification.model.js";
 import { sendEmail } from "./email.service.js";
 import User from "../models/user.model.js";
+import problemModel from "../models/problem.model.js";
+import organizationMemberModel from "../models/organizationmember.model.js";
 
 export const notificationService = {
     async notify({ recipientId, type, title, message, context = {}, sendEmailFlag = true }) {
@@ -159,5 +161,46 @@ export const notificationService = {
             { read: true, readAt: new Date() }
         );
         return { markedCount: result.modifiedCount };
+    },
+
+    async inviteStartupToApply({ actor, organizationId, problemId, customMessage }) {
+        const problem = await problemModel.findById(problemId).select("title").lean();
+        if (!problem) {
+            const err = new Error("Problem statement not found");
+            err.statusCode = 404;
+            throw err;
+        }
+
+        const members = await organizationMemberModel.find({
+            organizationId,
+            status: "ACTIVE",
+        }).select("userId").lean();
+
+        if (!members.length) {
+            const err = new Error("No active registered users found for candidate organization");
+            err.statusCode = 404;
+            throw err;
+        }
+
+        const recipientIds = members.map((m) => m.userId);
+        const title = `Official Nodal Invitation: ${problem.title}`;
+        const message =
+            customMessage ||
+            `Your organization has been identified by the Explainable AI matching engine as a high-affinity candidate for "${problem.title}". You are formally invited to file a proposal under statutory GFR 173(i) waivers.`;
+
+        const results = await this.notifyMany({
+            recipientIds,
+            type: NOTIFICATION_TYPES.SYSTEM_ANNOUNCEMENT,
+            title,
+            message,
+            context: { entityType: "PROBLEM", entityId: problem._id },
+            sendEmailFlag: true,
+        });
+
+        return {
+            dispatchedCount: results.length,
+            title,
+            message,
+        };
     },
 };

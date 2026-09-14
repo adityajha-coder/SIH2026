@@ -13,4 +13,7 @@ notificationRouter.put("/:id/read", requireAuth, notificationController.markAsRe
 // PUT /v1/notifications/read-all
 notificationRouter.put("/read-all", requireAuth, notificationController.markAllAsRead);
 
+// POST /v1/notifications/invite
+notificationRouter.post("/invite", requireAuth, notificationController.inviteStartup);
+
 export default notificationRouter;
