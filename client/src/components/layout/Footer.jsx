@@ -53,6 +53,11 @@ export function Footer() {
                   Direct Innovation Pilots
                 </Link>
               </li>
+              <li>
+                <Link to="/about" className="hover:text-[#2563EB] transition-colors">
+                  How It Works (About)
+                </Link>
+              </li>
             </ul>
           </div>
 

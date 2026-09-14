@@ -318,9 +318,6 @@ export function ChallengeStudio() {
         <h1 className="text-2xl sm:text-3xl font-extrabold text-[#10233F] tracking-tight">
           Challenge Authoring Studio
         </h1>
-        <p className="text-xs sm:text-sm text-[#64748B]">
-          Define measurable operational problem statements for Maharashtra departments. Startups compete on capability and pilot merit rather than prior turnover.
-        </p>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
@@ -366,9 +363,6 @@ export function ChallengeStudio() {
                     <CardTitle className="text-lg font-bold text-[#10233F]">
                       1. Problem Narrative &amp; Sector Domain
                     </CardTitle>
-                    <CardDescription className="text-xs text-[#64748B]">
-                      Articulate the operational challenge currently faced by your department or municipal body.
-                    </CardDescription>
                   </CardHeader>
                   <CardContent className="p-6 space-y-5">
                     <div className="space-y-1.5">
@@ -376,7 +370,7 @@ export function ChallengeStudio() {
                         Challenge Title *
                       </label>
                       <Input
-                        placeholder="e.g. Real-Time Non-Revenue Water Leakage Detection in Nashik Municipal Pipeline"
+                        placeholder="e.g. WeatherGPT"
                         value={title}
                         onChange={(e) => setTitle(e.target.value)}
                         className="h-10 text-xs"
@@ -392,7 +386,7 @@ export function ChallengeStudio() {
                       </label>
                       <textarea
                         rows={3}
-                        placeholder="Concise 2-line summary explaining the core civic pain point and why traditional solutions failed..."
+                        placeholder="Concise 2-line summary..."
                         value={shortSummary}
                         onChange={(e) => setShortSummary(e.target.value)}
                         className="w-full rounded-xl border border-slate-200 p-3 text-xs focus:border-[#2563EB] focus:outline-hidden"
@@ -405,7 +399,7 @@ export function ChallengeStudio() {
                       </label>
                       <textarea
                         rows={5}
-                        placeholder="Provide in-depth contextual background, field environment constraints, current operational workflow, and key failure points..."
+                        placeholder="Provide in-depth statement, field environment constraints, current operational workflow, and key failure points..."
                         value={fullStatement}
                         onChange={(e) => setFullStatement(e.target.value)}
                         className="w-full rounded-xl border border-slate-200 p-3 text-xs focus:border-[#2563EB] focus:outline-hidden"
@@ -455,9 +449,6 @@ export function ChallengeStudio() {
                     <CardTitle className="text-lg font-bold text-[#10233F]">
                       2. Quantifiable Outcomes &amp; Impact Targets
                     </CardTitle>
-                    <CardDescription className="text-xs text-[#64748B]">
-                      Outcome-based procurement requires quantifiable metrics rather than generic feature wishlists.
-                    </CardDescription>
                   </CardHeader>
                   <CardContent className="p-6 space-y-5">
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -546,9 +537,6 @@ export function ChallengeStudio() {
                     <CardTitle className="text-lg font-bold text-[#10233F]">
                       3. District Geography &amp; Procurement Path
                     </CardTitle>
-                    <CardDescription className="text-xs text-[#64748B]">
-                      Specify target Maharashtra administrative districts for the field trial deployment.
-                    </CardDescription>
                   </CardHeader>
                   <CardContent className="p-6 space-y-5">
                     <div className="space-y-2">
@@ -627,9 +615,6 @@ export function ChallengeStudio() {
                     <CardTitle className="text-lg font-bold text-[#10233F]">
                       4. Mandatory Hard Gates &amp; Technical Criteria
                     </CardTitle>
-                    <CardDescription className="text-xs text-[#64748B]">
-                      Deterministic rules evaluated automatically before proposals reach the review committee.
-                    </CardDescription>
                   </CardHeader>
                   <CardContent className="p-6 space-y-5">
                     {/* Statutory Exemption Toggle */}

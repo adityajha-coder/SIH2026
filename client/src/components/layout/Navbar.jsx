@@ -41,6 +41,7 @@ export function Navbar() {
     { label: "Eligibility Policy", href: "/policy" },
     { label: "Pilot Framework", href: "/pilot-framework" },
     { label: "Audit & Transparency", href: "/audit-public" },
+    { label: "About", href: "/about" },
   ];
 
   const isActive = (path) => location.pathname === path;

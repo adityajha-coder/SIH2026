@@ -36,6 +36,7 @@ import { AdminAuditConsole } from "./pages/admin/AdminAuditConsole";
 import { NotificationCenter } from "./pages/app/NotificationCenter";
 import { ProfilePage } from "./pages/app/ProfilePage";
 import { PublicTransparencyPage } from "./pages/public/PublicTransparencyPage";
+import { AboutPage } from "./pages/public/AboutPage";
 
 import { ErrorBoundary } from "./components/common/ErrorBoundary";
 import { NotFoundPage } from "./pages/public/NotFoundPage";
@@ -66,6 +67,7 @@ export function App() {
                 path="/audit-public"
                 element={<PublicTransparencyPage />}
               />
+              <Route path="/about" element={<AboutPage />} />
             </Route>
 
             <Route element={<RoleGuard />}>
