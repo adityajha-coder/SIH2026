@@ -118,9 +118,6 @@ export function EvaluatorQueue() {
           <h1 className="text-2xl sm:text-3xl font-extrabold text-[#10233F] tracking-tight">
             Assigned Review Dossiers
           </h1>
-          <p className="text-xs sm:text-sm text-[#64748B]">
-            All applicant commercial identifiers are cryptographically masked. Score proposals strictly on technical merit, architecture, and pilot feasibility.
-          </p>
         </div>
 
         <div className="flex items-center gap-2 text-xs font-semibold text-emerald-700 bg-emerald-50 px-3 py-1.5 rounded-xl border border-emerald-200">
@@ -235,9 +232,6 @@ export function EvaluatorQueue() {
             <h2 className="text-lg font-bold text-[#10233F]">
               Active Evaluation Assignments
             </h2>
-            <p className="text-xs text-[#64748B]">
-              Review each submission under double-blind conditions. Conflict of Interest (COI) declaration is mandatory before scoring.
-            </p>
           </div>
 
           {/* Filter Tabs */}

@@ -8,7 +8,8 @@ export async function handleSocialCallback(req, res) {
     const user = req.user;
 
     if (!user) {
-        return res.redirect(`${process.env.FRONTEND_URL || "http://localhost:3001"}/login?error=auth_failed`);
+        const frontendUrl = process.env.FRONTEND_URL || "http://localhost:5173";
+        return res.redirect(`${frontendUrl}/login?error=auth_failed`);
     }
 
     // 1. Issue Refresh Token (7 days)
@@ -30,7 +31,7 @@ export async function handleSocialCallback(req, res) {
 
     // 3. Issue Access Token (15m)
     const accessToken = jwt.sign(
-        { id: user._id, sessionId: session._id },
+        { id: user._id, sessionId: session._id, role: user.role },
         config.JWT_SECRET,
         { expiresIn: "15m" }
     );
@@ -38,12 +39,12 @@ export async function handleSocialCallback(req, res) {
     // 4. Set httpOnly cookie
     res.cookie("refreshToken", refreshToken, {
         httpOnly: true,
-        secure: true,
-        sameSite: "strict",
+        secure: process.env.NODE_ENV === "production",
+        sameSite: process.env.NODE_ENV === "production" ? "strict" : "lax",
         maxAge: 7 * 24 * 60 * 60 * 1000,
     });
 
     // 5. Redirect user to frontend dashboard with accessToken
-    const frontendUrl = process.env.FRONTEND_URL || "http://localhost:3001";
+    const frontendUrl = process.env.FRONTEND_URL || "http://localhost:5173";
     return res.redirect(`${frontendUrl}/auth/callback?token=${accessToken}`);
 }

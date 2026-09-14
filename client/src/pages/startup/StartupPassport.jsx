@@ -117,9 +117,6 @@ export function StartupPassport() {
           <h1 className="text-2xl sm:text-3xl font-extrabold text-[#10233F] tracking-tight">
             Startup Passport
           </h1>
-          <p className="text-xs sm:text-sm text-[#64748B]">
-            Maintain your official capabilities and statutory prior-turnover exemption credentials for government procurement.
-          </p>
         </div>
 
         <Button

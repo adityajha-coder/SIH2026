@@ -99,9 +99,6 @@ export function MyApplicationsPage() {
           <h1 className="text-2xl sm:text-3xl font-extrabold text-[#10233F] tracking-tight">
             My Challenge Applications
           </h1>
-          <p className="text-xs sm:text-sm text-[#64748B]">
-            Track submitted proposals, double-blind evaluation progress, clarifications, and sovereign sandbox transitions.
-          </p>
         </div>
 
         <Link to="/challenges">

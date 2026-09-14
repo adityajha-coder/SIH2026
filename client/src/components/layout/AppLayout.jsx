@@ -1,20 +1,6 @@
 import React, { useState } from "react";
 import { Outlet, Link, useLocation, useNavigate } from "react-router-dom";
-import { 
-  LayoutDashboard, 
-  FileText, 
-  Send, 
-  CheckSquare, 
-  Sliders, 
-  ShieldAlert, 
-  Bell, 
-  LogOut, 
-  Menu, 
-  X,
-  ChevronRight,
-  User,
-  Home
-} from "lucide-react";
+import { PanelLeftClose, PanelLeftOpen, Bell, LogOut } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { getRoleDashboardPath } from "@/context/AuthContext";
 import { useAuth } from "@/hooks/useAuth";
@@ -36,33 +22,33 @@ const ROLE_SECTION_LABELS = {
   ADMIN: "Administration Console",
 };
 
-// Strictly authorized navigation according to user role
+// Strictly authorized navigation according to user role (Icon-free)
 const ROLE_NAV_CONFIG = {
   STARTUP_USER: [
-    { label: "Startup Dashboard", href: "/startup/dashboard", icon: LayoutDashboard },
-    { label: "Find Challenges", href: "/challenges", icon: FileText },
-    { label: "My Applications", href: "/startup/submissions", icon: Send },
-    { label: "Startup Passport", href: "/startup/profile", icon: FileText },
-    { label: "Profile & Settings", href: "/profile", icon: User },
+    { label: "Startup Dashboard", href: "/startup/dashboard" },
+    { label: "Find Challenges", href: "/challenges" },
+    { label: "My Applications", href: "/startup/submissions" },
+    { label: "Startup Passport", href: "/startup/profile" },
+    { label: "Profile & Settings", href: "/profile" },
   ],
   GOVERNMENT_USER: [
-    { label: "Command Center", href: "/government/dashboard", icon: LayoutDashboard },
-    { label: "Challenge Studio", href: "/government/challenges/new", icon: Sliders },
-    { label: "Public Challenges", href: "/challenges", icon: FileText },
-    { label: "Department Affiliation", href: "/profile", icon: User },
+    { label: "Command Center", href: "/government/dashboard" },
+    { label: "Challenge Studio", href: "/government/challenges/new" },
+    { label: "Public Challenges", href: "/challenges" },
+    { label: "Department Affiliation", href: "/profile" },
   ],
   EVALUATOR: [
-    { label: "Evaluations Queue", href: "/evaluator/queue", icon: CheckSquare },
-    { label: "Problem Statements", href: "/challenges", icon: FileText },
-    { label: "Evaluator Credentials", href: "/profile", icon: User },
+    { label: "Evaluations Queue", href: "/evaluator/queue" },
+    { label: "Problem Statements", href: "/challenges" },
+    { label: "Evaluator Credentials", href: "/profile" },
   ],
   ADMIN: [
-    { label: "Forensic Audit Trail", href: "/admin/audit", icon: ShieldAlert },
-    { label: "Department Command", href: "/government/dashboard", icon: LayoutDashboard },
-    { label: "Challenge Studio", href: "/government/challenges/new", icon: Sliders },
-    { label: "Evaluations Queue", href: "/evaluator/queue", icon: CheckSquare },
-    { label: "Public Challenges", href: "/challenges", icon: FileText },
-    { label: "System Profile", href: "/profile", icon: User },
+    { label: "Forensic Audit Trail", href: "/admin/audit" },
+    { label: "Department Command", href: "/government/dashboard" },
+    { label: "Challenge Studio", href: "/government/challenges/new" },
+    { label: "Evaluations Queue", href: "/evaluator/queue" },
+    { label: "Public Challenges", href: "/challenges" },
+    { label: "System Profile", href: "/profile" },
   ],
 };
 
@@ -84,7 +70,8 @@ const getBreadcrumbTitle = (pathname) => {
 };
 
 export function AppLayout() {
-  const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [sidebarVisible, setSidebarVisible] = useState(true);
+  const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
   const location = useLocation();
   const navigate = useNavigate();
   const { user, organization, logout } = useAuth();
@@ -103,7 +90,6 @@ export function AppLayout() {
   };
 
   const renderNavItem = (item) => {
-    const Icon = item.icon;
     const active =
       location.pathname === item.href ||
       (item.href !== "/" &&
@@ -113,120 +99,183 @@ export function AppLayout() {
       <Link
         key={item.href}
         to={item.href}
-        onClick={() => setSidebarOpen(false)}
+        onClick={() => setMobileSidebarOpen(false)}
         className={cn(
-          "flex items-center gap-3 rounded-lg px-3 py-2.5 text-xs font-semibold transition-all",
+          "flex items-center justify-between rounded-md px-3 py-2.5 text-xs font-semibold transition-all",
           active
             ? "bg-[#2563EB] text-white shadow-xs"
             : "text-[#64748B] hover:bg-[#F1F5F9] hover:text-[#10233F]"
         )}
       >
-        <Icon className="h-4 w-4" />
         <span>{item.label}</span>
+        {active && (
+          <span className="text-[9px] uppercase tracking-wider font-mono opacity-80">
+            Active
+          </span>
+        )}
       </Link>
     );
   };
 
   return (
     <div className="flex min-h-screen bg-[#F7F9FC]">
-      {/* Desktop Sidebar */}
-      <aside className="hidden lg:flex w-64 flex-col border-r border-[#E2E8F0] bg-white">
-        {/* Brand header */}
-        <Link
-          to="/"
-          title="Return to Sovereign Portal Home"
-          className="h-16 flex items-center gap-3 px-6 border-b border-[#E2E8F0] hover:bg-slate-50/80 transition-colors"
-        >
-          <img
-            src={logoImg}
-            alt="Pragati-GovX"
-            className="h-8 w-auto object-contain rounded-md"
-          />
-          <div>
-            <h1 className="font-bold text-sm text-[#10233F]">Pragati-GovX</h1>
-            <span className="text-[10px] text-[#64748B] font-medium">Console</span>
-          </div>
-        </Link>
+      {/* Desktop Sidebar (Collapsible / Toggleable) */}
+      {sidebarVisible && (
+        <aside className="hidden lg:flex w-64 flex-col border-r border-[#E2E8F0] bg-white shrink-0 transition-all duration-200">
+          {/* Brand header */}
+          <div className="h-16 flex items-center justify-between px-5 border-b border-[#E2E8F0]">
+            <Link
+              to="/"
+              title="Return to Portal Home"
+              className="flex items-center gap-2.5 hover:opacity-80 transition-opacity"
+            >
+              <img
+                src={logoImg}
+                alt="Pragati-GovX"
+                className="h-7 w-auto object-contain rounded"
+              />
+              <div>
+                <h1 className="font-bold text-xs text-[#10233F]">Pragati-GovX</h1>
+                <span className="text-[10px] text-[#64748B] font-medium block -mt-0.5">
+                  Console
+                </span>
+              </div>
+            </Link>
 
-        {/* Navigation list */}
-        <div className="flex-1 px-3 py-4 space-y-1">
-          <div className="px-3 pb-2 text-[10px] font-bold uppercase tracking-wider text-[#64748B]">
-            {sectionLabel}
+            <button
+              type="button"
+              onClick={() => setSidebarVisible(false)}
+              className="p-1.5 rounded-lg text-slate-500 hover:text-[#10233F] hover:bg-slate-100 transition-colors cursor-pointer border border-slate-200"
+              title="Collapse sidebar"
+              aria-label="Collapse sidebar"
+            >
+              <PanelLeftClose className="h-4 w-4" />
+            </button>
           </div>
-          {roleNavItems.map(renderNavItem)}
-        </div>
 
-        {/* User Card & Logout */}
-        <div className="p-4 border-t border-[#E2E8F0] space-y-3">
-          <Link
-            to="/profile"
-            title="View Profile & Data"
-            className="flex items-center gap-3 p-1.5 -m-1.5 rounded-lg hover:bg-slate-50 transition-colors group cursor-pointer"
-          >
-            <div className="h-8 w-8 rounded-full bg-blue-100 text-[#2563EB] flex items-center justify-center font-bold text-xs group-hover:scale-105 transition-transform">
-              {userName.charAt(0)}
+          {/* Navigation list */}
+          <div className="flex-1 px-3 py-4 space-y-1 overflow-y-auto">
+            <div className="px-3 pb-2 text-[10px] font-bold uppercase tracking-wider text-[#64748B]">
+              {sectionLabel}
             </div>
-            <div className="flex-1 min-w-0">
-              <p className="text-xs font-semibold text-[#10233F] truncate group-hover:text-blue-600 transition-colors">
-                {userName}
-              </p>
-              <span className="inline-block rounded bg-blue-50 px-1.5 py-0.5 text-[9px] font-semibold text-[#2563EB] border border-blue-200/60">
-                {roleDisplay}
-              </span>
-              {organization?.name && (
-                <p className="mt-1 truncate text-[10px] text-[#64748B]">
-                  {organization.name}
+            {roleNavItems.map(renderNavItem)}
+          </div>
+
+          {/* User Card & Logout */}
+          <div className="p-4 border-t border-[#E2E8F0] space-y-3">
+            <Link
+              to="/profile"
+              title="View Profile & Data"
+              className="flex items-center gap-3 p-1.5 -m-1.5 rounded-lg hover:bg-slate-50 transition-colors group cursor-pointer"
+            >
+              <div className="h-8 w-8 rounded-full bg-blue-100 text-[#2563EB] flex items-center justify-center font-bold text-xs">
+                {userName.charAt(0)}
+              </div>
+              <div className="flex-1 min-w-0">
+                <p className="text-xs font-semibold text-[#10233F] truncate group-hover:text-blue-600 transition-colors">
+                  {userName}
                 </p>
-              )}
-            </div>
-          </Link>
-          <Button
-            variant="outline"
-            size="sm"
-            className="w-full text-xs text-[#DC2626] hover:bg-red-50 hover:text-[#DC2626] border-red-100 cursor-pointer"
-            onClick={handleLogout}
-          >
-            <LogOut className="h-3.5 w-3.5 mr-1.5" />
-            Sign Out
-          </Button>
-        </div>
-      </aside>
+                <span className="inline-block rounded bg-blue-50 px-1.5 py-0.5 text-[9px] font-semibold text-[#2563EB] border border-blue-200/60">
+                  {roleDisplay}
+                </span>
+                {organization?.name && (
+                  <p className="mt-0.5 truncate text-[10px] text-[#64748B]">
+                    {organization.name}
+                  </p>
+                )}
+              </div>
+            </Link>
+            <button
+              type="button"
+              onClick={handleLogout}
+              className="w-full flex items-center justify-center gap-2 text-xs font-semibold py-1.5 px-3 rounded-md border border-red-200 text-[#DC2626] hover:bg-red-50 transition-colors text-center cursor-pointer"
+            >
+              <LogOut className="h-3.5 w-3.5" />
+              <span>Sign Out</span>
+            </button>
+          </div>
+        </aside>
+      )}
 
-      {sidebarOpen && (
+      {/* Mobile Drawer Navigation */}
+      {mobileSidebarOpen && (
         <div className="fixed inset-0 z-50 lg:hidden">
           <button
             type="button"
             className="absolute inset-0 bg-black/30"
-            onClick={() => setSidebarOpen(false)}
+            onClick={() => setMobileSidebarOpen(false)}
             aria-label="Close workspace navigation"
           />
           <aside className="relative flex h-full w-72 flex-col border-r border-[#E2E8F0] bg-white shadow-xl">
             <div className="h-16 flex items-center justify-between gap-3 px-5 border-b border-[#E2E8F0]">
-              <Link to="/" className="flex items-center gap-3" title="Return to Sovereign Portal Home">
+              <Link
+                to="/"
+                className="flex items-center gap-2.5"
+                title="Return to Portal Home"
+                onClick={() => setMobileSidebarOpen(false)}
+              >
                 <img
                   src={logoImg}
                   alt="Pragati-GovX"
-                  className="h-8 w-auto object-contain rounded-md"
+                  className="h-7 w-auto object-contain rounded"
                 />
                 <div>
-                  <h1 className="font-bold text-sm text-[#10233F]">Pragati-GovX</h1>
-                  <span className="text-[10px] text-[#64748B] font-medium">Console</span>
+                  <h1 className="font-bold text-xs text-[#10233F]">Pragati-GovX</h1>
+                  <span className="text-[10px] text-[#64748B] font-medium block -mt-0.5">
+                    Console
+                  </span>
                 </div>
               </Link>
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={() => setSidebarOpen(false)}
-                aria-label="Close workspace navigation"
+              <button
+                type="button"
+                onClick={() => setMobileSidebarOpen(false)}
+                className="p-1.5 rounded-lg text-slate-500 hover:text-[#10233F] hover:bg-slate-100 transition-colors cursor-pointer"
+                title="Close sidebar"
+                aria-label="Close sidebar"
               >
-                <X className="h-5 w-5" />
-              </Button>
+                <PanelLeftClose className="h-4 w-4" />
+              </button>
             </div>
-            <div className="flex-1 px-3 py-4 space-y-1">
+            <div className="flex-1 px-3 py-4 space-y-1 overflow-y-auto">
               <div className="px-3 pb-2 text-[10px] font-bold uppercase tracking-wider text-[#64748B]">
                 {sectionLabel}
               </div>
               {roleNavItems.map(renderNavItem)}
+            </div>
+
+            {/* Mobile User Card & Logout */}
+            <div className="p-4 border-t border-[#E2E8F0] space-y-3">
+              <Link
+                to="/profile"
+                onClick={() => setMobileSidebarOpen(false)}
+                title="View Profile & Data"
+                className="flex items-center gap-3 p-1.5 -m-1.5 rounded-lg hover:bg-slate-50 transition-colors group cursor-pointer"
+              >
+                <div className="h-8 w-8 rounded-full bg-blue-100 text-[#2563EB] flex items-center justify-center font-bold text-xs">
+                  {userName.charAt(0)}
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="text-xs font-semibold text-[#10233F] truncate group-hover:text-blue-600 transition-colors">
+                    {userName}
+                  </p>
+                  <span className="inline-block rounded bg-blue-50 px-1.5 py-0.5 text-[9px] font-semibold text-[#2563EB] border border-blue-200/60">
+                    {roleDisplay}
+                  </span>
+                  {organization?.name && (
+                    <p className="mt-0.5 truncate text-[10px] text-[#64748B]">
+                      {organization.name}
+                    </p>
+                  )}
+                </div>
+              </Link>
+              <button
+                type="button"
+                onClick={handleLogout}
+                className="w-full flex items-center justify-center gap-2 text-xs font-semibold py-1.5 px-3 rounded-md border border-red-200 text-[#DC2626] hover:bg-red-50 transition-colors text-center cursor-pointer"
+              >
+                <LogOut className="h-3.5 w-3.5" />
+                <span>Sign Out</span>
+              </button>
             </div>
           </aside>
         </div>
@@ -235,27 +284,41 @@ export function AppLayout() {
       {/* Main Content Area */}
       <div className="flex-1 flex flex-col min-w-0">
         {/* Top App Header */}
-        <header className="h-16 glass-nav flex items-center justify-between px-4 sm:px-8 border-b border-[#E2E8F0]">
+        <header className="h-16 bg-white flex items-center justify-between px-4 sm:px-8 border-b border-[#E2E8F0]">
           <div className="flex items-center gap-3">
-            <Button
-              variant="ghost"
-              size="icon"
-              className="lg:hidden"
-              onClick={() => setSidebarOpen(!sidebarOpen)}
-              aria-label="Open workspace navigation"
+            {/* Sidebar Toggle Icon Button (Obsidian / ChatGPT style - shown on mobile or when desktop sidebar is collapsed) */}
+            <button
+              type="button"
+              onClick={() => {
+                if (typeof window !== "undefined" && window.innerWidth < 1024) {
+                  setMobileSidebarOpen(true);
+                } else {
+                  setSidebarVisible(true);
+                }
+              }}
+              className={cn(
+                "p-2 rounded-lg text-slate-600 hover:text-[#10233F] hover:bg-slate-100 transition-colors cursor-pointer shrink-0 border border-slate-200",
+                sidebarVisible ? "lg:hidden" : "flex"
+              )}
+              title="Expand sidebar"
+              aria-label="Expand sidebar"
             >
-              <Menu className="h-5 w-5" />
-            </Button>
+              <PanelLeftOpen className="h-4 w-4 text-[#2563EB]" />
+            </button>
+
+            {/* Breadcrumbs */}
             <div className="flex min-w-0 items-center gap-1.5 text-xs text-[#64748B]">
-              <Link to="/" className="hover:text-[#2563EB] flex items-center gap-1 font-medium transition-colors">
-                <Home className="h-3.5 w-3.5 text-blue-600" />
-                <span>Home</span>
+              <Link to="/" className="hover:text-[#2563EB] font-medium transition-colors">
+                Home
               </Link>
-              <ChevronRight className="h-3 w-3 text-slate-300" />
-              <Link to={getRoleDashboardPath(userRole)} className="hover:text-[#10233F] transition-colors">
+              <span className="text-slate-300">/</span>
+              <Link
+                to={getRoleDashboardPath(userRole)}
+                className="hover:text-[#10233F] transition-colors"
+              >
                 Workspace
               </Link>
-              <ChevronRight className="h-3 w-3 text-slate-300" />
+              <span className="text-slate-300">/</span>
               <span className="truncate font-semibold text-[#10233F]">
                 {getBreadcrumbTitle(location.pathname)}
               </span>
@@ -264,7 +327,7 @@ export function AppLayout() {
 
           <div className="flex items-center gap-2 sm:gap-3">
             {/* Authorization & Affiliation Tag */}
-            <div className="hidden sm:flex items-center gap-1.5 px-2.5 py-1 rounded-md border border-slate-200 bg-white text-xs">
+            <div className="hidden sm:flex items-center gap-1.5 px-2.5 py-1 rounded-md border border-slate-200 bg-slate-50 text-xs">
               <span className="font-semibold text-[#10233F]">
                 {roleDisplay}
               </span>
@@ -278,14 +341,18 @@ export function AppLayout() {
               )}
             </div>
 
+            {/* Notification Center Link with Bell Icon */}
             <Link
               to="/notifications"
               title="Universal Notification Hub"
-              className="relative p-2 rounded-lg text-[#64748B] hover:text-[#10233F] hover:bg-slate-100 transition-colors"
+              aria-label="Universal Notification Hub"
+              className="relative p-2 rounded-lg border border-slate-200 bg-white text-slate-600 hover:text-[#10233F] hover:bg-slate-50 transition-colors flex items-center justify-center"
             >
               <Bell className="h-4 w-4" />
               {unreadCount > 0 && (
-                <span className="absolute top-1.5 right-1.5 h-2 w-2 rounded-full bg-[#2563EB]" />
+                <span className="absolute -top-1 -right-1 flex h-4 min-w-[16px] px-1 items-center justify-center rounded-full bg-[#2563EB] text-[9px] font-bold text-white shadow-xs">
+                  {unreadCount > 99 ? "99+" : unreadCount}
+                </span>
               )}
             </Link>
           </div>
@@ -300,3 +367,4 @@ export function AppLayout() {
 }
 
 export default AppLayout;
+

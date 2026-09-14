@@ -20,6 +20,7 @@ import {
   PieChart,
   Pie,
   Cell,
+  CartesianGrid,
 } from "recharts";
 import { EvaluationRubricModal } from "@/components/government/EvaluationRubricModal";
 import { AssignEvaluatorModal } from "@/components/government/AssignEvaluatorModal";
@@ -100,9 +101,12 @@ export function DepartmentDashboard() {
       const st = s.status || "SUBMITTED";
       countMap[st] = (countMap[st] || 0) + 1;
     });
+    const total = submissions.length || 1;
     return Object.entries(countMap).map(([name, value]) => ({
+      rawKey: name,
       name: name.replace(/_/g, " "),
       value,
+      percentage: Math.round((value / total) * 100),
     }));
   }, [submissions]);
 
@@ -123,7 +127,7 @@ export function DepartmentDashboard() {
   return (
     <div className="space-y-8 pb-16">
       {/* Header Banner */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-2 border-b border-slate-200">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-slate-200">
         <div className="space-y-1">
           <div className="flex items-center gap-2 text-xs">
             <span className="font-bold uppercase tracking-wider text-[#2563EB]">
@@ -134,99 +138,132 @@ export function DepartmentDashboard() {
           <h1 className="text-2xl sm:text-3xl font-extrabold text-[#10233F] tracking-tight">
             {organization?.name || "Government Department Workspace"}
           </h1>
-          <p className="text-xs sm:text-sm text-[#64748B]">
-            Formulate outcome-based innovation challenges, evaluate startup candidates with Explainable AI, and monitor field pilots.
+          <p className="text-xs text-[#64748B]">
+            Challenge lifecycle management, startup proposal pipelines, and double-blind scoring console.
           </p>
         </div>
 
-        <Link to="/government/challenges/new">
-          <Button className="text-xs font-medium bg-[#10233F] hover:bg-slate-800 text-white rounded shadow-sm h-9 px-4">
-            + Create Challenge
-          </Button>
-        </Link>
+        <div className="flex items-center gap-2 shrink-0">
+          <Link to="/challenges">
+            <Button
+              variant="outline"
+              className="text-xs font-semibold border-slate-300 text-[#10233F] hover:bg-slate-50 h-9 px-3.5 rounded-lg cursor-pointer"
+            >
+              Public Challenges
+            </Button>
+          </Link>
+          <Link to="/government/challenges/new">
+            <Button className="text-xs font-semibold bg-[#2563EB] hover:bg-blue-700 text-white rounded-lg shadow-xs h-9 px-4 cursor-pointer">
+              Create Challenge
+            </Button>
+          </Link>
+        </div>
       </div>
 
+      {/* 4 Metric Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         {/* Metric 1 */}
-        <Card className="border border-slate-200 bg-white shadow-xs rounded-xl">
-          <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
-            <CardTitle className="text-xs font-semibold text-[#64748B]">
+        <Card className="border border-slate-200/80 bg-white hover:border-blue-300 hover:shadow-xs transition-all rounded-xl p-5">
+          <div className="flex items-center justify-between">
+            <span className="text-xs font-semibold text-[#64748B]">
               Published Challenges
-            </CardTitle>
-            <span className="text-xs font-bold text-[#2563EB]">Active</span>
-          </CardHeader>
-          <CardContent>
+            </span>
+            <span className="text-[10px] font-mono font-bold px-2 py-0.5 rounded-full border border-blue-200 bg-blue-50 text-[#2563EB]">
+              Active
+            </span>
+          </div>
+          <div className="mt-3">
             {loadingProblems ? (
               <Skeleton className="h-8 w-16" />
             ) : (
               <div>
-                <p className="text-2xl font-bold text-[#10233F]">{metrics.publishedProblems}</p>
-                <p className="text-[11px] text-[#64748B] mt-1">
+                <p className="text-3xl font-extrabold text-[#10233F] tracking-tight">
+                  {metrics.publishedProblems}
+                </p>
+                <p className="text-[11px] text-[#64748B] font-medium mt-1">
                   {metrics.draftProblems} in draft preparation
                 </p>
               </div>
             )}
-          </CardContent>
+          </div>
         </Card>
 
         {/* Metric 2 */}
-        <Card className="border border-slate-200 bg-white shadow-xs rounded-xl">
-          <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
-            <CardTitle className="text-xs font-semibold text-[#64748B]">
+        <Card className="border border-slate-200/80 bg-white hover:border-teal-300 hover:shadow-xs transition-all rounded-xl p-5">
+          <div className="flex items-center justify-between">
+            <span className="text-xs font-semibold text-[#64748B]">
               Candidate Submissions
-            </CardTitle>
-            <span className="text-xs font-bold text-teal-700">Total</span>
-          </CardHeader>
-          <CardContent>
+            </span>
+            <span className="text-[10px] font-mono font-bold px-2 py-0.5 rounded-full border border-teal-200 bg-teal-50 text-[#0F766E]">
+              Total
+            </span>
+          </div>
+          <div className="mt-3">
             {loadingSubmissions ? (
               <Skeleton className="h-8 w-16" />
             ) : (
               <div>
-                <p className="text-2xl font-bold text-[#10233F]">{metrics.totalSubmissions}</p>
-                <p className="text-[11px] text-[#64748B] mt-1">Across all open problem statements</p>
+                <p className="text-3xl font-extrabold text-[#10233F] tracking-tight">
+                  {metrics.totalSubmissions}
+                </p>
+                <p className="text-[11px] text-[#64748B] font-medium mt-1">
+                  Across all open problem statements
+                </p>
               </div>
             )}
-          </CardContent>
+          </div>
         </Card>
 
         {/* Metric 3 */}
-        <Card className="border border-slate-200 bg-white shadow-xs rounded-xl">
-          <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
-            <CardTitle className="text-xs font-semibold text-[#64748B]">
+        <Card className="border border-slate-200/80 bg-white hover:border-amber-300 hover:shadow-xs transition-all rounded-xl p-5">
+          <div className="flex items-center justify-between">
+            <span className="text-xs font-semibold text-[#64748B]">
               Pending Evaluation
-            </CardTitle>
-            <span className="text-xs font-bold text-amber-700">Queue</span>
-          </CardHeader>
-          <CardContent>
+            </span>
+            <span className="text-[10px] font-mono font-bold px-2 py-0.5 rounded-full border border-amber-200 bg-amber-50 text-[#B45309]">
+              Queue
+            </span>
+          </div>
+          <div className="mt-3">
             {loadingSubmissions ? (
               <Skeleton className="h-8 w-16" />
             ) : (
               <div>
-                <p className="text-2xl font-bold text-[#10233F]">{metrics.pendingReview}</p>
-                <p className="text-[11px] text-[#64748B] mt-1">Awaiting double-blind scoring</p>
+                <p className="text-3xl font-extrabold text-[#10233F] tracking-tight">
+                  {metrics.pendingReview}
+                </p>
+                <p className="text-[11px] text-[#64748B] font-medium mt-1">
+                  Awaiting double-blind scoring
+                </p>
               </div>
             )}
-          </CardContent>
+          </div>
         </Card>
 
         {/* Metric 4 */}
-        <Card className="border border-slate-200 bg-white shadow-xs rounded-xl">
-          <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
-            <CardTitle className="text-xs font-semibold text-[#64748B]">
+        <Card className="border border-slate-200/80 bg-white hover:border-purple-300 hover:shadow-xs transition-all rounded-xl p-5">
+          <div className="flex items-center justify-between">
+            <span className="text-xs font-semibold text-[#64748B]">
               Active Field Pilots
-            </CardTitle>
-            <span className="text-xs font-bold text-purple-700">Sandbox</span>
-          </CardHeader>
-          <CardContent>
+            </span>
+            <span className="text-[10px] font-mono font-bold px-2 py-0.5 rounded-full border border-purple-200 bg-purple-50 text-[#7C3AED]">
+              Sandbox
+            </span>
+          </div>
+          <div className="mt-3">
             {loadingSubmissions ? (
               <Skeleton className="h-8 w-16" />
             ) : (
               <div>
-                <p className="text-2xl font-bold text-[#10233F]">{metrics.activePilots}</p>
-                <p className="text-[11px] text-[#64748B] mt-1">Live sandbox trials in progress</p>
+                <p className="text-3xl font-extrabold text-[#10233F] tracking-tight">
+                  {metrics.activePilots}
+                </p>
+                <p className="text-[11px] text-[#64748B] font-medium mt-1">
+                  Live sandbox trials in progress
+                </p>
               </div>
             )}
-          </CardContent>
+          </div>
         </Card>
       </div>
 
@@ -234,85 +271,173 @@ export function DepartmentDashboard() {
       {!loadingProblems && !loadingSubmissions && (problems.length > 0 || submissions.length > 0) && (
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           {/* Chart 1: Problems by Sector */}
-          <Card className="border border-slate-200 bg-white shadow-xs rounded-xl">
-            <CardHeader className="pb-2 border-b border-slate-100">
-              <CardTitle className="text-sm font-bold text-[#10233F]">
-                Challenges by Sector Focus
-              </CardTitle>
+          <Card className="border border-slate-200 bg-white shadow-xs rounded-xl overflow-hidden">
+            <CardHeader className="py-3.5 px-5 border-b border-slate-100 flex flex-row items-center justify-between">
+              <div>
+                <CardTitle className="text-sm font-bold text-[#10233F]">
+                  Challenges by Sector Focus
+                </CardTitle>
+                <p className="text-[11px] text-[#64748B]">
+                  Domain distribution of registered problem statements
+                </p>
+              </div>
+              <span className="text-[11px] font-mono font-semibold px-2 py-0.5 rounded-full border border-slate-200 bg-slate-50 text-slate-600">
+                {sectorData.length} {sectorData.length === 1 ? "Sector" : "Sectors"}
+              </span>
             </CardHeader>
-            <CardContent className="pt-4 h-64">
+            <CardContent className="p-5 h-64">
               {sectorData.length > 0 ? (
                 <ResponsiveContainer width="100%" height="100%">
-                  <BarChart data={sectorData} margin={{ top: 10, right: 10, left: -20, bottom: 20 }}>
+                  <BarChart
+                    data={sectorData}
+                    margin={{ top: 12, right: 16, left: -16, bottom: 8 }}
+                  >
+                    <CartesianGrid stroke="#F1F5F9" strokeDasharray="3 3" vertical={false} />
                     <XAxis
                       dataKey="name"
                       tick={{ fontSize: 11, fill: "#64748B" }}
-                      interval={0}
+                      axisLine={{ stroke: "#E2E8F0" }}
+                      tickLine={false}
                     />
                     <YAxis
                       allowDecimals={false}
                       tick={{ fontSize: 11, fill: "#64748B" }}
+                      axisLine={false}
+                      tickLine={false}
                     />
                     <Tooltip
+                      formatter={(val) => [`${val} Challenges`, "Volume"]}
                       contentStyle={{
                         backgroundColor: "#10233F",
-                        borderRadius: "6px",
+                        borderRadius: "8px",
+                        border: "none",
                         color: "#FFFFFF",
                         fontSize: "12px",
+                        boxShadow: "0 4px 12px rgba(0,0,0,0.15)",
                       }}
                     />
-                    <Bar dataKey="count" fill="#2563EB" radius={[4, 4, 0, 0]} />
+                    <Bar
+                      dataKey="count"
+                      fill="#2563EB"
+                      radius={[6, 6, 0, 0]}
+                      maxBarSize={44}
+                    />
                   </BarChart>
                 </ResponsiveContainer>
               ) : (
-                <div className="h-full flex items-center justify-center">
-                  <p className="text-xs text-[#64748B]">No sector data available yet.</p>
+                <div className="h-full flex flex-col items-center justify-center text-center">
+                  <p className="text-xs font-semibold text-[#10233F]">No sector data available</p>
+                  <p className="text-[11px] text-[#64748B] mt-0.5">
+                    Categorized challenge statements will appear here.
+                  </p>
                 </div>
               )}
             </CardContent>
           </Card>
 
-          {/* Chart 2: Submissions Status Distribution */}
-          <Card className="border border-slate-200 bg-white shadow-xs rounded-xl">
-            <CardHeader className="pb-2 border-b border-slate-100">
-              <CardTitle className="text-sm font-bold text-[#10233F]">
-                Applicant Pipeline Lifecycle
-              </CardTitle>
+          {/* Chart 2: Submissions Status Distribution (Clean Donut + Structured Legend) */}
+          <Card className="border border-slate-200 bg-white shadow-xs rounded-xl overflow-hidden">
+            <CardHeader className="py-3.5 px-5 border-b border-slate-100 flex flex-row items-center justify-between">
+              <div>
+                <CardTitle className="text-sm font-bold text-[#10233F]">
+                  Applicant Pipeline Lifecycle
+                </CardTitle>
+                <p className="text-[11px] text-[#64748B]">
+                  Live candidate distribution across procurement milestones
+                </p>
+              </div>
+              <span className="text-[11px] font-mono font-semibold px-2 py-0.5 rounded-full border border-slate-200 bg-slate-50 text-slate-600">
+                {submissions.length} Total
+              </span>
             </CardHeader>
-            <CardContent className="pt-4 h-64 flex items-center justify-center">
+            <CardContent className="p-5">
               {statusData.length > 0 ? (
-                <ResponsiveContainer width="100%" height="100%">
-                  <PieChart>
-                    <Pie
-                      data={statusData}
-                      dataKey="value"
-                      nameKey="name"
-                      cx="50%"
-                      cy="50%"
-                      innerRadius={42}
-                      outerRadius={68}
-                      paddingAngle={2}
-                      label={({ name, value }) => `${name} (${value})`}
-                    >
-                      {statusData.map((entry, index) => (
-                        <Cell
-                          key={`cell-${index}`}
-                          fill={PIE_COLORS[index % PIE_COLORS.length]}
+                <div className="grid grid-cols-1 sm:grid-cols-12 gap-4 items-center">
+                  {/* Donut graphic without colliding polyline labels */}
+                  <div className="sm:col-span-5 h-48 flex items-center justify-center relative">
+                    <ResponsiveContainer width="100%" height="100%">
+                      <PieChart>
+                        <Pie
+                          data={statusData}
+                          dataKey="value"
+                          nameKey="name"
+                          cx="50%"
+                          cy="50%"
+                          innerRadius={50}
+                          outerRadius={72}
+                          paddingAngle={3}
+                          stroke="#FFFFFF"
+                          strokeWidth={2}
+                        >
+                          {statusData.map((entry, index) => (
+                            <Cell
+                              key={`cell-${index}`}
+                              fill={PIE_COLORS[index % PIE_COLORS.length]}
+                            />
+                          ))}
+                        </Pie>
+                        <Tooltip
+                          formatter={(val, name) => [`${val} Proposals`, name]}
+                          contentStyle={{
+                            backgroundColor: "#10233F",
+                            borderRadius: "8px",
+                            border: "none",
+                            color: "#FFFFFF",
+                            fontSize: "12px",
+                            boxShadow: "0 4px 12px rgba(0,0,0,0.15)",
+                          }}
                         />
-                      ))}
-                    </Pie>
-                    <Tooltip
-                      contentStyle={{
-                        backgroundColor: "#10233F",
-                        borderRadius: "6px",
-                        color: "#FFFFFF",
-                        fontSize: "12px",
-                      }}
-                    />
-                  </PieChart>
-                </ResponsiveContainer>
+                      </PieChart>
+                    </ResponsiveContainer>
+                    {/* Centered Total Indicator */}
+                    <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
+                      <span className="text-xl font-extrabold text-[#10233F] leading-none">
+                        {submissions.length}
+                      </span>
+                      <span className="text-[10px] uppercase font-bold text-slate-400 tracking-wider mt-0.5">
+                        Proposals
+                      </span>
+                    </div>
+                  </div>
+
+                  {/* Clean Structured Legend List - Never collides */}
+                  <div className="sm:col-span-7 space-y-2">
+                    {statusData.map((entry, idx) => {
+                      const color = PIE_COLORS[idx % PIE_COLORS.length];
+                      return (
+                        <div
+                          key={entry.name}
+                          className="flex items-center justify-between p-2.5 rounded-lg bg-slate-50 border border-slate-100 hover:bg-slate-100/70 transition-colors text-xs"
+                        >
+                          <div className="flex items-center gap-2 min-w-0">
+                            <span
+                              className="h-2.5 w-2.5 rounded-full shrink-0"
+                              style={{ backgroundColor: color }}
+                            />
+                            <span className="font-semibold text-[#10233F] truncate">
+                              {entry.name}
+                            </span>
+                          </div>
+                          <div className="flex items-center gap-2 shrink-0 ml-2">
+                            <span className="font-bold text-[#10233F]">
+                              {entry.value}
+                            </span>
+                            <span className="text-[10px] font-mono text-slate-500 bg-white px-1.5 py-0.5 rounded border border-slate-200">
+                              {entry.percentage}%
+                            </span>
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
               ) : (
-                <p className="text-xs text-[#64748B]">No applicant data available yet.</p>
+                <div className="h-48 flex flex-col items-center justify-center text-center">
+                  <p className="text-xs font-semibold text-[#10233F]">No proposals submitted yet</p>
+                  <p className="text-[11px] text-[#64748B] mt-0.5">
+                    Submissions from startups will populate this lifecycle pipeline.
+                  </p>
+                </div>
               )}
             </CardContent>
           </Card>
@@ -326,9 +451,6 @@ export function DepartmentDashboard() {
             <h2 className="text-base font-bold text-[#10233F]">
               Department Challenge Statements
             </h2>
-            <p className="text-xs text-[#64748B]">
-              Review status, publish drafts, and evaluate candidate match rankings.
-            </p>
           </div>
 
           {/* Status Filter Tabs */}
@@ -366,8 +488,8 @@ export function DepartmentDashboard() {
               Draft a new problem statement to invite innovative pilot proposals from certified startups.
             </p>
             <Link to="/government/challenges/new" className="inline-block mt-4">
-              <Button size="sm" className="text-xs font-medium bg-[#10233F] hover:bg-slate-800 text-white rounded h-8 px-3">
-                + Draft Problem Statement
+              <Button size="sm" className="text-xs font-semibold bg-[#10233F] hover:bg-slate-800 text-white rounded h-8 px-3 cursor-pointer">
+                Draft Problem Statement
               </Button>
             </Link>
           </Card>
@@ -427,7 +549,7 @@ export function DepartmentDashboard() {
                         variant="outline"
                         onClick={() => handlePublish(prob._id, prob.title)}
                         disabled={publishMutation.isPending}
-                        className="text-xs font-semibold border-emerald-300 text-emerald-700 hover:bg-emerald-50 h-8"
+                        className="text-xs font-semibold border-emerald-300 text-emerald-700 hover:bg-emerald-50 h-8 cursor-pointer"
                       >
                         Publish Now
                       </Button>
@@ -438,7 +560,7 @@ export function DepartmentDashboard() {
                       size="sm"
                       variant="outline"
                       onClick={() => setSelectedProblemForRubric(prob)}
-                      className="text-xs font-semibold border-slate-300 text-[#10233F] hover:bg-slate-50 h-8 px-2.5 rounded"
+                      className="text-xs font-semibold border-slate-300 text-[#10233F] hover:bg-slate-50 h-8 px-2.5 rounded cursor-pointer"
                     >
                       Evaluation Rubrics
                     </Button>
@@ -446,7 +568,7 @@ export function DepartmentDashboard() {
                     <Link to={`/government/challenges/${prob._id}/matching`}>
                       <Button
                         size="sm"
-                        className="text-xs font-medium bg-[#10233F] hover:bg-slate-800 text-white h-8 px-3 rounded"
+                        className="text-xs font-semibold bg-[#10233F] hover:bg-slate-800 text-white h-8 px-3 rounded cursor-pointer"
                       >
                         AI Candidate Matching
                       </Button>
@@ -456,9 +578,9 @@ export function DepartmentDashboard() {
                       <Button
                         variant="outline"
                         size="sm"
-                        className="text-xs text-[#64748B] hover:text-[#10233F] border-slate-300 h-8 px-2.5 rounded"
+                        className="text-xs font-semibold text-[#10233F] hover:bg-slate-50 border-slate-300 h-8 px-2.5 rounded cursor-pointer"
                       >
-                        View &rarr;
+                        View
                       </Button>
                     </Link>
                   </div>
@@ -476,9 +598,6 @@ export function DepartmentDashboard() {
             <h2 className="text-base font-bold text-[#10233F]">
               Candidate Submissions by Challenge
             </h2>
-            <p className="text-xs text-[#64748B]">
-              Filter and evaluate proposals submitted across your department's innovation challenges.
-            </p>
           </div>
 
           {/* Quick Filter Dropdown */}
@@ -562,9 +681,9 @@ export function DepartmentDashboard() {
                       <Button
                         variant="outline"
                         size="sm"
-                        className="text-xs font-medium border-slate-300 text-[#64748B] hover:text-[#10233F] hover:bg-slate-50 h-8 px-2.5 rounded"
+                        className="text-xs font-semibold border-slate-300 text-[#10233F] hover:bg-slate-50 h-8 px-2.5 rounded cursor-pointer"
                       >
-                        Evaluate Match &rarr;
+                        Evaluate Match
                       </Button>
                     </Link>
                   </div>
