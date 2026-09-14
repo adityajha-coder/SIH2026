@@ -49,4 +49,5 @@ export const listProblemsQuerySchema = z.object({
     sector: z.string().trim().optional(),
     status: z.enum(Object.values(PROBLEM_STATUS)).optional(),
     search: z.string().trim().optional(),
+    sortBy: z.enum(["newest", "closingSoon", "budgetHigh", "alphabetical"]).optional().default("newest"),
 });

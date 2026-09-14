@@ -134,7 +134,7 @@ export const problemService = {
     },
 
     async listProblems({ query }) {
-        const { page = 1, limit = 10, sector, status, search } = query;
+        const { page = 1, limit = 10, sector, status, search, sortBy = "newest" } = query;
         const filter = {};
 
         if (status) {
@@ -151,12 +151,21 @@ export const problemService = {
             filter.$text = { $search: search };
         }
 
+        let sort = { publishedAt: -1, createdAt: -1 };
+        if (sortBy === "closingSoon") {
+            sort = { applicationCloseAt: 1, publishedAt: -1 };
+        } else if (sortBy === "alphabetical") {
+            sort = { title: 1 };
+        } else if (sortBy === "budgetHigh") {
+            sort = { procurementPath: 1, publishedAt: -1 };
+        }
+
         const skip = (page - 1) * limit;
 
         const [problems, total] = await Promise.all([
             problemModel.find(filter)
                 .populate("organizationId", "name type state")
-                .sort({ publishedAt: -1, createdAt: -1 })
+                .sort(sort)
                 .skip(skip)
                 .limit(limit)
                 .select("title shortSummary sectors status procurementPath applicationCloseAt publishedAt organizationId"),
