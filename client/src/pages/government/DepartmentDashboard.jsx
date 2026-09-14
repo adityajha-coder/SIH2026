@@ -21,6 +21,8 @@ import {
   Pie,
   Cell,
 } from "recharts";
+import { EvaluationRubricModal } from "@/components/government/EvaluationRubricModal";
+import { AssignEvaluatorModal } from "@/components/government/AssignEvaluatorModal";
 
 const PIE_COLORS = ["#2563EB", "#0F766E", "#B45309", "#7C3AED", "#0284C7"];
 
@@ -28,6 +30,8 @@ export function DepartmentDashboard() {
   const { user, organization } = useAuth();
   const [filterStatus, setFilterStatus] = useState("ALL");
   const [selectedProblemFilter, setSelectedProblemFilter] = useState("ALL");
+  const [selectedProblemForRubric, setSelectedProblemForRubric] = useState(null);
+  const [selectedSubmissionForAssignment, setSelectedSubmissionForAssignment] = useState(null);
 
   const {
     data: problems = [],
@@ -38,6 +42,7 @@ export function DepartmentDashboard() {
   const {
     data: submissions = [],
     isLoading: loadingSubmissions,
+    refetch: refetchSubmissions,
   } = useDepartmentSubmissions();
 
   const publishMutation = usePublishProblem();
@@ -419,6 +424,16 @@ export function DepartmentDashboard() {
                       </Button>
                     )}
 
+                    <Button
+                      type="button"
+                      size="sm"
+                      variant="outline"
+                      onClick={() => setSelectedProblemForRubric(prob)}
+                      className="text-xs font-semibold border-slate-300 text-[#10233F] hover:bg-slate-50 h-8 px-2.5 rounded"
+                    >
+                      Evaluation Rubrics
+                    </Button>
+
                     <Link to={`/government/challenges/${prob._id}/matching`}>
                       <Button
                         size="sm"
@@ -521,24 +536,56 @@ export function DepartmentDashboard() {
                     </p>
                   </div>
 
-                  <Link
-                    to={`/government/challenges/${sub.problemId?._id || sub.problemId}/matching`}
-                    className="shrink-0"
-                  >
+                  <div className="flex flex-wrap items-center gap-2 shrink-0 self-end sm:self-auto">
                     <Button
-                      variant="outline"
+                      type="button"
                       size="sm"
-                      className="text-xs font-medium border-slate-300 hover:bg-slate-50 h-8 px-3 rounded"
+                      variant="outline"
+                      onClick={() => setSelectedSubmissionForAssignment(sub)}
+                      className="text-xs font-semibold border-slate-300 text-[#10233F] hover:bg-slate-50 h-8 px-2.5 rounded"
                     >
-                      Evaluate Match &rarr;
+                      Assign Evaluator
                     </Button>
-                  </Link>
+
+                    <Link
+                      to={`/government/challenges/${sub.problemId?._id || sub.problemId}/matching`}
+                    >
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className="text-xs font-medium border-slate-300 text-[#64748B] hover:text-[#10233F] hover:bg-slate-50 h-8 px-2.5 rounded"
+                      >
+                        Evaluate Match &rarr;
+                      </Button>
+                    </Link>
+                  </div>
                 </div>
               );
             })}
           </div>
         )}
       </div>
+
+      {/* Rubric Configuration Modal */}
+      {selectedProblemForRubric && (
+        <EvaluationRubricModal
+          isOpen={Boolean(selectedProblemForRubric)}
+          onClose={() => setSelectedProblemForRubric(null)}
+          problem={selectedProblemForRubric}
+        />
+      )}
+
+      {/* Evaluator Assignment Modal */}
+      {selectedSubmissionForAssignment && (
+        <AssignEvaluatorModal
+          isOpen={Boolean(selectedSubmissionForAssignment)}
+          onClose={() => setSelectedSubmissionForAssignment(null)}
+          submission={selectedSubmissionForAssignment}
+          onAssigned={() => {
+            refetchSubmissions();
+          }}
+        />
+      )}
     </div>
   );
 }
