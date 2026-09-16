@@ -21,7 +21,7 @@ const problemSchema = new mongoose.Schema({
         type: String,
         required: [true, "Short summary is required"],
         trim: true,
-        maxlength: 300,
+        maxlength: 2000,
     },
     fullStatement: {
         type: String,

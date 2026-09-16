@@ -5,19 +5,21 @@ export const createProblemSchema = z.object({
     title: z
         .string({ required_error: "Problem title is required" })
         .trim()
-        .min(5, "Title must be at least 5 characters")
-        .max(150, "Title cannot exceed 150 characters"),
+        .min(3, "Title must be at least 3 characters")
+        .max(250, "Title cannot exceed 250 characters"),
 
     shortSummary: z
         .string({ required_error: "Short summary is required" })
         .trim()
-        .min(10, "Summary must be at least 10 characters")
-        .max(300, "Summary cannot exceed 300 characters"),
+        .min(5, "Summary must be at least 5 characters")
+        .max(2000, "Summary cannot exceed 2000 characters"),
 
     fullStatement: z
-        .string({ required_error: "Full problem statement is required" })
+        .string()
         .trim()
-        .min(20, "Problem statement must be at least 20 characters"),
+        .min(5, "Problem statement must be at least 5 characters")
+        .optional()
+        .or(z.literal("")),
 
     organizationId: z
         .string({ required_error: "Organization ID is required" })
@@ -29,16 +31,16 @@ export const createProblemSchema = z.object({
 
     sectors: z.array(z.string().trim()).optional().default([]),
     geography: z.object({
-        state: z.string().trim().optional().default(""),
+        state: z.string().trim().optional().default("Maharashtra"),
         districts: z.array(z.string().trim()).optional().default([]),
-    }).optional(),
+    }).optional().default({ state: "Maharashtra", districts: [] }),
 
-    eligibleApplicantTypes: z.array(z.enum(["STARTUP", "MSME", "INDIVIDUAL_INNOVATOR"])).optional().default(["STARTUP"]),
+    eligibleApplicantTypes: z.array(z.string().trim()).optional().default(["STARTUP"]),
     procurementPath: z.enum(["DIRECT_PILOT", "CHALLENGE_PROCUREMENT", "RESEARCH_GRANT", "SCALE_UP"]).optional().default("DIRECT_PILOT"),
 
-    applicationOpenAt: z.string().datetime().optional().nullable(),
-    applicationCloseAt: z.string().datetime().optional().nullable(),
-    sourceUrls: z.array(z.string().url("Invalid source URL")).optional().default([]),
+    applicationOpenAt: z.union([z.string().datetime(), z.string(), z.date()]).optional().nullable(),
+    applicationCloseAt: z.union([z.string().datetime(), z.string(), z.date()]).optional().nullable(),
+    sourceUrls: z.array(z.string()).optional().default([]),
 });
 
 export const updateProblemSchema = createProblemSchema.partial().omit({ organizationId: true });

@@ -219,9 +219,16 @@ export function ChallengeStudio() {
   ]);
 
   const buildPayload = () => {
-    const orgId = organization?._id;
+    const orgId = organization?._id || organization?.id;
     if (!orgId) {
-      throw new Error("Department organization context missing. Please re-login.");
+      throw new Error("Department organization context missing. Please ensure your account is assigned to a government department.");
+    }
+
+    const trimmedTitle = title.trim();
+    const trimmedSummary = shortSummary.trim();
+    let trimmedStatement = fullStatement.trim();
+    if (!trimmedStatement || trimmedStatement.length < 5) {
+      trimmedStatement = trimmedSummary;
     }
 
     let allReqs = [...mandatoryReqs];
@@ -229,38 +236,47 @@ export function ChallengeStudio() {
       allReqs.push(`KPI Target: ${baselineMetric || "Baseline"} -> ${targetMetric || "Target Outcome"}`);
     }
 
+    let validCloseDate = null;
+    if (closeDate) {
+      const parsed = new Date(closeDate);
+      if (!isNaN(parsed.getTime())) {
+        validCloseDate = parsed.toISOString();
+      }
+    }
+    if (!validCloseDate) {
+      validCloseDate = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString();
+    }
+
     return {
-      title: title.trim(),
-      shortSummary: shortSummary.trim(),
-      fullStatement: fullStatement.trim() || shortSummary.trim(),
+      title: trimmedTitle,
+      shortSummary: trimmedSummary,
+      fullStatement: trimmedStatement,
       organizationId: orgId,
       sectors: selectedSectors.length > 0 ? selectedSectors : ["GovTech"],
       geography: {
         state: "Maharashtra",
-        districts: selectedDistricts,
+        districts: selectedDistricts.length > 0 ? selectedDistricts : ["Statewide"],
       },
       mandatoryRequirements: allReqs,
       preferredRequirements: [`TRL >= ${minTrl}`, `Pilot Duration: ${timelineWeeks} weeks`],
       constraints: constraints,
       eligibleApplicantTypes: ["STARTUP"],
-      procurementPath: procurementPath,
+      procurementPath: procurementPath || "DIRECT_PILOT",
       applicationOpenAt: new Date().toISOString(),
-      applicationCloseAt: closeDate
-        ? new Date(closeDate).toISOString()
-        : new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(),
+      applicationCloseAt: validCloseDate,
       sourceUrls: [],
     };
   };
 
   // Save Draft Handler
   const handleSaveDraft = async () => {
-    if (title.trim().length < 5) {
-      toast.error("Please enter a problem title (at least 5 characters).");
+    if (!title.trim() || title.trim().length < 3) {
+      toast.error("Please enter a problem title (at least 3 characters).");
       setCurrentStep(1);
       return;
     }
-    if (shortSummary.trim().length < 10) {
-      toast.error("Please provide a short summary (at least 10 characters).");
+    if (!shortSummary.trim() || shortSummary.trim().length < 5) {
+      toast.error("Please provide a short summary (at least 5 characters).");
       setCurrentStep(1);
       return;
     }
@@ -271,7 +287,12 @@ export function ChallengeStudio() {
       toast.success("Challenge statement saved as Draft!");
       navigate("/government/dashboard");
     } catch (err) {
-      toast.error(err.response?.data?.error?.message || err.message || "Failed to save draft");
+      const errObj = err.response?.data?.error;
+      if (errObj?.details && Array.isArray(errObj.details) && errObj.details.length > 0) {
+        toast.error(`${errObj.details[0].field}: ${errObj.details[0].message}`);
+      } else {
+        toast.error(errObj?.message || err.message || "Failed to save draft");
+      }
     }
   };
 
@@ -281,11 +302,21 @@ export function ChallengeStudio() {
       toast.error("Please complete more challenge fields before publishing (Score >= 60%).");
       return;
     }
+    if (!title.trim() || title.trim().length < 3) {
+      toast.error("Please enter a problem title (at least 3 characters).");
+      setCurrentStep(1);
+      return;
+    }
+    if (!shortSummary.trim() || shortSummary.trim().length < 5) {
+      toast.error("Please provide an executive summary (at least 5 characters).");
+      setCurrentStep(1);
+      return;
+    }
 
     try {
       const payload = buildPayload();
       const res = await createProblemMutation.mutateAsync(payload);
-      const problemId = res.problem?._id || res._id;
+      const problemId = res.problem?._id || res.data?.problem?._id || res._id;
       if (problemId) {
         await publishProblemMutation.mutateAsync(problemId);
         toast.success("Challenge published live to public catalog!");
@@ -294,7 +325,12 @@ export function ChallengeStudio() {
       }
       navigate("/government/dashboard");
     } catch (err) {
-      toast.error(err.response?.data?.error?.message || err.message || "Failed to publish challenge");
+      const errObj = err.response?.data?.error;
+      if (errObj?.details && Array.isArray(errObj.details) && errObj.details.length > 0) {
+        toast.error(`${errObj.details[0].field}: ${errObj.details[0].message}`);
+      } else {
+        toast.error(errObj?.message || err.message || "Failed to publish challenge");
+      }
     }
   };
 

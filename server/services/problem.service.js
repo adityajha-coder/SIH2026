@@ -32,11 +32,14 @@ export const problemService = {
             throw error;
         }
 
-        const problem = await problemModel.create({
+        const problemData = {
             ...input,
+            fullStatement: input.fullStatement?.trim() || input.shortSummary?.trim(),
             createdById: actor._id,
             status: PROBLEM_STATUS.DRAFT,
-        });
+        };
+
+        const problem = await problemModel.create(problemData);
 
         // Audit log
         auditService.logEvent({
