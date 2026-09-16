@@ -224,22 +224,58 @@ export const evaluationService = {
     async getAssignmentsForEvaluator({ actor }) {
         const assignments = await evaluationAssignmentModel.find({
             evaluatorId: actor._id,
-            status: { $in: [ASSIGNMENT_STATUS.PENDING, ASSIGNMENT_STATUS.IN_PROGRESS] },
         })
-            .populate("submissionId", "solutionTitle executiveSummary status organizationId")
+            .populate("submissionId", "solutionTitle executiveSummary status organizationId problemId")
             .populate("templateId", "title criteria")
             .sort({ deadline: 1 });
 
-        return assignments;
+        // Attach corresponding evaluation responses for completed assignments
+        const completedIds = assignments
+            .filter((a) => a.status === ASSIGNMENT_STATUS.COMPLETED)
+            .map((a) => a._id);
+
+        let responseMap = new Map();
+        if (completedIds.length > 0) {
+            const responses = await evaluationResponseModel.find({
+                assignmentId: { $in: completedIds },
+            }).lean();
+            responseMap = new Map(responses.map((r) => [r.assignmentId.toString(), r]));
+        }
+
+        return assignments.map((a) => {
+            const doc = a.toObject();
+            if (responseMap.has(a._id.toString())) {
+                doc.evaluationResponse = responseMap.get(a._id.toString());
+            }
+            return doc;
+        });
     },
 
     async getAssignmentsForSubmission({ submissionId }) {
         const assignments = await evaluationAssignmentModel.find({ submissionId })
             .populate("evaluatorId", "name email")
-            .populate("templateId", "title")
+            .populate("templateId", "title criteria")
             .sort({ createdAt: -1 });
 
-        return assignments;
+        const completedIds = assignments
+            .filter((a) => a.status === ASSIGNMENT_STATUS.COMPLETED)
+            .map((a) => a._id);
+
+        let responseMap = new Map();
+        if (completedIds.length > 0) {
+            const responses = await evaluationResponseModel.find({
+                assignmentId: { $in: completedIds },
+            }).lean();
+            responseMap = new Map(responses.map((r) => [r.assignmentId.toString(), r]));
+        }
+
+        return assignments.map((a) => {
+            const doc = a.toObject();
+            if (responseMap.has(a._id.toString())) {
+                doc.evaluationResponse = responseMap.get(a._id.toString());
+            }
+            return doc;
+        });
     },
 
     // scoring
@@ -331,7 +367,8 @@ export const evaluationService = {
     async getResponsesForSubmission({ submissionId }) {
         const responses = await evaluationResponseModel.find({ submissionId })
             .populate("evaluatorId", "name email")
-            .sort({ submittedAt: -1 });
+            .populate("templateId", "title criteria")
+            .sort({ submittedAt: -1, createdAt: -1 });
 
         return responses;
     },

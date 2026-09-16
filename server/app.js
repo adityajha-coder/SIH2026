@@ -23,24 +23,29 @@ app.use(requestMiddleware); // tracking myst be first
 
 app.use(helmet());
 
-const allowedOrigins = [
-    "http://localhost:3000", // react default
-    "http://localhost:5173", // vite default
-    "http://localhost:3001" ,// mine default
-    process.env.FRONTEND_URL // production frontend url (from .env file)
-].filter(Boolean);
+const configuredOrigins = (process.env.FRONTEND_URL || "")
+    .split(",")
+    .map((o) => o.trim().replace(/\/$/, ""))
+    .filter(Boolean);
+
+const allowedOrigins = new Set([
+    "http://localhost:3000",
+    "http://localhost:5173",
+    "http://localhost:3001",
+    ...configuredOrigins,
+]);
 
 app.use(cors({
     origin: (origin, callback) => {
-        // allow req with no origins (mobile apps, postman)
-        if(!origin || allowedOrigins.includes(origin)){
-            callback(null, true);
-        } else {
-            callback(new Error("CORS policy: Not allowed by origin"));
+        if (!origin) return callback(null, true);
+        const normalized = origin.replace(/\/$/, "");
+        if (allowedOrigins.has(normalized) || /\.vercel\.app$/.test(normalized)) {
+            return callback(null, true);
         }
+        callback(new Error(`CORS policy: Origin ${origin} not allowed`));
     },
-    credentials: true, //required for httpOnly cookies
-    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    credentials: true,
+    methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
     allowedHeaders: ["Content-Type", "Authorization", "X-Request-ID"],
 }));
 

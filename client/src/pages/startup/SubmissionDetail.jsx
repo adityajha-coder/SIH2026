@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { useParams, Link, useNavigate } from "react-router-dom";
 import { useSubmission, useTransitionSubmission, useDeleteSubmission } from "@/hooks/useSubmissions";
+import { useSubmissionResponses } from "@/hooks/useEvaluations";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -14,6 +15,7 @@ import {
   Layers,
   Loader2,
   Rocket,
+  Scale,
   Send,
   ShieldAlert,
   ShieldCheck,
@@ -37,6 +39,7 @@ export function SubmissionDetail() {
   const navigate = useNavigate();
 
   const { data: submission, isLoading, isError, error } = useSubmission(id);
+  const { data: evaluationResponses = [], isLoading: loadingEvaluations } = useSubmissionResponses(id);
   const transitionMutation = useTransitionSubmission();
   const deleteMutation = useDeleteSubmission();
 
@@ -240,6 +243,128 @@ export function SubmissionDetail() {
           </Link>
         </div>
       )}
+
+      {/* Official Evaluation Committee Scorecard & Review */}
+      {evaluationResponses && evaluationResponses.length > 0 ? (
+        <Card className="border border-blue-200 bg-white rounded-2xl shadow-sm p-6 space-y-5">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-slate-100">
+            <div>
+              <div className="flex items-center gap-2">
+                <Scale className="h-4 w-4 text-[#2563EB]" />
+                <span className="text-xs font-bold uppercase tracking-wider text-[#2563EB]">
+                  Independent Technical Evaluation
+                </span>
+                <span className="text-xs text-[#64748B]">• Statutory Rubric Assessment</span>
+              </div>
+              <h2 className="text-base sm:text-lg font-bold text-[#10233F] mt-0.5">
+                Evaluation Committee Scorecard &amp; Feedback
+              </h2>
+            </div>
+            <div className="flex items-center gap-2">
+              <span className="text-xs font-semibold px-3 py-1 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200">
+                {evaluationResponses.length} {evaluationResponses.length === 1 ? "Review Completed" : "Reviews Completed"}
+              </span>
+            </div>
+          </div>
+
+          <div className="space-y-4">
+            {evaluationResponses.map((evalResp, idx) => {
+              const templateTitle = evalResp.templateId?.title || "Standard Innovation Sandbox Rubric";
+              const submittedDate = evalResp.createdAt
+                ? new Date(evalResp.createdAt).toLocaleDateString("en-IN", {
+                    day: "numeric",
+                    month: "short",
+                    year: "numeric",
+                  })
+                : "Official Record";
+
+              return (
+                <div
+                  key={evalResp._id || idx}
+                  className="p-5 rounded-xl border border-slate-200/80 bg-slate-50/60 space-y-4"
+                >
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                    <div>
+                      <span className="text-xs font-bold text-[#10233F]">
+                        Empaneled Technical Evaluator #{idx + 1}
+                      </span>
+                      <p className="text-[11px] text-[#64748B]">
+                        Scored under: <strong className="text-slate-700">{templateTitle}</strong> • Evaluated on {submittedDate}
+                      </p>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <div className="px-3 py-1 rounded-lg bg-white border border-slate-200 text-right">
+                        <span className="text-xs text-[#64748B] mr-1">Aggregate Score:</span>
+                        <span className="text-sm font-extrabold text-[#2563EB]">
+                          {evalResp.totalScore} pts
+                        </span>
+                        {evalResp.weightedScore !== undefined && (
+                          <span className="text-xs text-emerald-600 font-semibold ml-1.5">
+                            ({Math.round(evalResp.weightedScore)}%)
+                          </span>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Rubric Criteria Marks Breakdown */}
+                  {evalResp.scores && evalResp.scores.length > 0 && (
+                    <div className="space-y-2">
+                      <span className="text-[11px] font-bold text-slate-500 uppercase tracking-wider block">
+                        Criterion-by-Criterion Marks
+                      </span>
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                        {evalResp.scores.map((sc, scIdx) => (
+                          <div
+                            key={scIdx}
+                            className="p-3 rounded-lg bg-white border border-slate-200/80 text-xs space-y-1"
+                          >
+                            <div className="flex items-center justify-between font-semibold text-[#10233F]">
+                              <span className="truncate pr-2">{sc.criterionName}</span>
+                              <span className="font-mono text-[#2563EB] shrink-0">
+                                {sc.score} / {sc.maxScore || 25}
+                              </span>
+                            </div>
+                            {sc.comment && (
+                              <p className="text-[11px] text-[#64748B] italic leading-tight">
+                                "{sc.comment}"
+                              </p>
+                            )}
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Overall Reviewer Commentary */}
+                  {evalResp.overallComment && (
+                    <div className="p-3.5 rounded-lg bg-blue-50/50 border border-blue-100 text-xs space-y-1">
+                      <span className="font-bold text-[#10233F] block">
+                        Committee Qualitative Feedback:
+                      </span>
+                      <p className="text-[#334155] leading-relaxed italic">
+                        "{evalResp.overallComment}"
+                      </p>
+                    </div>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+        </Card>
+      ) : status === "UNDER_REVIEW" ? (
+        <Card className="border border-blue-200 bg-blue-50/40 rounded-2xl p-5 text-xs text-[#10233F] flex items-start gap-3 shadow-2xs">
+          <Clock className="h-5 w-5 text-[#2563EB] shrink-0 mt-0.5" />
+          <div className="space-y-1">
+            <span className="font-bold text-sm block text-[#10233F]">
+              Double-Blind Technical Evaluation In Progress
+            </span>
+            <p className="text-[#475569] leading-relaxed">
+              This proposal is currently under independent evaluation by empaneled technical domain experts. Rubric marks, criterion breakdown, and committee commentary will appear here automatically once scoring is sealed.
+            </p>
+          </div>
+        </Card>
+      ) : null}
 
       {/* Clarification Drawer if in CLARIFICATION state */}
       {status === "CLARIFICATION" && (

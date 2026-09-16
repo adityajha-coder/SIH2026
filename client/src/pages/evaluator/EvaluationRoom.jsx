@@ -166,9 +166,29 @@ export function EvaluationRoom() {
   const [scores, setScores] = useState({});
   const [overallComment, setOverallComment] = useState("");
 
-  // Initialize scores on load
+  const foundAssignment = useMemo(() => {
+    return serverAssignments.find((a) => a._id === assignmentId);
+  }, [serverAssignments, assignmentId]);
+
+  const isCompleted = foundAssignment?.status === "COMPLETED";
+
+  // Initialize scores on load or from saved evaluationResponse
   useEffect(() => {
-    if (dossier?.criteria) {
+    if (foundAssignment?.evaluationResponse) {
+      const resp = foundAssignment.evaluationResponse;
+      const initial = {};
+      (resp.scores || []).forEach((s) => {
+        initial[s.criterionName] = {
+          score: s.score,
+          comment: s.comment || "",
+        };
+      });
+      setScores(initial);
+      if (resp.overallComment) {
+        setOverallComment(resp.overallComment);
+      }
+      setCoiDeclared(true);
+    } else if (dossier?.criteria) {
       const initial = {};
       dossier.criteria.forEach((c) => {
         initial[c.name] = {
@@ -178,7 +198,7 @@ export function EvaluationRoom() {
       });
       setScores(initial);
     }
-  }, [dossier]);
+  }, [foundAssignment, dossier]);
 
   // Handle score change
   const handleScoreChange = (critName, val, maxScore) => {
@@ -294,8 +314,28 @@ export function EvaluationRoom() {
 
   return (
     <div className="max-w-7xl mx-auto space-y-8 pb-20">
-      {/* COI Modal Gate (if not yet declared) */}
-      {!coiDeclared && (
+      {/* Completed & Sealed Scorecard Notification */}
+      {isCompleted && (
+        <div className="p-4 rounded-2xl border border-emerald-200 bg-emerald-50 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 text-xs">
+          <div className="flex items-center gap-2 text-emerald-900 font-semibold">
+            <CheckCircle2 className="h-5 w-5 text-emerald-600 shrink-0" />
+            <div>
+              <p className="font-bold text-sm">Scorecard Officially Recorded & Sealed</p>
+              <p className="text-emerald-700">
+                You have finalized and submitted this evaluation. Rubric scores and commentary are locked and archived for the committee.
+              </p>
+            </div>
+          </div>
+          <Link to="/evaluator/queue">
+            <Button size="sm" variant="outline" className="border-emerald-300 text-emerald-800 bg-white hover:bg-emerald-100 text-xs">
+              Return to Queue
+            </Button>
+          </Link>
+        </div>
+      )}
+
+      {/* COI Modal Gate (if not yet declared and not already completed) */}
+      {!coiDeclared && !isCompleted && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/70 backdrop-blur-xs p-4">
           <Card className="max-w-lg w-full border border-slate-200 bg-white rounded-2xl shadow-xl overflow-hidden animate-in fade-in zoom-in-95 duration-200">
             <CardHeader className="bg-slate-50 border-b border-slate-100 p-6 pb-4">
@@ -684,16 +724,20 @@ export function EvaluationRoom() {
                         min="0"
                         max={crit.maxScore}
                         value={currentVal}
+                        disabled={isCompleted}
                         onChange={(e) =>
                           handleScoreChange(crit.name, e.target.value, crit.maxScore)
                         }
-                        className="w-full h-1.5 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-[#2563EB]"
+                        className={`w-full h-1.5 bg-slate-200 rounded-lg appearance-none ${
+                          isCompleted ? "cursor-not-allowed opacity-75" : "cursor-pointer"
+                        } accent-[#2563EB]`}
                       />
 
                       {/* Qualitative Justification Input */}
                       <Input
                         placeholder="Justification commentary for this score..."
                         value={commentVal}
+                        disabled={isCompleted}
                         onChange={(e) => handleCommentChange(crit.name, e.target.value)}
                         className="h-8 text-xs bg-white"
                       />
@@ -711,38 +755,57 @@ export function EvaluationRoom() {
                   rows={4}
                   placeholder="Summarize your technical assessment and specify conditions for pilot trial sign-off..."
                   value={overallComment}
+                  disabled={isCompleted}
                   onChange={(e) => setOverallComment(e.target.value)}
-                  className="w-full rounded-xl border border-slate-200 p-3 text-xs focus:border-[#2563EB] focus:outline-hidden"
+                  className={`w-full rounded-xl border border-slate-200 p-3 text-xs focus:border-[#2563EB] focus:outline-hidden ${
+                    isCompleted ? "bg-slate-50 text-slate-700 cursor-not-allowed" : ""
+                  }`}
                 />
               </div>
 
               {/* Action Buttons */}
               <div className="pt-2 flex items-center justify-between gap-3">
-                <Button
-                  type="button"
-                  variant="outline"
-                  size="sm"
-                  onClick={() => toast.success("Draft score progress saved locally.")}
-                  className="text-xs font-semibold gap-1 h-9"
-                >
-                  <Save className="h-3.5 w-3.5" />
-                  Save Draft
-                </Button>
+                {isCompleted ? (
+                  <div className="w-full flex items-center justify-between">
+                    <span className="flex items-center gap-1.5 text-xs font-bold text-emerald-800 bg-emerald-50 px-3 py-2 rounded-xl border border-emerald-200">
+                      <CheckCircle2 className="h-4 w-4 text-emerald-600" />
+                      Scorecard Sealed &amp; Archival State Active
+                    </span>
+                    <Link to="/evaluator/queue">
+                      <Button variant="outline" size="sm" className="text-xs">
+                        Back to Queue
+                      </Button>
+                    </Link>
+                  </div>
+                ) : (
+                  <>
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      onClick={() => toast.success("Draft score progress saved locally.")}
+                      className="text-xs font-semibold gap-1 h-9"
+                    >
+                      <Save className="h-3.5 w-3.5" />
+                      Save Draft
+                    </Button>
 
-                <Button
-                  type="button"
-                  size="sm"
-                  disabled={submitScoresMutation.isPending}
-                  onClick={handleSubmitScorecard}
-                  className="bg-emerald-600 hover:bg-emerald-700 text-white font-semibold text-xs gap-1.5 h-9 px-4 shadow-sm"
-                >
-                  {submitScoresMutation.isPending ? (
-                    <Loader2 className="h-3.5 w-3.5 animate-spin" />
-                  ) : (
-                    <Send className="h-3.5 w-3.5" />
-                  )}
-                  Submit Official Scorecard
-                </Button>
+                    <Button
+                      type="button"
+                      size="sm"
+                      disabled={submitScoresMutation.isPending}
+                      onClick={handleSubmitScorecard}
+                      className="bg-emerald-600 hover:bg-emerald-700 text-white font-semibold text-xs gap-1.5 h-9 px-4 shadow-sm"
+                    >
+                      {submitScoresMutation.isPending ? (
+                        <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                      ) : (
+                        <Send className="h-3.5 w-3.5" />
+                      )}
+                      Submit Official Scorecard
+                    </Button>
+                  </>
+                )}
               </div>
             </CardContent>
           </Card>

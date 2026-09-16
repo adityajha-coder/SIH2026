@@ -336,6 +336,22 @@ export function EvaluatorQueue() {
                         </>
                       )}
                     </div>
+
+                    {isCompleted && assignment.evaluationResponse && (
+                      <div className="mt-2 p-2.5 rounded-xl bg-slate-50 border border-slate-200/80 flex flex-wrap items-center justify-between gap-2 text-xs">
+                        <div className="flex items-center gap-2">
+                          <span className="font-bold text-[#10233F]">Score Awarded:</span>
+                          <span className="font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200">
+                            {assignment.evaluationResponse.totalScore} pts ({Math.round(assignment.evaluationResponse.weightedScore || 0)}%)
+                          </span>
+                        </div>
+                        {assignment.evaluationResponse.overallComment && (
+                          <p className="text-[11px] text-[#64748B] italic truncate max-w-md">
+                            "{assignment.evaluationResponse.overallComment}"
+                          </p>
+                        )}
+                      </div>
+                    )}
                   </div>
 
                   {/* CTA Button */}

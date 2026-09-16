@@ -1,12 +1,14 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import { useParams, Link } from "react-router-dom";
 import { useProblem } from "@/hooks/useProblems";
 import { useDepartmentSubmissions, useAiMatch } from "@/hooks/useGovernment";
+import { useSubmissionResponses } from "@/hooks/useEvaluations";
 import apiClient from "@/lib/api/client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { toast } from "sonner";
+import { Scale, CheckCircle2, Clock } from "lucide-react";
 export function CandidateMatching() {
   const { id: problemId } = useParams();
 
@@ -21,6 +23,16 @@ export function CandidateMatching() {
   const [matchResult, setMatchResult] = useState(null);
   const [isSendingInvite, setIsSendingInvite] = useState(false);
   const [inviteSent, setInviteSent] = useState(false);
+
+  const selectedSubmission = useMemo(() => {
+    return submissions.find(
+      (s) => (s.organizationId?._id || s.organizationId) === selectedOrgId
+    );
+  }, [submissions, selectedOrgId]);
+
+  const { data: evaluationResponses = [], isLoading: loadingEvaluations } = useSubmissionResponses(
+    selectedSubmission?._id
+  );
 
   // Auto-select first applicant when submissions load
   useEffect(() => {
@@ -167,6 +179,95 @@ export function CandidateMatching() {
           </div>
         </div>
       </Card>
+
+      {/* Empaneled Evaluator Assessment & Scorecard Section */}
+      {selectedSubmission && (
+        <Card className="border border-slate-200 bg-white rounded-xl shadow-xs overflow-hidden">
+          <CardHeader className="py-3.5 px-5 border-b border-slate-100 flex flex-row items-center justify-between">
+            <div className="flex items-center gap-2">
+              <Scale className="h-4 w-4 text-[#2563EB]" />
+              <div>
+                <CardTitle className="text-sm font-bold text-[#10233F]">
+                  Technical Committee Evaluation
+                </CardTitle>
+                <p className="text-[11px] text-[#64748B]">
+                  Double-blind expert scoring for proposal: "{selectedSubmission.solutionTitle}"
+                </p>
+              </div>
+            </div>
+            {evaluationResponses.length > 0 ? (
+              <span className="text-xs font-bold px-2.5 py-1 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200 flex items-center gap-1">
+                <CheckCircle2 className="h-3.5 w-3.5" />
+                {evaluationResponses.length} {evaluationResponses.length === 1 ? "Evaluator Review" : "Evaluator Reviews"}
+              </span>
+            ) : (
+              <span className="text-xs font-medium px-2.5 py-1 rounded-full bg-amber-50 text-amber-800 border border-amber-200 flex items-center gap-1">
+                <Clock className="h-3.5 w-3.5" />
+                Pending Evaluator Scoring
+              </span>
+            )}
+          </CardHeader>
+          <CardContent className="p-5 text-xs">
+            {loadingEvaluations ? (
+              <Skeleton className="h-20 w-full" />
+            ) : evaluationResponses.length === 0 ? (
+              <div className="p-4 rounded-lg bg-slate-50 border border-slate-100 text-center space-y-1">
+                <p className="font-semibold text-[#10233F]">No submitted evaluations recorded yet.</p>
+                <p className="text-[11px] text-[#64748B]">
+                  Assign an empaneled evaluator from the Department Dashboard to score this candidate under the statutory rubric.
+                </p>
+              </div>
+            ) : (
+              <div className="space-y-4">
+                {evaluationResponses.map((resp, idx) => (
+                  <div key={resp._id || idx} className="p-4 rounded-xl border border-slate-200 bg-slate-50/50 space-y-3">
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                      <div>
+                        <span className="font-bold text-[#10233F]">
+                          Empaneled Evaluator #{idx + 1} {resp.evaluatorId?.name ? `(${resp.evaluatorId.name})` : ""}
+                        </span>
+                        <p className="text-[11px] text-[#64748B]">
+                          Rubric: {resp.templateId?.title || "Department Rubric"} • Evaluated {new Date(resp.createdAt).toLocaleDateString("en-IN")}
+                        </p>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <span className="font-mono text-sm font-extrabold text-[#2563EB] bg-blue-50 px-2.5 py-1 rounded border border-blue-200">
+                          {resp.totalScore} pts ({Math.round(resp.weightedScore || 0)}%)
+                        </span>
+                      </div>
+                    </div>
+
+                    {/* Criteria marks */}
+                    {resp.scores && resp.scores.length > 0 && (
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 pt-1">
+                        {resp.scores.map((sc, scIdx) => (
+                          <div key={scIdx} className="p-2.5 rounded-lg bg-white border border-slate-200 text-xs">
+                            <div className="flex justify-between font-medium text-[#10233F]">
+                              <span>{sc.criterionName}</span>
+                              <span className="font-mono font-bold text-[#2563EB]">{sc.score} / {sc.maxScore || 25}</span>
+                            </div>
+                            {sc.comment && (
+                              <p className="text-[11px] text-[#64748B] italic mt-0.5">"{sc.comment}"</p>
+                            )}
+                          </div>
+                        ))}
+                      </div>
+                    )}
+
+                    {/* Comment */}
+                    {resp.overallComment && (
+                      <div className="p-2.5 rounded-lg bg-white border border-slate-200 text-xs">
+                        <span className="font-bold text-[#10233F] block">Evaluator Overall Finding:</span>
+                        <p className="text-slate-700 italic mt-0.5">"{resp.overallComment}"</p>
+                      </div>
+                    )}
+                  </div>
+                ))}
+              </div>
+            )}
+          </CardContent>
+        </Card>
+      )}
 
       {/* Match Results Display */}
       {matchResult && (

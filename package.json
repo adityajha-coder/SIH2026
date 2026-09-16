@@ -5,6 +5,7 @@
   "main": "server/server.js",
   "type": "module",
   "scripts": {
+    "start": "node server/server.js",
     "test": "vitest run",
     "dev": "npx nodemon server/server.js"
   },
