@@ -6,9 +6,18 @@ import { hashSHA256 } from "../utils/crypto.utils.js";
 
 export async function handleSocialCallback(req, res) {
     const user = req.user;
+    const host = req.headers.host || "";
+    const isLocalhost = host.includes("localhost") || host.includes("127.0.0.1") || process.env.NODE_ENV !== "production";
+    const candidates = (process.env.FRONTEND_URL || "")
+        .split(",")
+        .map((s) => s.trim().replace(/\/+$/, ""))
+        .filter(Boolean);
+
+    const frontendUrl = isLocalhost
+        ? (candidates.find((u) => u.includes("localhost")) || "http://localhost:5173")
+        : (candidates.find((u) => !u.includes("localhost")) || candidates[0] || "http://localhost:5173");
 
     if (!user) {
-        const frontendUrl = process.env.FRONTEND_URL || "http://localhost:5173";
         return res.redirect(`${frontendUrl}/login?error=auth_failed`);
     }
 
@@ -45,6 +54,5 @@ export async function handleSocialCallback(req, res) {
     });
 
     // 5. Redirect user to frontend dashboard with accessToken
-    const frontendUrl = process.env.FRONTEND_URL || "http://localhost:5173";
     return res.redirect(`${frontendUrl}/auth/callback?token=${accessToken}`);
 }

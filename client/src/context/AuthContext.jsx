@@ -28,19 +28,19 @@ function unwrapData(response) {
   return response?.data ?? response ?? {};
 }
 
-async function fetchOrganizationSafely() {
+async function fetchOrganizationSafely(explicitToken) {
   try {
-    const response = await apiClient.get("/organizations/my/current");
+    const requestConfig = explicitToken
+      ? { headers: { Authorization: `Bearer ${explicitToken}` } }
+      : {};
+    const response = await apiClient.get("/organizations/my/current", requestConfig);
     return unwrapData(response);
-  } catch (error) {
-    if (error?.status === 404) {
-      return {
-        organization: null,
-        membership: null,
-        profile: null,
-      };
-    }
-    throw error;
+  } catch {
+    return {
+      organization: null,
+      membership: null,
+      profile: null,
+    };
   }
 }
 
@@ -208,14 +208,16 @@ export function AuthProvider({ children }) {
       }
 
       setAccessToken(token);
-      const meResponse = await apiClient.get("/auth/get-me");
+      const meResponse = await apiClient.get("/auth/get-me", {
+        headers: { Authorization: `Bearer ${token}` },
+      });
       const meData = unwrapData(meResponse);
 
       if (!meData.user) {
         throw new Error("Could not load OAuth profile");
       }
 
-      const orgData = await fetchOrganizationSafely();
+      const orgData = await fetchOrganizationSafely(token);
       const nextSession = {
         user: meData.user,
         organization: orgData.organization ?? null,
