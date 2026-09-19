@@ -8,14 +8,15 @@ import {
     createProblemSchema,
     listProblemsQuerySchema,
 } from "../validators/problem.validator.js";
+import { cacheMiddleware } from "../middleware/cache.middleware.js";
+
 
 const problemRouter = Router();
 
 /**
  * GET /v1/problems
  */
-problemRouter.get("/", problemController.listProblems
-);
+problemRouter.get("/", cacheMiddleware(120), problemController.listProblems);
 
 /**
  * GET /v1/problems/:id/eligibility

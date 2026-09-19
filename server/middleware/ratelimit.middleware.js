@@ -1,4 +1,15 @@
 import rateLimit from "express-rate-limit";
+import { RedisStore } from "rate-limit-redis";
+import getRedisClient, { isRedisReady } from "../config/redis.js";
+
+const createRedisStore = (prefix) => {
+    const client = getRedisClient();
+    if (!client) return undefined;
+    return new RedisStore({
+        sendCommand: (...args) => client.call(...args),
+        prefix: `rl:${prefix}:`
+    });
+};
 
 // rate limiter for login (max attempts per 15 minutes)
 export const loginLimiter = rateLimit({
@@ -9,6 +20,8 @@ export const loginLimiter = rateLimit({
     },
     standardHeaders: true,
     legacyHeaders: false,
+    passOnStoreError: true, // if redis is not available, it will use in-memory storage
+    store: createRedisStore("login")
 });
 
 // rate limiter for register (max 5 registrations per hour)
@@ -20,6 +33,8 @@ export const registerLimiter = rateLimit({
     },
     standardHeaders: true,
     legacyHeaders: false,
+    passOnStoreError: true,
+    store: createRedisStore("register")
 });
 
 // rate limiter for otp verification (max 3 attempts per 10 minutes)
@@ -31,6 +46,8 @@ export const otpLimiter = rateLimit({
     },
     standardHeaders: true,
     legacyHeaders: false,
+    passOnStoreError: true,
+    store: createRedisStore("otp")
 });
 
 // Rate limiter for Password Reset requests (Max 3 requests per hour)
@@ -42,4 +59,6 @@ export const passwordResetLimiter = rateLimit({
     },
     standardHeaders: true,
     legacyHeaders: false,
+    passOnStoreError: true,
+    store: createRedisStore("passwordReset")
 });

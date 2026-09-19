@@ -1,4 +1,5 @@
 import { problemService } from "../services/problem.service.js";
+import { cacheService } from "../services/cache.service.js";
 
 export const problemController = {
     
@@ -9,6 +10,8 @@ export const problemController = {
                 actor: req.user,
                 input: req.body,
             });
+
+            await cacheService.delByPattern("cache:/v1/problems*");
 
             return res.status(201).json({
                 data: {
@@ -30,6 +33,8 @@ export const problemController = {
                 actor: req.user,
                 problemId: req.params.id,
             });
+
+            await cacheService.delByPattern("cache:/v1/problems*");
 
             return res.status(200).json({
                 data: {
