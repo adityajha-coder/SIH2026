@@ -19,7 +19,7 @@ transporter.verify((error, success) => {
 });
 
 // Function to send email
-export const sendEmail = async (to, subject, text, html) => {
+export const sendEmailDirect = async (to, subject, text, html) => {
   try {
     const info = await transporter.sendMail({
       from: `"Pragati-GovX" <${config.EMAIL_USER}>`, // sender address
@@ -30,9 +30,18 @@ export const sendEmail = async (to, subject, text, html) => {
     });
 
     console.log('Message sent: %s', info.messageId);
+    return info;
     console.log('Preview URL: %s', nodemailer.getTestMessageUrl(info));
   } catch (error) {
         console.error('Error sending email:', error);
         throw error; // Or return false
     }
 };
+
+// Delegates to BULLMQ Queue
+export const sendEmail = async (to, subject, text, html) => {
+    // Dynamic import to avoid circular dependency
+    const { enqueueEmail } = await import("../queues/email.queue.js");
+    return enqueueEmail({ to, subject, text, html });
+};
+export default { sendEmail, sendEmailDirect };

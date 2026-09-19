@@ -3,6 +3,8 @@ import { sendEmail } from "./email.service.js";
 import User from "../models/user.model.js";
 import problemModel from "../models/problem.model.js";
 import organizationMemberModel from "../models/organizationmember.model.js";
+import { enqueueBulkNotifications } from "../queues/notification.queue.js";
+import { isRedisReady } from "../config/redis.js";
 
 export const notificationService = {
     async notify({ recipientId, type, title, message, context = {}, sendEmailFlag = true }) {
@@ -44,6 +46,22 @@ export const notificationService = {
 
     // bulk notify to all
     async notifyMany({ recipientIds, type, title, message, context = {}, sendEmailFlag = true }) {
+        if (!recipientIds || recipientIds.length === 0) return [];
+        // Offload to background BullMQ worker if Redis is active
+        if (isRedisReady() && recipientIds.length > 1) {
+            const result = await enqueueBulkNotifications({
+                recipientIds,
+                type,
+                title,
+                message,
+                context,
+                sendEmailFlag
+            });
+            if (result.queued) {
+                return [{ queued: true, count: recipientIds.length }];
+            }
+        }
+
         const results = [];
         for (const recipientId of recipientIds) {
             const n = await this.notify({ recipientId, type, title, message, context, sendEmailFlag });
