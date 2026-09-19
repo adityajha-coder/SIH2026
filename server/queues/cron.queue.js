@@ -13,20 +13,16 @@ export const initCronScheduler = async () => {
     }
 
     try {
-        const repeatableJobs = await cronQueue.getRepeatableJobs();
-        for (const job of repeatableJobs) {
-            await cronQueue.removeRepeatableByKey(job.key);
-        }
-
-        await cronQueue.add(
+        await cronQueue.upsertJobScheduler(
             "sla-daily-audit",
-            {},
+             { pattern: "0 8 * * *" }, // Daily at 08:00 AM
             {
-                repeat: {
-                    pattern: "0 8 * * *", // Daily at 08:00 AM
-                },
-                removeOnComplete: true,
-                removeOnFail: false,
+                name: "sla-daily-audit",
+                data: {},
+                opts: {
+                    removeOnComplete: true,
+                    removeOnFail: false,
+                }
             }
         );
 
