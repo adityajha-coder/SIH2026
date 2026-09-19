@@ -5,12 +5,15 @@ import getRedisClient, { disconnectRedis} from "./config/redis.js";
 import "./workers/email.worker.js";
 import "./workers/notification.worker.js";
 import "./workers/ai.worker.js";
+import "./workers/cron.worker.js";
+import { initCronScheduler } from "./queues/cron.queue.js";
 
 connectDB().catch((err) => {
     console.error("Database connection error:", err.message);
 });
 
 getRedisClient();
+initCronScheduler();
 
 const PORT = process.env.PORT || 3001;
 

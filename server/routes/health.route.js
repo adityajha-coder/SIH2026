@@ -1,5 +1,6 @@
 import express from "express";
 import mongoose from "mongoose"
+import { isRedisReady } from "../config/redis.js";
 
 const healthRouter = express.Router();
 
@@ -17,12 +18,14 @@ healthRouter.get("/ready", (req, res) => {
         return res.status(503).json({
             status: "not_ready",
             database: "disconnected",
+            redis: isRedisReady() ? "connected" : "offline (fallback)",
             timestamp: new Date().toISOString(),
         });
     }
     res.status(200).json({
         status: "ready",
         database: "connected",
+        redis: isRedisReady() ? "connected" : "offline (fallback)",
         timestamp: new Date().toISOString(),
     });
 });
