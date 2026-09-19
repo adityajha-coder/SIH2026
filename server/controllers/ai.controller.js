@@ -3,6 +3,7 @@ import { geminiProvider } from "../services/ai/providers/gemini.provider.js";
 import { aiPolicy } from "../services/ai/ai.policy.js";
 import { AIRun } from "../models/aiRun.model.js";
 import { matchingService } from "../services/matching.service.js";
+import { enqueueAiVerification } from "../queues/ai.queue.js";
 
 export const aiController = {
     
@@ -36,7 +37,7 @@ export const aiController = {
      
     async verifyProposal(req, res, next) {
         try {
-            const result = await verificationService.verifyProposal({
+            const result = await enqueueAiVerification({
                 actor: req.user,
                 ...req.body,
             });

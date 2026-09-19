@@ -7,6 +7,13 @@ export const AI_VERDICTS = Object.freeze({
     UNKNOWN: "UNKNOWN",
 });
 
+export const AI_RUN_STATUS = Object.freeze({
+    QUEUED: "QUEUED",
+    PROCESSING: "PROCESSING",
+    COMPLETED: "COMPLETED",
+    FAILED: "FAILED",
+});
+
 const aiRunSchema = new mongoose.Schema(
     {
         task: {
@@ -22,6 +29,12 @@ const aiRunSchema = new mongoose.Schema(
         promptVersion: {
             type: String,
             default: "1.0",
+        },
+        status: {
+            type: String,
+            enum: Object.values(AI_RUN_STATUS),
+            default: AI_RUN_STATUS.COMPLETED,
+            index: true,
         },
         verdict: {
             type: String,

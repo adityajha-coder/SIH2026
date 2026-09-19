@@ -11,7 +11,7 @@ export const verificationService = {
      * Complete 3-Layer Verification Pipeline with Anti-Cascade Rule:
      * Model 1 (Gemini) -> Model 2 (Groq) -> Model 3 (OpenRouter) -> Model 4 (Ollama Fallback)
      */
-    async verifyProposal({ actor, task, userInput, evidence = [], entityType, entityId }) {
+    async verifyProposal({ actor, task, userInput, evidence = [], entityType, entityId, existingRunId }) {
         const startTime = Date.now();
 
         const cleanInput = aiPolicy.sanitizeInput(userInput);
@@ -110,7 +110,7 @@ Reported Issues: ${(verifierResult.issues || []).join("; ") || "None"}
         const totalLatencyMs = Date.now() - startTime;
 
         // aiRun record
-        const aiRun = await AIRun.create({
+        const runData = {
             task,
             userInputHash: inputHash,
             promptVersion: "1.0",
@@ -123,7 +123,14 @@ Reported Issues: ${(verifierResult.issues || []).join("; ") || "None"}
             auditorResult,
             disagreements,
             totalLatencyMs,
-        });
+        };
+        let aiRun;
+        if (existingRunId) {
+            aiRun = await AIRun.findByIdAndUpdate(existingRunId, runData, { new: true });
+        } else {
+            aiRun = await AIRun.create(runData);
+        }
+
 
         return {
             runId: aiRun._id,

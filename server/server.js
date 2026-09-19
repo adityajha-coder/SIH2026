@@ -4,6 +4,7 @@ import connectDB from "./config/db.js";
 import getRedisClient, { disconnectRedis} from "./config/redis.js";
 import "./workers/email.worker.js";
 import "./workers/notification.worker.js";
+import "./workers/ai.worker.js";
 
 connectDB().catch((err) => {
     console.error("Database connection error:", err.message);
