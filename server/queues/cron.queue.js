@@ -1,11 +1,12 @@
 import { createQueue } from "./queue.factory.js";
-import { isRedisReady } from "../config/redis.js";
+import { isRedisReady, waitForRedis } from "../config/redis.js";
 
 export const CRON_QUEUE_NAME = "cron-scheduler-queue";
 
 export const cronQueue = createQueue(CRON_QUEUE_NAME);
 
 export const initCronScheduler = async () => {
+    await waitForRedis(3000); // wait upto 3s for redis init handshake
     if (!isRedisReady()) {
         console.log(" !! Redis offline: Cron scheduler will not initialize repeatable jobs.");
         return;

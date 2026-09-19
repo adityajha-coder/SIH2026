@@ -81,4 +81,25 @@ export const disconnectRedis = async () => {
     }
 };
 
+export const waitForRedis = (timeoutMs = 3000) => {
+    return new Promise((resolve) => {
+        if (isRedisReady()) return resolve(true);
+        const client = getRedisClient();
+        if (!client) return resolve(false);
+        const timer = setTimeout(() => {
+            cleanup();
+            resolve(false);
+        }, timeoutMs);
+        const onReady = () => {
+            cleanup();
+            resolve(true);
+        };
+        const cleanup = () => {
+            client.off("ready", onReady);
+            clearTimeout(timer);
+        };
+        client.once("ready", onReady);
+    });
+};
+
 export default getRedisClient;
