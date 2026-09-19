@@ -256,6 +256,7 @@ export function ApplicationWizard() {
         executiveSummary: formData.executiveSummary.trim(),
         proposalDetails: `${formData.proposalDetails.trim()}\n\n---\nTimeline: ${formData.implementationTimeline}\nTarget Pilot KPIs: ${formData.pilotKPIs || "Standard Department Baseline Targets"}${filesSummary}${linksSummary}`,
         evidenceFileIds: uploadedFiles.map((f) => f.id).filter(Boolean),
+        status: "SUBMITTED",
       });
 
       const submissionId = result?.submission?._id || result?._id;

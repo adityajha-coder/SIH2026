@@ -24,6 +24,7 @@ import {
 } from "recharts";
 import { EvaluationRubricModal } from "@/components/government/EvaluationRubricModal";
 import { AssignEvaluatorModal } from "@/components/government/AssignEvaluatorModal";
+import { RequestClarificationModal } from "@/components/government/RequestClarificationModal";
 
 const PIE_COLORS = ["#2563EB", "#0F766E", "#B45309", "#7C3AED", "#0284C7"];
 
@@ -33,6 +34,7 @@ export function DepartmentDashboard() {
   const [selectedProblemFilter, setSelectedProblemFilter] = useState("ALL");
   const [selectedProblemForRubric, setSelectedProblemForRubric] = useState(null);
   const [selectedSubmissionForAssignment, setSelectedSubmissionForAssignment] = useState(null);
+  const [selectedSubmissionForClarification, setSelectedSubmissionForClarification] = useState(null);
 
   const {
     data: problems = [],
@@ -665,12 +667,24 @@ export function DepartmentDashboard() {
                   </div>
 
                   <div className="flex flex-wrap items-center gap-2 shrink-0 self-end sm:self-auto">
+                    {(sub.status === "SUBMITTED" || sub.status === "UNDER_REVIEW") && (
+                      <Button
+                        type="button"
+                        size="sm"
+                        variant="outline"
+                        onClick={() => setSelectedSubmissionForClarification(sub)}
+                        className="text-xs font-semibold border-amber-300 text-amber-800 hover:bg-amber-50 h-8 px-2.5 rounded cursor-pointer"
+                      >
+                        Request Clarification
+                      </Button>
+                    )}
+
                     <Button
                       type="button"
                       size="sm"
                       variant="outline"
                       onClick={() => setSelectedSubmissionForAssignment(sub)}
-                      className="text-xs font-semibold border-slate-300 text-[#10233F] hover:bg-slate-50 h-8 px-2.5 rounded"
+                      className="text-xs font-semibold border-slate-300 text-[#10233F] hover:bg-slate-50 h-8 px-2.5 rounded cursor-pointer"
                     >
                       Assign Evaluator
                     </Button>
@@ -710,6 +724,18 @@ export function DepartmentDashboard() {
           onClose={() => setSelectedSubmissionForAssignment(null)}
           submission={selectedSubmissionForAssignment}
           onAssigned={() => {
+            refetchSubmissions();
+          }}
+        />
+      )}
+
+      {/* Request Clarification Modal */}
+      {selectedSubmissionForClarification && (
+        <RequestClarificationModal
+          isOpen={Boolean(selectedSubmissionForClarification)}
+          onClose={() => setSelectedSubmissionForClarification(null)}
+          submission={selectedSubmissionForClarification}
+          onSuccess={() => {
             refetchSubmissions();
           }}
         />

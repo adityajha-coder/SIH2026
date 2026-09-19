@@ -74,6 +74,17 @@ export const submissionService = {
             throw error;
         }
 
+        const targetStatus = input.status || SUBMISSION_STATUS.SUBMITTED;
+        const initialTransitions = targetStatus === SUBMISSION_STATUS.SUBMITTED
+            ? [{
+                from: SUBMISSION_STATUS.DRAFT,
+                to: SUBMISSION_STATUS.SUBMITTED,
+                actorId: actor._id,
+                note: "Initial proposal submission via Innovation Compact Wizard",
+                timestamp: new Date(),
+            }]
+            : [];
+
         const submission = await submissionModel.create({
             problemId: input.problemId,
             organizationId: input.organizationId,
@@ -82,7 +93,8 @@ export const submissionService = {
             executiveSummary: input.executiveSummary,
             proposalDetails: input.proposalDetails,
             evidenceFileIds: input.evidenceFileIds || [],
-            status: SUBMISSION_STATUS.DRAFT,
+            status: targetStatus,
+            transitionHistory: initialTransitions,
         });
 
         // Audit log
@@ -92,8 +104,19 @@ export const submissionService = {
             action: AUDIT_ACTIONS.SUBMISSION_CREATED,
             entityType: AUDIT_ENTITY_TYPES.SUBMISSION,
             entityId: submission._id,
-            metadata: { problemId: submission.problemId, solutionTitle: submission.solutionTitle },
+            metadata: {
+                problemId: submission.problemId,
+                solutionTitle: submission.solutionTitle,
+                status: targetStatus,
+            },
         }).catch(() => {});
+
+        // If submitted, notify the problem owner (Government officer)
+        if (targetStatus === SUBMISSION_STATUS.SUBMITTED) {
+            notificationService.onSubmissionReceived({ submission, problem }).catch((err) => {
+                console.warn("!! Notification dispatch failed for submission received:", err.message);
+            });
+        }
 
         return submission;
     },
@@ -275,6 +298,12 @@ export const submissionService = {
         notificationService.onSubmissionStatusChanged({ submission, newStatus: toStatus, note }).catch((err) => {
             console.warn("!! Notification dispatch failed for submission status transition:", err.message);
         });
+
+        if (toStatus === SUBMISSION_STATUS.CLARIFICATION) {
+            notificationService.onClarificationRequested({ submission, note }).catch((err) => {
+                console.warn("!! Notification dispatch failed for clarification request:", err.message);
+            });
+        }
 
         return submission;
     },

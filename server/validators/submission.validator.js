@@ -30,6 +30,8 @@ export const createSubmissionSchema = z.object({
         .min(20, "Proposal details must be at least 20 characters"),
 
     evidenceFileIds: z.array(z.string().trim()).optional().default([]),
+
+    status: z.enum([SUBMISSION_STATUS.DRAFT, SUBMISSION_STATUS.SUBMITTED]).optional().default(SUBMISSION_STATUS.SUBMITTED),
 });
 
 export const transitionSubmissionSchema = z.object({

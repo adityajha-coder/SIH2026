@@ -363,7 +363,13 @@ export function ChallengeDetailPage() {
                             </div>
 
                             {/* Apply Button */}
-                            <Link to={`/challenges/${id}/apply`} className="block w-full pt-2">
+                            <Link
+                              to={`/challenges/${id}/apply`}
+                              className={`block w-full pt-2 ${!canApply ? "pointer-events-none opacity-60" : ""}`}
+                              onClick={(e) => {
+                                if (!canApply) e.preventDefault();
+                              }}
+                            >
                               <Button
                                 className="w-full h-11 font-medium bg-[#10233F] hover:bg-slate-800 text-white shadow-xs cursor-pointer text-xs rounded disabled:opacity-50 disabled:cursor-not-allowed"
                                 disabled={!canApply}

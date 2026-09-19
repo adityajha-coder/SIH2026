@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useMemo } from "react";
 import { useParams, Link, useNavigate } from "react-router-dom";
 import { useSubmission, useTransitionSubmission, useDeleteSubmission } from "@/hooks/useSubmissions";
 import { useSubmissionResponses } from "@/hooks/useEvaluations";
@@ -376,6 +376,22 @@ export function SubmissionDetail() {
           <p className="text-xs text-amber-800 leading-relaxed">
             The technical evaluation committee has requested additional operational details or clarification before finalizing scores. Please provide your explanation below.
           </p>
+
+          {(() => {
+            const reverseTransitions = [...transitions].reverse();
+            const clarEntry = reverseTransitions.find(
+              (t) => (t.to || t.toStatus) === "CLARIFICATION"
+            );
+            const queryText = clarEntry?.note;
+
+            return queryText ? (
+              <div className="p-3.5 rounded-xl border border-amber-300 bg-amber-100/70 text-xs space-y-1">
+                <span className="font-bold text-amber-950 block">Officer Query:</span>
+                <p className="text-amber-900 leading-relaxed font-medium">"{queryText}"</p>
+              </div>
+            ) : null;
+          })()}
+
           <form onSubmit={handleSendClarification} className="space-y-3 pt-1">
             <textarea
               rows={4}
@@ -388,7 +404,7 @@ export function SubmissionDetail() {
               type="submit"
               size="sm"
               disabled={transitionMutation.isPending}
-              className="gap-1.5 font-semibold text-xs bg-amber-700 hover:bg-amber-800 text-white shadow-xs"
+              className="gap-1.5 font-semibold text-xs bg-amber-700 hover:bg-amber-800 text-white shadow-xs cursor-pointer"
             >
               {transitionMutation.isPending ? (
                 <Loader2 className="h-3.5 w-3.5 animate-spin" />
