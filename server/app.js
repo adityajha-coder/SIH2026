@@ -16,6 +16,7 @@ import aiRouter from "./routes/ai.route.js";
 import notificationRouter from "./routes/notification.route.js";
 import adminRouter from "./routes/admin.route.js";
 import healthRouter from "./routes/health.route.js";
+import paymentRouter from "./routes/payment.route.js";
 
 const app = express();
 
@@ -48,6 +49,17 @@ app.use(cors({
     methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
     allowedHeaders: ["Content-Type", "Authorization", "X-Request-ID"],
 }));
+
+app.post("/v1/payments/webhook", express.raw({ type: "application/json", limit: "1mb" }), async (req, res, next) => {
+    try {
+        const signature = req.headers["x-razorpay-signature"];
+        const payload = req.body;
+        const controller = await import("./controllers/payment.controller.js");
+        await controller.paymentController.handleWebhook(req, res, next, { rawBody: payload, signature });
+    } catch (error) {
+        next(error);
+    }
+});
 
 app.use(express.json());
 app.use(cookieParser());
@@ -84,6 +96,8 @@ app.use("/v1/notifications", notificationRouter);
 app.use("/api/notifications", notificationRouter);
 app.use("/v1/admin", adminRouter);
 app.use("/api/admin", adminRouter);
+app.use("/v1/payments", paymentRouter);
+app.use("/api/payments", paymentRouter);
 
 app.use(errorHandler); // must be after all routes
 

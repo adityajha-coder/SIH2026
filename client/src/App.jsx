@@ -32,6 +32,9 @@ import { EvaluationRoom } from "./pages/evaluator/EvaluationRoom";
 import { PilotCanvas } from "./pages/pilot/PilotCanvas";
 import { PilotFrameworkPage } from "./pages/public/PilotFrameworkPage";
 import { ScaleGateConsole } from "./pages/government/ScaleGateConsole";
+import { PaymentPage } from "./pages/government/PaymentPage";
+import { GovernmentPayment } from "./pages/government/GovernmentPayment";
+import { StartupPayments } from "./pages/startup/StartupPayments";
 import { AdminAuditConsole } from "./pages/admin/AdminAuditConsole";
 import { NotificationCenter } from "./pages/app/NotificationCenter";
 import { ProfilePage } from "./pages/app/ProfilePage";
@@ -107,6 +110,14 @@ export function App() {
                   }
                 />
                 <Route
+                  path="/startup/payments"
+                  element={
+                    <RoleGuard allowedRoles={["STARTUP_USER", "ADMIN"]}>
+                      <StartupPayments />
+                    </RoleGuard>
+                  }
+                />
+                <Route
                   path="/challenges/:id/apply"
                   element={
                     <RoleGuard allowedRoles={["STARTUP_USER", "ADMIN"]}>
@@ -119,6 +130,22 @@ export function App() {
                   element={
                     <RoleGuard allowedRoles={["GOVERNMENT_USER", "ADMIN"]}>
                       <DepartmentDashboard />
+                    </RoleGuard>
+                  }
+                />
+                <Route
+                  path="/government/payments"
+                  element={
+                    <RoleGuard allowedRoles={["GOVERNMENT_USER", "ADMIN"]}>
+                      <GovernmentPayment />
+                    </RoleGuard>
+                  }
+                />
+                <Route
+                  path="/government/payments/:paymentId"
+                  element={
+                    <RoleGuard allowedRoles={["GOVERNMENT_USER", "ADMIN"]}>
+                      <PaymentPage />
                     </RoleGuard>
                   }
                 />
