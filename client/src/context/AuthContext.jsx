@@ -6,7 +6,7 @@ import React, {
 } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
-import apiClient, { setAccessToken } from "@/lib/api/client";
+import apiClient, { setAccessToken, refreshAccessToken } from "@/lib/api/client";
 
 export const ROLE_DASHBOARD_PATHS = Object.freeze({
   STARTUP_USER: "/startup/dashboard",
@@ -46,16 +46,12 @@ async function fetchOrganizationSafely(explicitToken) {
 
 async function loadSession() {
   try {
-    const refreshResponse = await apiClient.get("/auth/refresh-token");
-    const refreshedToken =
-      refreshResponse?.accessToken || refreshResponse?.data?.accessToken;
+    const refreshedToken = await refreshAccessToken();
 
     if (!refreshedToken) {
       setAccessToken(null);
       return EMPTY_SESSION;
     }
-
-    setAccessToken(refreshedToken);
 
     const meResponse = await apiClient.get("/auth/get-me");
     const meData = unwrapData(meResponse);

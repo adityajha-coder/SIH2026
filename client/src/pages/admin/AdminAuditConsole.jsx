@@ -75,7 +75,7 @@ const DEFAULT_AUDIT_LOGS = [
     actorId: { _id: "usr_sys_00", name: "Sovereign AI Engine", role: "SYSTEM", email: "ai.cascade@pragati.gov.in" },
     traceId: "trc_66c891dd3e",
     ipAddress: "127.0.0.1",
-    metadata: { model: "Gemini 1.5 Flash + Claude 3.5 Sonnet", claimsVerified: 6, riskFlags: 0 },
+    metadata: { model: "Gemini 3.6 Flash + Groq LLaMA-3.3 70B", claimsVerified: 6, riskFlags: 0 },
     timestamp: "2026-09-13T23:10:05.000Z",
   },
   {

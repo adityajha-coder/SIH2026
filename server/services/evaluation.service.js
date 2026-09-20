@@ -96,28 +96,12 @@ export const evaluationService = {
     },
 
     async getEvaluators({ actor }) {
-        let evaluators = await userModel.find({
+        const evaluators = await userModel.find({
             role: ROLES.EVALUATOR,
             status: "ACTIVE",
-        }).select("name userName email department").lean();
+        }).select("userName email department").lean();
 
-        if (!evaluators || evaluators.length === 0) {
-            let existing = await userModel.findOne({ email: "ananya.joshi@iitb.ac.in" });
-            if (!existing) {
-                existing = await userModel.create({
-                    name: "Dr. Ananya Joshi (IIT Bombay)",
-                    userName: "evaluator_ananya",
-                    email: "ananya.joshi@iitb.ac.in",
-                    role: ROLES.EVALUATOR,
-                    status: "ACTIVE",
-                    password: "EvaluatorPassword123!",
-                    isEmailVerified: true,
-                });
-            }
-            evaluators = [existing];
-        }
-
-        return evaluators;
+        return evaluators || [];
     },
 
     async createAssignment({ actor, input }) {

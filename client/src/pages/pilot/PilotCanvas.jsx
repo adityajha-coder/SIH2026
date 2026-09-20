@@ -16,6 +16,14 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { toast } from "sonner";
 import { ECertificateModal } from "@/components/certificate/ECertificateModal";
 
+function parseTrancheAmount(val) {
+  if (typeof val === "number") return isNaN(val) ? 0 : val;
+  if (!val) return 0;
+  const cleaned = String(val).replace(/[^0-9.-]+/g, "");
+  const num = parseFloat(cleaned);
+  return isNaN(num) ? 0 : num;
+}
+
 const PILOT_LIFECYCLE_STAGES = [
   { key: "PILOT_PROPOSED", label: "Pilot Proposed", desc: "Charter & baseline defined" },
   { key: "PILOT_ACTIVE", label: "Active Field Trial", desc: "Live deployment & testing" },
