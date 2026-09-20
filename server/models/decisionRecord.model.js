@@ -40,6 +40,58 @@ const decisionRecordSchema = new mongoose.Schema({
         type: Date,
         default: Date.now,
     },
+    grantAmount: {
+        type: Number,
+        default: 2500000,
+    },
+    paymentDescription: {
+        type: String,
+        trim: true,
+        default: "Three-phase milestone disbursement via Maharashtra Sovereign Treasury Escrow (PFMS) under Rule 173(i) GFR 2017.",
+    },
+    tranches: [{
+        trancheId: { type: String, required: true },
+        name: { type: String, required: true },
+        percentage: { type: Number, required: true },
+        amount: { type: Number, required: true },
+        deliverable: { type: String, required: true },
+    }],
+    planDetails: {
+        type: String,
+        trim: true,
+        default: "",
+    },
+    durationDays: {
+        type: Number,
+        default: 90,
+    },
+    planDocumentUrl: {
+        type: String,
+        default: "",
+    },
+    planDocumentName: {
+        type: String,
+        default: "",
+    },
+    planDocumentHash: {
+        type: String,
+        default: "",
+    },
+    startupResponse: {
+        status: {
+            type: String,
+            enum: ["PENDING", "ACCEPTED", "REJECTED"],
+            default: "PENDING",
+        },
+        respondedAt: {
+            type: Date,
+            default: null,
+        },
+        rejectionReason: {
+            type: String,
+            default: "",
+        },
+    },
 }, { timestamps: true });
 
 const decisionRecordModel = mongoose.model("decision_records", decisionRecordSchema);

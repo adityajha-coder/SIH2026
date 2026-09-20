@@ -1,7 +1,9 @@
+import crypto from "crypto";
 import submissionModel, { SUBMISSION_STATUS } from "../models/submission.model.js";
 import problemModel, { PROBLEM_STATUS } from "../models/problem.model.js";
 import organizationModel from "../models/organization.model.js";
 import organizationMemberModel from "../models/organizationmember.model.js";
+import pilotEscrowModel from "../models/escrow.model.js";
 import { ROLES } from "../constants/role.constant.js";
 import { assertTransition } from "./submission/transitionGuard.js";
 import { eligibilityService } from "./eligibility.service.js";
@@ -353,5 +355,74 @@ export const submissionService = {
 
         await submissionModel.findByIdAndDelete(submissionId);
         return { deleted: true };
+    },
+
+    async getCertificate({ actor, submissionId }) {
+        const submission = await submissionModel.findById(submissionId)
+            .populate("problemId", "title category department problemStatementCode")
+            .populate("organizationId", "name type state dpiitRecognitionNumber")
+            .populate("submittedById", "userName email");
+
+        if (!submission) {
+            const error = new Error("Submission not found");
+            error.statusCode = 404;
+            error.code = "NOT_FOUND";
+            throw error;
+        }
+
+        // Authorization: Only the awarded startup (owner or active org member) can access and download the e-certificate
+        if (actor.role !== ROLES.STARTUP_USER) {
+            const error = new Error("Only the awarded startup can access and download this e-certificate");
+            error.statusCode = 403;
+            error.code = "PERMISSION_DENIED";
+            throw error;
+        }
+
+        const isOwner = submission.submittedById._id.toString() === actor._id.toString();
+        let isMember = false;
+        if (!isOwner && submission.organizationId?._id) {
+            const membership = await organizationMemberModel.findOne({
+                organizationId: submission.organizationId._id,
+                userId: actor._id,
+                status: "ACTIVE",
+            });
+            isMember = Boolean(membership);
+        }
+
+        if (!isOwner && !isMember) {
+            const error = new Error("You are not authorized to view this certificate");
+            error.statusCode = 403;
+            error.code = "PERMISSION_DENIED";
+            throw error;
+        }
+
+        const escrow = await pilotEscrowModel.findOne({ submissionId });
+
+        const certCode = `CERT-GOVX-2026-${submission._id.toString().slice(-8).toUpperCase()}`;
+        const certHash = crypto
+            .createHash("sha256")
+            .update(`${certCode}:${submission.organizationId?.name}:${submission.solutionTitle}:${submission.status}`)
+            .digest("hex");
+
+        const isCompleted = ["PILOT_COMPLETED", "SCALED", "CLOSED"].includes(submission.status) ||
+            (escrow?.tranches && escrow.tranches.length > 0 && escrow.tranches.every(t => t.status === "DISBURSED"));
+
+        return {
+            certificateId: certCode,
+            issueDate: escrow?.commercialScale?.scaledAt || submission.updatedAt || new Date(),
+            recipientOrgName: submission.organizationId?.name || "Candidate Startup",
+            dpiitNumber: submission.organizationId?.dpiitRecognitionNumber || "DPIIT-RECOGNIZED",
+            solutionTitle: submission.solutionTitle,
+            problemTitle: submission.problemId?.title || "Outcome-Based Innovation Challenge",
+            department: submission.problemId?.department || "Department of Information Technology & Innovation",
+            statutoryReference: "Rule 173(i) General Financial Rules (GFR) 2017",
+            pilotId: `PLT-${submission._id.toString().slice(-8).toUpperCase()}`,
+            grantAmount: escrow?.totalGrantAmount || 2500000,
+            gemContractId: escrow?.commercialScale?.gemContractId || "GEM-2026-DIR-99120",
+            sanctionMemo: escrow?.commercialScale?.sanctionMemo || "Sanctioned for direct commercial procurement on GeM under GFR Rule 173(i) exemption following audited pilot success.",
+            verificationHash: `sha256:${certHash}`,
+            issuingAuthority: "Government of India & Pragati-GovX Sovereign Procurement Council",
+            status: isCompleted ? "VALID_AND_SANCTIONED" : "PROVISIONAL",
+        };
     },
 };

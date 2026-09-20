@@ -26,6 +26,11 @@ submissionRouter.get("/", requireAuth, requirePermission(PERMISSIONS.SUBMISSION_
 submissionRouter.get("/:id", requireAuth, requirePermission(PERMISSIONS.SUBMISSION_VIEW), submissionController.getSubmission);
 
 /**
+ * GET /v1/submissions/:id/certificate
+ */
+submissionRouter.get("/:id/certificate", requireAuth, requirePermission(PERMISSIONS.SUBMISSION_VIEW), submissionController.getCertificate);
+
+/**
  * POST /v1/submissions/:id/transition
  */
 submissionRouter.post("/:id/transition", requireAuth, validate(transitionSubmissionSchema), submissionController.transitionSubmission);

@@ -130,12 +130,29 @@ export const notificationService = {
 
     // decision released → notify the startup
     async onDecisionReleased({ decisionRecord, submission }) {
+        const isAccepted = decisionRecord.outcome === "ACCEPTED";
+        const grantFormatted = decisionRecord.grantAmount ? `₹${decisionRecord.grantAmount.toLocaleString("en-IN")}` : "₹25,00,000";
+        
+        let message = `A final decision has been released for your submission "${submission.solutionTitle}". Outcome: ${decisionRecord.outcome}.`;
+        if (isAccepted) {
+            message = `Congratulations! Your proposal "${submission.solutionTitle}" has been ACCEPTED for a 90-day sandbox pilot with a grant corpus of ${grantFormatted}. The disbursement will be released in 3 milestone phases under Rule 173(i) GFR 2017. Please review the official pilot plan & sanction document on your portal to accept or decline the offer.`;
+            if (decisionRecord.planDocumentUrl) {
+                message += ` Download Plan Document: ${decisionRecord.planDocumentUrl}`;
+            }
+        }
+
         return this.notify({
             recipientId: submission.submittedById,
             type: NOTIFICATION_TYPES.DECISION_RELEASED,
-            title: `Decision Released: ${decisionRecord.outcome}`,
-            message: `A final decision has been released for your submission "${submission.solutionTitle}". Outcome: ${decisionRecord.outcome}.`,
-            context: { entityType: "SUBMISSION", entityId: submission._id },
+            title: isAccepted ? `Pilot Offer Sanctioned: ${grantFormatted}` : `Decision Released: ${decisionRecord.outcome}`,
+            message,
+            context: {
+                entityType: "SUBMISSION",
+                entityId: submission._id,
+                planDocumentUrl: decisionRecord.planDocumentUrl || "",
+                grantAmount: decisionRecord.grantAmount || 2500000,
+            },
+            sendEmailFlag: true,
         });
     },
 

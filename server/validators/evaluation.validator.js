@@ -74,4 +74,19 @@ export const createDecisionSchema = z.object({
         .trim()
         .min(10, "Rationale must be at least 10 characters")
         .max(5000, "Rationale cannot exceed 5000 characters"),
+
+    grantAmount: z.number().min(0).optional(),
+    paymentDescription: z.string().trim().max(5000).optional(),
+    tranches: z.array(z.object({
+        trancheId: z.string(),
+        name: z.string(),
+        percentage: z.number().min(1).max(100),
+        amount: z.number().min(0),
+        deliverable: z.string(),
+    })).optional(),
+    planDetails: z.string().trim().max(5000).optional(),
+    durationDays: z.number().int().min(1).max(365).optional(),
+    planDocumentUrl: z.string().trim().optional(),
+    planDocumentName: z.string().trim().optional(),
+    planDocumentHash: z.string().trim().optional(),
 });

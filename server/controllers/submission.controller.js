@@ -33,6 +33,22 @@ export const submissionController = {
         }
     },
 
+    async getCertificate(req, res, next) {
+        try {
+            const certificate = await submissionService.getCertificate({
+                actor: req.user,
+                submissionId: req.params.id,
+            });
+            return res.status(200).json({
+                data: certificate,
+                meta: { traceId: req.id, timestamp: new Date().toISOString() },
+                error: null,
+            });
+        } catch (error) {
+            next(error);
+        }
+    },
+
     async listSubmissions(req, res, next) {
         try {
             const result = await submissionService.listSubmissions({

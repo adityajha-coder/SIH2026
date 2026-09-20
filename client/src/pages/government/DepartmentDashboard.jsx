@@ -25,6 +25,7 @@ import {
 import { EvaluationRubricModal } from "@/components/government/EvaluationRubricModal";
 import { AssignEvaluatorModal } from "@/components/government/AssignEvaluatorModal";
 import { RequestClarificationModal } from "@/components/government/RequestClarificationModal";
+import { DecisionModal } from "@/components/government/DecisionModal";
 
 const PIE_COLORS = ["#2563EB", "#0F766E", "#B45309", "#7C3AED", "#0284C7"];
 
@@ -35,6 +36,7 @@ export function DepartmentDashboard() {
   const [selectedProblemForRubric, setSelectedProblemForRubric] = useState(null);
   const [selectedSubmissionForAssignment, setSelectedSubmissionForAssignment] = useState(null);
   const [selectedSubmissionForClarification, setSelectedSubmissionForClarification] = useState(null);
+  const [selectedSubmissionForDecision, setSelectedSubmissionForDecision] = useState(null);
 
   const {
     data: problems = [],
@@ -126,6 +128,13 @@ export function DepartmentDashboard() {
     );
   }, [submissions, selectedProblemFilter]);
 
+  // Active sandbox pilots for government milestone review
+  const activePilotsList = useMemo(() => {
+    return submissions.filter((s) =>
+      ["ACCEPTED", "PILOT_PROPOSED", "PILOT_ACTIVE", "PILOT_COMPLETED", "SCALED"].includes(s.status)
+    );
+  }, [submissions]);
+
   return (
     <div className="space-y-8 pb-16">
       {/* Header Banner */}
@@ -140,9 +149,6 @@ export function DepartmentDashboard() {
           <h1 className="text-2xl sm:text-3xl font-extrabold text-[#10233F] tracking-tight">
             {organization?.name || "Government Department Workspace"}
           </h1>
-          <p className="text-xs text-[#64748B]">
-            Challenge lifecycle management, startup proposal pipelines, and double-blind scoring console.
-          </p>
         </div>
 
         <div className="flex items-center gap-2 shrink-0">
@@ -170,9 +176,6 @@ export function DepartmentDashboard() {
             <span className="text-xs font-semibold text-[#64748B]">
               Published Challenges
             </span>
-            <span className="text-[10px] font-mono font-bold px-2 py-0.5 rounded-full border border-blue-200 bg-blue-50 text-[#2563EB]">
-              Active
-            </span>
           </div>
           <div className="mt-3">
             {loadingProblems ? (
@@ -181,9 +184,6 @@ export function DepartmentDashboard() {
               <div>
                 <p className="text-3xl font-extrabold text-[#10233F] tracking-tight">
                   {metrics.publishedProblems}
-                </p>
-                <p className="text-[11px] text-[#64748B] font-medium mt-1">
-                  {metrics.draftProblems} in draft preparation
                 </p>
               </div>
             )}
@@ -196,9 +196,6 @@ export function DepartmentDashboard() {
             <span className="text-xs font-semibold text-[#64748B]">
               Candidate Submissions
             </span>
-            <span className="text-[10px] font-mono font-bold px-2 py-0.5 rounded-full border border-teal-200 bg-teal-50 text-[#0F766E]">
-              Total
-            </span>
           </div>
           <div className="mt-3">
             {loadingSubmissions ? (
@@ -207,9 +204,6 @@ export function DepartmentDashboard() {
               <div>
                 <p className="text-3xl font-extrabold text-[#10233F] tracking-tight">
                   {metrics.totalSubmissions}
-                </p>
-                <p className="text-[11px] text-[#64748B] font-medium mt-1">
-                  Across all open problem statements
                 </p>
               </div>
             )}
@@ -222,9 +216,6 @@ export function DepartmentDashboard() {
             <span className="text-xs font-semibold text-[#64748B]">
               Pending Evaluation
             </span>
-            <span className="text-[10px] font-mono font-bold px-2 py-0.5 rounded-full border border-amber-200 bg-amber-50 text-[#B45309]">
-              Queue
-            </span>
           </div>
           <div className="mt-3">
             {loadingSubmissions ? (
@@ -233,9 +224,6 @@ export function DepartmentDashboard() {
               <div>
                 <p className="text-3xl font-extrabold text-[#10233F] tracking-tight">
                   {metrics.pendingReview}
-                </p>
-                <p className="text-[11px] text-[#64748B] font-medium mt-1">
-                  Awaiting double-blind scoring
                 </p>
               </div>
             )}
@@ -248,9 +236,6 @@ export function DepartmentDashboard() {
             <span className="text-xs font-semibold text-[#64748B]">
               Active Field Pilots
             </span>
-            <span className="text-[10px] font-mono font-bold px-2 py-0.5 rounded-full border border-purple-200 bg-purple-50 text-[#7C3AED]">
-              Sandbox
-            </span>
           </div>
           <div className="mt-3">
             {loadingSubmissions ? (
@@ -259,9 +244,6 @@ export function DepartmentDashboard() {
               <div>
                 <p className="text-3xl font-extrabold text-[#10233F] tracking-tight">
                   {metrics.activePilots}
-                </p>
-                <p className="text-[11px] text-[#64748B] font-medium mt-1">
-                  Live sandbox trials in progress
                 </p>
               </div>
             )}
@@ -279,9 +261,6 @@ export function DepartmentDashboard() {
                 <CardTitle className="text-sm font-bold text-[#10233F]">
                   Challenges by Sector Focus
                 </CardTitle>
-                <p className="text-[11px] text-[#64748B]">
-                  Domain distribution of registered problem statements
-                </p>
               </div>
               <span className="text-[11px] font-mono font-semibold px-2 py-0.5 rounded-full border border-slate-200 bg-slate-50 text-slate-600">
                 {sectorData.length} {sectorData.length === 1 ? "Sector" : "Sectors"}
@@ -344,9 +323,6 @@ export function DepartmentDashboard() {
                 <CardTitle className="text-sm font-bold text-[#10233F]">
                   Applicant Pipeline Lifecycle
                 </CardTitle>
-                <p className="text-[11px] text-[#64748B]">
-                  Live candidate distribution across procurement milestones
-                </p>
               </div>
               <span className="text-[11px] font-mono font-semibold px-2 py-0.5 rounded-full border border-slate-200 bg-slate-50 text-slate-600">
                 {submissions.length} Total
@@ -593,6 +569,74 @@ export function DepartmentDashboard() {
         )}
       </div>
 
+      {/* Active Field Pilots & Milestone Deliverables Section */}
+      <div className="space-y-4 pt-4 border-t border-slate-200">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+          <div className="space-y-0.5">
+            <div className="flex items-center gap-2">
+              <span className="text-xs font-bold uppercase tracking-wider text-[#0F766E]">
+                Sandbox Monitoring &amp; PFMS Disbursements
+              </span>
+              <span className="text-[11px] font-mono px-2 py-0.5 rounded-full bg-teal-50 text-teal-700 border border-teal-200">
+                {activePilotsList.length} Active {activePilotsList.length === 1 ? "Pilot" : "Pilots"}
+              </span>
+            </div>
+            <h2 className="text-base font-bold text-[#10233F]">
+              Active Field Pilots &amp; Milestone Work Proofs
+            </h2>
+          </div>
+        </div>
+
+        {activePilotsList.length === 0 ? (
+          <Card className="border border-slate-200 p-6 text-center rounded-xl bg-slate-50">
+            <p className="text-xs text-[#64748B]">
+              No active field pilots yet. When proposals are accepted and enter the sandbox, their 3-phase milestone work proofs will appear here for verification and disbursement.
+            </p>
+          </Card>
+        ) : (
+          <div className="grid gap-3">
+            {activePilotsList.map((pilot) => {
+              const orgName = pilot.organizationId?.name || "Candidate Startup";
+              const probTitle = pilot.problemId?.title || "Challenge Statement";
+
+              return (
+                <div
+                  key={pilot._id}
+                  className="p-4 rounded-xl border border-teal-200 bg-white hover:border-teal-400 hover:shadow-xs transition-all flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 text-xs"
+                >
+                  <div className="space-y-1 max-w-xl">
+                    <div className="flex items-center gap-2">
+                      <span className="font-bold text-[#10233F]">{orgName}</span>
+                      <span className="text-slate-300">•</span>
+                      <span className="font-semibold text-[#0F766E] bg-teal-50 px-2 py-0.5 rounded border border-teal-200">
+                        {pilot.status.replace(/_/g, " ")}
+                      </span>
+                      <span className="text-slate-300">•</span>
+                      <span className="text-slate-500 font-mono">PLT-{pilot._id.slice(-6).toUpperCase()}</span>
+                    </div>
+                    <h4 className="font-bold text-sm text-[#10233F]">{pilot.solutionTitle}</h4>
+                    <p className="text-xs text-[#64748B] truncate">
+                      Challenge: {probTitle}
+                    </p>
+                  </div>
+
+                  <div className="flex items-center gap-2 shrink-0 self-end sm:self-auto">
+                    <Link to={`/pilots/${pilot._id}`}>
+                      <Button
+                        size="sm"
+                        className="text-xs font-semibold bg-[#0F766E] hover:bg-[#0D655E] text-white h-8 px-3.5 rounded-lg cursor-pointer shadow-xs"
+                      >
+                        Review Proof &amp; Disburse
+                      </Button>
+                    </Link>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        )}
+      </div>
+
       {/* Submissions Section with Challenge Filter */}
       <div className="space-y-4 pt-4 border-t border-slate-200">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
@@ -667,6 +711,17 @@ export function DepartmentDashboard() {
                   </div>
 
                   <div className="flex flex-wrap items-center gap-2 shrink-0 self-end sm:self-auto">
+                    {["ACCEPTED", "PILOT_PROPOSED", "PILOT_ACTIVE", "PILOT_COMPLETED", "SCALED"].includes(sub.status) && (
+                      <Link to={`/pilots/${sub._id}`}>
+                        <Button
+                          size="sm"
+                          className="text-xs font-semibold bg-[#0F766E] hover:bg-[#0D655E] text-white h-8 px-3 rounded cursor-pointer shadow-xs"
+                        >
+                          Pilot Canvas
+                        </Button>
+                      </Link>
+                    )}
+
                     {(sub.status === "SUBMITTED" || sub.status === "UNDER_REVIEW") && (
                       <Button
                         type="button"
@@ -676,6 +731,17 @@ export function DepartmentDashboard() {
                         className="text-xs font-semibold border-amber-300 text-amber-800 hover:bg-amber-50 h-8 px-2.5 rounded cursor-pointer"
                       >
                         Request Clarification
+                      </Button>
+                    )}
+
+                    {sub.status === "UNDER_REVIEW" && (
+                      <Button
+                        type="button"
+                        size="sm"
+                        onClick={() => setSelectedSubmissionForDecision(sub)}
+                        className="text-xs font-semibold bg-emerald-700 hover:bg-emerald-800 text-white h-8 px-2.5 rounded cursor-pointer shadow-xs"
+                      >
+                        Statutory Decision
                       </Button>
                     )}
 
@@ -736,6 +802,18 @@ export function DepartmentDashboard() {
           onClose={() => setSelectedSubmissionForClarification(null)}
           submission={selectedSubmissionForClarification}
           onSuccess={() => {
+            refetchSubmissions();
+          }}
+        />
+      )}
+
+      {/* Statutory Decision Modal */}
+      {selectedSubmissionForDecision && (
+        <DecisionModal
+          isOpen={Boolean(selectedSubmissionForDecision)}
+          onClose={() => setSelectedSubmissionForDecision(null)}
+          submission={selectedSubmissionForDecision}
+          onDecisionMade={() => {
             refetchSubmissions();
           }}
         />
