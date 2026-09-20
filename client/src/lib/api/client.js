@@ -102,15 +102,27 @@ apiClient.interceptors.response.use(
       }
     }
 
+    const details = error.response?.data?.error?.details;
+    let errorMessage =
+      error.response?.data?.error?.message ||
+      error.response?.data?.message ||
+      error.message ||
+      "An unexpected error occurred";
+
+    if (Array.isArray(details) && details.length > 0) {
+      const detailMessages = details
+        .map((d) => (d.field ? `${d.field}: ${d.message}` : d.message))
+        .filter(Boolean);
+      if (detailMessages.length > 0) {
+        errorMessage = detailMessages.join("; ");
+      }
+    }
+
     const customError = {
       status: error.response?.status || 500,
       code: error.response?.data?.error?.code || "NETWORK_ERROR",
-      message:
-        error.response?.data?.error?.message ||
-        error.response?.data?.message ||
-        error.message ||
-        "An unexpected error occurred",
-      details: error.response?.data?.error?.details || null,
+      message: errorMessage,
+      details: details || null,
       traceId: error.response?.data?.meta?.traceId || null,
     };
 

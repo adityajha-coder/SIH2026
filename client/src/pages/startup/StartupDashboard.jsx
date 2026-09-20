@@ -7,17 +7,11 @@ import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import {
   ArrowRight,
-  Building2,
-  CheckCircle2,
-  Clock,
-  FileText,
-  HelpCircle,
   Plus,
-  Rocket,
   ShieldAlert,
   ShieldCheck,
   Sparkles,
-  TrendingUp,
+  Rocket,
 } from "lucide-react";
 
 const STATUS_BADGE_CONFIG = {
@@ -66,9 +60,6 @@ export function StartupDashboard() {
           <h1 className="text-2xl sm:text-3xl font-extrabold text-[#10233F] tracking-tight">
             {organization?.name || "Startup Innovation Workspace"}
           </h1>
-          <p className="text-xs sm:text-sm text-[#64748B]">
-            Manage departmental challenge applications, active sandbox pilots, and milestone payment claims.
-          </p>
         </div>
 
         <div className="flex items-center gap-2.5">
@@ -93,7 +84,6 @@ export function StartupDashboard() {
           <span className="text-xs font-medium text-[#64748B]">Total Applications</span>
           <div className="flex items-baseline justify-between">
             <span className="text-2xl font-bold text-[#10233F]">{stats.total}</span>
-            <FileText className="h-4 w-4 text-blue-500" />
           </div>
         </Card>
 
@@ -101,7 +91,6 @@ export function StartupDashboard() {
           <span className="text-xs font-medium text-[#64748B]">Under Evaluation</span>
           <div className="flex items-baseline justify-between">
             <span className="text-2xl font-bold text-amber-700">{stats.inReview}</span>
-            <Clock className="h-4 w-4 text-amber-500" />
           </div>
         </Card>
 
@@ -109,7 +98,6 @@ export function StartupDashboard() {
           <span className="text-xs font-medium text-[#64748B]">Sandbox Pilots Active</span>
           <div className="flex items-baseline justify-between">
             <span className="text-2xl font-bold text-emerald-700">{stats.activePilots}</span>
-            <Rocket className="h-4 w-4 text-emerald-500" />
           </div>
         </Card>
 
@@ -117,23 +105,37 @@ export function StartupDashboard() {
           <span className="text-xs font-medium text-[#64748B]">Clarifications Needed</span>
           <div className="flex items-baseline justify-between">
             <span className="text-2xl font-bold text-rose-700">{stats.clarifications}</span>
-            <HelpCircle className="h-4 w-4 text-rose-500" />
           </div>
         </Card>
       </div>
 
       {/* Clarification Alert Banner if any */}
       {stats.clarifications > 0 && (
-        <div className="rounded-xl border border-rose-200 bg-rose-50/70 p-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+        <div className="rounded-xl border border-rose-200 bg-rose-50/70 p-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 shadow-xs">
           <div className="flex items-center gap-2 text-xs text-rose-900 font-medium">
             <ShieldAlert className="h-4 w-4 text-rose-600 shrink-0" />
             <span>
               You have <strong>{stats.clarifications}</strong> challenge proposal(s) with questions requested by the evaluation committee.
             </span>
           </div>
-          <span className="text-xs font-bold text-rose-700 underline shrink-0 cursor-pointer">
-            Review Questions
-          </span>
+          {(() => {
+            const clarSub = submissions.find((s) => s.status === "CLARIFICATION");
+            return clarSub ? (
+              <Link to={`/startup/submissions/${clarSub._id}`}>
+                <Button
+                  size="sm"
+                  className="text-xs font-bold bg-rose-700 hover:bg-rose-800 text-white h-8 px-3 rounded-lg shadow-xs cursor-pointer gap-1.5"
+                >
+                  Review Questions
+                  <ArrowRight className="h-3.5 w-3.5" />
+                </Button>
+              </Link>
+            ) : (
+              <span className="text-xs font-bold text-rose-700 underline shrink-0 cursor-pointer">
+                Review Questions
+              </span>
+            );
+          })()}
         </div>
       )}
 
@@ -210,11 +212,32 @@ export function StartupDashboard() {
                   </div>
 
                   <div className="flex items-center gap-2 shrink-0 self-end sm:self-auto">
+                    {["ACCEPTED", "PILOT_PROPOSED", "PILOT_ACTIVE", "PILOT_COMPLETED", "SCALED"].includes(sub.status) && (
+                      <Link to={`/pilots/${sub._id}`}>
+                        <Button
+                          size="sm"
+                          className="h-8 text-xs font-bold gap-1 bg-[#0F766E] hover:bg-[#0D655E] text-white shadow-xs cursor-pointer"
+                        >
+                          Pilot Canvas
+                          <ArrowRight className="h-3 w-3" />
+                        </Button>
+                      </Link>
+                    )}
                     <Link to={`/startup/submissions/${sub._id}`}>
-                      <Button variant="outline" size="sm" className="h-8 text-xs font-semibold gap-1">
-                        Track Status
-                        <ArrowRight className="h-3 w-3" />
-                      </Button>
+                      {sub.status === "CLARIFICATION" ? (
+                        <Button
+                          size="sm"
+                          className="h-8 text-xs font-bold gap-1 bg-amber-600 hover:bg-amber-700 text-white shadow-xs cursor-pointer"
+                        >
+                          Respond to Query
+                          <ArrowRight className="h-3 w-3" />
+                        </Button>
+                      ) : (
+                        <Button variant="outline" size="sm" className="h-8 text-xs font-semibold gap-1 cursor-pointer">
+                          Track Status
+                          <ArrowRight className="h-3 w-3" />
+                        </Button>
+                      )}
                     </Link>
                   </div>
                 </div>

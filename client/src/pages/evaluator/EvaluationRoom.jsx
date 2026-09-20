@@ -1,7 +1,8 @@
 import React, { useState, useMemo, useEffect } from "react";
 import { useParams, Link, useNavigate } from "react-router-dom";
-import { useMyAssignments, useSubmitScores, useAiVerify } from "@/hooks/useEvaluations";
 import { useAuth } from "@/hooks/useAuth";
+import { useMyAssignments, useSubmitScores, useAiVerify } from "@/hooks/useEvaluations";
+import { apiClient } from "@/lib/api/client";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -24,17 +25,12 @@ import {
   AlertTriangle,
   Scale,
   Sparkles,
-  Send,
-  Save,
   FileText,
-  FileCode2,
-  Calendar,
-  Layers,
-  Cpu,
-  HelpCircle,
-  Clock,
   Loader2,
-  Check,
+  Cpu,
+  FileCode2,
+  Save,
+  Send,
 } from "lucide-react";
 
 const DEMO_EVALUATION_DATA = {
@@ -130,17 +126,24 @@ export function EvaluationRoom() {
     const found = serverAssignments.find((a) => a._id === assignmentId);
     if (found) {
       const sub = found.submissionId || {};
+      const prob = sub.problemId || {};
       const tpl = found.templateId || {};
 
       return {
         anonymizedCode: `ANON-PROP-${found._id.slice(-4).toUpperCase()}`,
-        problemTitle: found.problemTitle || "Department Innovation Challenge",
+        problemTitle: prob.title || found.problemTitle || "Department Innovation Challenge",
         solutionTitle: sub.solutionTitle || "Technical Pilot Proposal",
         executiveSummary: sub.executiveSummary || "No executive summary provided.",
-        technicalProposal: "Technical architecture submitted under Maharashtra Sandbox protocol.",
+        technicalProposal: sub.proposalDetails || "Technical architecture submitted under Maharashtra Sandbox protocol.",
         baselineOutcome: "Specified in submission documentation.",
         targetOutcome: "Demonstrated measurable pilot improvement.",
-        evidenceLinks: [{ name: "Technical Proposal Dossier", size: "1.2 MB", type: "Document" }],
+        evidenceLinks: (sub.evidenceFileIds && sub.evidenceFileIds.length > 0)
+          ? sub.evidenceFileIds.map((f, i) => ({
+              name: `Attached Evidence Document #${i + 1}`,
+              size: "Verified Vault Artifact",
+              type: "Document",
+            }))
+          : [{ name: "Technical Proposal Dossier", size: "1.2 MB", type: "Document" }],
         criteria:
           tpl.criteria && tpl.criteria.length > 0
             ? tpl.criteria
@@ -297,6 +300,8 @@ export function EvaluationRoom() {
       const evidenceTexts = (dossier.evidenceLinks || []).map((e) => e.name);
       if (evidenceTexts.length === 0) evidenceTexts.push("Standard Proposal Submission Dossier");
 
+      const toastId = toast.loading("Submitting to 3-Model AI Anti-Cascade Pipeline...");
+
       const res = await aiVerifyMutation.mutateAsync({
         task: `Evaluation Audit: ${dossier.problemTitle}`,
         userInput: `${dossier.solutionTitle}. Executive Summary: ${dossier.executiveSummary}. Baseline: ${dossier.baselineOutcome}. Target: ${dossier.targetOutcome}`,
@@ -305,8 +310,48 @@ export function EvaluationRoom() {
         entityId: typeof subId === "string" && subId.length === 24 ? subId : "6aa727d6d7548c3f68a6719e",
       });
 
-      setLiveAiResult(res);
-      toast.success("Live 3-Model AI Anti-Cascade Verification completed!");
+      if (res?.status === "QUEUED" && res?.runId) {
+        toast.loading("AI anti-cascade verification enqueued. Processing across Gemini & Groq...", { id: toastId });
+
+        const pollInterval = 1500;
+        let attempts = 0;
+        const maxAttempts = 35; // Support up to ~52s for multi-model cascade
+
+        const poll = async () => {
+          attempts++;
+          try {
+            const runRes = await apiClient.get(`/ai/runs/${res.runId}`);
+            const runData = runRes?.data || runRes;
+            if (runData?.status === "COMPLETED") {
+              const parsed = runData.result || runData;
+              setLiveAiResult({
+                ...parsed,
+                runId: res.runId,
+                status: "COMPLETED",
+              });
+              toast.success("Live 3-Model AI Anti-Cascade Verification completed!", { id: toastId });
+              return;
+            } else if (runData?.status === "FAILED") {
+              toast.error(runData?.errorMessage || "AI verification failed", { id: toastId });
+              return;
+            }
+          } catch (pollErr) {
+            console.warn("AI run polling error:", pollErr);
+          }
+
+          if (attempts < maxAttempts) {
+            setTimeout(poll, pollInterval);
+          } else {
+            toast.info("AI verification is processing in background. Check back shortly.", { id: toastId });
+          }
+        };
+
+        setTimeout(poll, pollInterval);
+      } else {
+        const directResult = res?.result || res;
+        setLiveAiResult(directResult);
+        toast.success("Live 3-Model AI Anti-Cascade Verification completed!", { id: toastId });
+      }
     } catch (err) {
       toast.error(err?.message || "Failed to execute AI verification");
     }

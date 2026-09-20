@@ -6,17 +6,13 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import {
-  FileText,
   Clock,
   CheckCircle2,
   AlertTriangle,
   ArrowRight,
   ShieldCheck,
-  Building2,
-  Layers,
-  Scale,
-  Sparkles,
   Lock,
+  Scale,
 } from "lucide-react";
 
 const DEMO_ASSIGNMENTS = [
@@ -134,9 +130,6 @@ export function EvaluatorQueue() {
             <CardTitle className="text-xs font-semibold text-[#64748B]">
               Total Assigned
             </CardTitle>
-            <div className="h-8 w-8 rounded-lg bg-blue-50 text-[#2563EB] flex items-center justify-center">
-              <FileText className="h-4 w-4" />
-            </div>
           </CardHeader>
           <CardContent>
             {isLoading ? (
@@ -158,9 +151,6 @@ export function EvaluatorQueue() {
             <CardTitle className="text-xs font-semibold text-[#64748B]">
               Pending Evaluation
             </CardTitle>
-            <div className="h-8 w-8 rounded-lg bg-amber-50 text-amber-700 flex items-center justify-center">
-              <Clock className="h-4 w-4" />
-            </div>
           </CardHeader>
           <CardContent>
             {isLoading ? (
@@ -182,9 +172,6 @@ export function EvaluatorQueue() {
             <CardTitle className="text-xs font-semibold text-[#64748B]">
               Completed Scorecards
             </CardTitle>
-            <div className="h-8 w-8 rounded-lg bg-teal-50 text-[#0F766E] flex items-center justify-center">
-              <CheckCircle2 className="h-4 w-4" />
-            </div>
           </CardHeader>
           <CardContent>
             {isLoading ? (
@@ -206,9 +193,6 @@ export function EvaluatorQueue() {
             <CardTitle className="text-xs font-semibold text-[#64748B]">
               Due &lt; 48 Hours
             </CardTitle>
-            <div className="h-8 w-8 rounded-lg bg-purple-50 text-purple-700 flex items-center justify-center">
-              <AlertTriangle className="h-4 w-4" />
-            </div>
           </CardHeader>
           <CardContent>
             {isLoading ? (

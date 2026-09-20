@@ -25,7 +25,6 @@ import {
   Search,
   RefreshCw,
   Clock,
-  UserCheck,
   Building2,
   Rocket,
   Scale,
@@ -34,7 +33,6 @@ import {
   Filter,
   CheckCircle2,
   ChevronRight,
-  Landmark,
   ArrowRight,
   Download,
 } from "lucide-react";
@@ -208,7 +206,6 @@ export function AdminAuditConsole() {
               <span className="text-[11px] font-bold uppercase tracking-wider text-[#64748B]">
                 Registered Platform Users
               </span>
-              <UserCheck className="h-4 w-4 text-blue-600" />
             </div>
             <div className="text-2xl font-bold font-mono text-[#10233F] mt-2">
               {stats?.users?.total || 114}
@@ -221,7 +218,6 @@ export function AdminAuditConsole() {
               <span className="text-[11px] font-bold uppercase tracking-wider text-[#64748B]">
                 Active Outcome Problems
               </span>
-              <Landmark className="h-4 w-4 text-teal-600" />
             </div>
             <div className="text-2xl font-bold font-mono text-[#10233F] mt-2">
               {stats?.problems?.total || 36}
@@ -234,7 +230,6 @@ export function AdminAuditConsole() {
               <span className="text-[11px] font-bold uppercase tracking-wider text-[#64748B]">
                 Proposals & Submissions
               </span>
-              <FileText className="h-4 w-4 text-indigo-600" />
             </div>
             <div className="text-2xl font-bold font-mono text-[#10233F] mt-2">
               {stats?.submissions?.total || 148}
@@ -247,7 +242,6 @@ export function AdminAuditConsole() {
               <span className="text-[11px] font-bold uppercase tracking-wider text-[#64748B]">
                 AI Cascades & Verifications
               </span>
-              <Sparkles className="h-4 w-4 text-amber-600" />
             </div>
             <div className="text-2xl font-bold font-mono text-[#10233F] mt-2">
               {stats?.governance?.totalAiRuns || 89}
