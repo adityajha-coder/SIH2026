@@ -19,6 +19,7 @@ Pragati-GovX dismantles the legacy public procurement barrier for startups by pr
 4. **90-Day Sovereign Sandbox Compacts:** Controlled, legally protected field deployments with milestone-based tranche disbursements (30% - 40% - 30%).
 5. **Statutory 30-Day Payment SLA Enforcement:** Automated MSMED Act 2006 Section 15 milestone payment tracking, preventing cash-flow insolvency caused by bureaucratic payment delays.
 6. **Direct GeM Procurement Scale Gate:** Conversion of successful sandbox trials into direct government procurement contracts on the Government e-Marketplace.
+7. **Startup Mitra AI Concierge:** Real-time conversational legal and public procurement advisor grounded in Indian statutory frameworks (GFR 170/173(i), MSMED Act 2006, GeM, SIPP), official government reference links, and guided Pragati-GovX platform shortcuts.
 
 ---
 
@@ -46,6 +47,7 @@ Pragati-GovX dismantles the legacy public procurement barrier for startups by pr
 | **Proposal Submissions**| Read / Track | `submission:view` | Scoped strictly to proposals authored by the startup's organization. |
 | **Evidence Vault** | Presigned Upload | `requireRole("STARTUP_USER")` | Direct S3 streaming; 25MB limit; client-side SHA-256 checksum binding. |
 | **Pilot Canvas** | Telemetry Stream | `requireRole("STARTUP_USER")` | Active sandboxes awarded to the startup; milestone telemetry submission. |
+| **Startup Mitra Concierge** | Chat Query | `requireRole("STARTUP_USER", "ADMIN")` | Real-time legal & platform Q&A via `/v1/ai/legal-chat`; validated via `legalQuerySchema`. |
 | **Evaluator Data** | Read | **Forbidden** | Double-blind isolation; evaluator identities and internal scoring are shielded. |
 | **Competitor Proposals**| Read | **Forbidden** | Multi-tenant isolation; competitor submissions are strictly inaccessible. |
 
@@ -128,6 +130,27 @@ Startup proposals proceed through a strictly governed 7-stage **Finite State Mac
   * If the milestone payment remains pending past 30 days, automated escalation alerts are dispatched to the Directorate of Industries and MSInS leadership.
 * **Scale Gate Direct GeM Onboarding:** Upon pilot completion and final outcome verification, the platform generates a cryptographically sealed **Scale Gate Sanction Order**, enabling the startup to onboard directly to the Government e-Marketplace (GeM) special procurement window without open tender competition.
 
+### 4.4 Startup Mitra: Legal & Public Procurement AI Concierge
+* **Dedicated Statutory Advisory:** An in-app conversational AI guide trained on Indian public procurement law, statutory exemptions, and Pragati-GovX system operations:
+  * **GFR 2017 Rule 170:** Explains 100% Earnest Money Deposit (EMD) and tender fee exemptions.
+  * **GFR 2017 Rule 173(i):** Explains turnover and prior operating experience waivers for DPIIT startups.
+  * **MSMED Act 2006 (Sections 15 & 16):** Demystifies mandatory 45-day payment ceilings, 30-day sandbox SLAs, and compound penal interest.
+  * **SIPP Scheme & IP Incentives:** Explains 80% patent filing fee rebates and fast-track examination.
+  * **GeM Startup Runway:** Guides startups on listing products without standard tender barriers upon pilot completion.
+* **Dynamic Official Government Citations:** Automatically pairs responses with verified official portals:
+  * [Startup India Hub](https://www.startupindia.gov.in) (DPIIT recognition and seed fund)
+  * [DPIIT Central Portal](https://dpiit.gov.in) (Official gazettes & notifications)
+  * [Department of Expenditure](https://doe.gov.in) (GFR 2017 procurement guidelines)
+  * [Government e-Marketplace](https://gem.gov.in) (GeM Startup Runway)
+  * [MSME Samadhaan](https://samadhaan.msme.gov.in) (Delayed payment grievance filing)
+  * [IP India](https://ipindia.gov.in) (SIPP patent rebate scheme)
+* **Direct Platform Navigation Shortcuts:** Emits actionable deep-link buttons allowing founders to jump directly to:
+  * **Startup Passport** (`/startup/profile`): Add DPIIT number to unlock GFR 173(i) waivers.
+  * **Explore Challenges** (`/challenges`): Browse open department problem statements.
+  * **Pilot Canvas** (`/pilots`): Track active sandboxes, telemetry, and 30-day payment SLAs.
+  * **My Submissions** (`/startup/submissions`): Monitor proposal evaluation and review status.
+* **Multi-Model Resilience:** Built on OpenRouter with active free model failover (`nex-agi/nex-n2.5-pro:free`, `nex-agi/nex-n2.5-mini:free`), per-model 8-second request timeouts, and deterministic simulated legal expert fallback.
+
 ---
 
 ## 5. API Reference for Startups
@@ -146,6 +169,7 @@ All endpoints require `Authorization: Bearer <AccessToken>`:
 | `POST` | `/v1/evidence/upload` | Request 15-min presigned S3 upload intent | `requireRole("STARTUP_USER")` |
 | `POST` | `/v1/evidence/finalize` | Finalize upload with in-browser SHA-256 digest | `requireRole("STARTUP_USER")` |
 | `PUT` | `/v1/organizations/:id` | Update Startup Passport and DPIIT credentials | `requireRole("STARTUP_USER")` (Owner) |
+| `POST` | `/v1/ai/legal-chat` | Query Startup Mitra legal & procurement assistant | `requireRole("STARTUP_USER", "ADMIN")` |
 
 ---
 

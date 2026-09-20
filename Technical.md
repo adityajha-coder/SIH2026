@@ -226,6 +226,22 @@ To eliminate human evaluator bias while preventing single-model AI hallucination
 * **Credential Redaction**: Prompts are automatically scrubbed of API keys, Bearer tokens, passwords, and PII before transmission to LLM inference endpoints.
 * **Payload Truncation Protection**: Strict prompt length cap of 30,000 characters prevents denial-of-wallet and context-overflow attacks.
 
+### 6.2 Startup Mitra: Dedicated Legal & Public Procurement AI Concierge (`legalAssistant.service.js`)
+* **Decoupled Architecture**: Unlike the heavy asynchronous 3-layer anti-cascade verification queue for proposal dossiers, **Startup Mitra** is engineered as a lightweight, low-latency conversational service for verified founders.
+* **Multi-Model Resilience & Dynamic Failover**:
+  * **Dynamic Credential Resolution**: Dynamically reads `process.env.OPENROUTER_API_KEY` with graceful fallback handling.
+  * **Model Cascade**: Evaluates requests sequentially across high-throughput active free models (`nex-agi/nex-n2.5-pro:free`, `nex-agi/nex-n2.5-mini:free`).
+  * **Per-Model Timeout Guard**: Enforces an 8,000ms `AbortSignal.timeout()` per provider model to prevent network hangs.
+  * **Deterministic Offline Expert Fallback**: If OpenRouter is unreachable or network limits are exceeded, the service falls back to a deterministic, statutory expert engine grounded in GFR 2017, DPIIT directives, and MSMED Act 2006.
+* **Contextual Grounding & Dynamic Citations**:
+  * **Official Reference Matching (`matchOfficialLinks`)**: Automatically matches keywords against official Indian government portals (Startup India Hub, DPIIT, Department of Expenditure, GeM, MSME Samadhaan, IP India).
+  * **Platform Action Shortcuts (`matchPlatformActions`)**: Emits actionable platform routes (`/startup/profile`, `/challenges`, `/pilots`, `/startup/submissions`) based on founder intent.
+* **Security & Access Boundary**:
+  * **Endpoint**: `POST /v1/ai/legal-chat`
+  * **RBAC Gate**: Restricted strictly to authenticated `STARTUP_USER` and `ADMIN` roles (`requireAuth`, `requireRole(ROLES.STARTUP_USER, ROLES.ADMIN)`).
+  * **Input Validation**: Zod-enforced schema (`legalQuerySchema`) validating query length (2–1000 characters) and session history structure.
+  * **Rate Limiting**: Enforced via distributed Redis-backed `apiLimiter`.
+
 ---
 
 ## 7. Sovereign Treasury Escrow & Statutory Payment SLA Engine

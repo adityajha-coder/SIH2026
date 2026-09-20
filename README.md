@@ -111,6 +111,13 @@ In the rare cases where a department conducted a successful proof-of-concept (Po
 * Completed pilots undergo a 5-pillar Scale Gate audit (KPI achievement, technical robustness, data security, economic viability, organizational readiness).
 * Upon approval, the platform auto-generates an official **Government Sanction Order (`GR-MSInS/2026/...`)** aggregating budgets across all 36 Maharashtra districts for direct listing and procurement via the **Government e-Marketplace (GeM)** Special Innovation Window.
 
+### 9. Startup Mitra: Legal & Public Procurement AI Concierge
+* Dedicated in-app conversational AI guide designed specifically for verified startup founders on Pragati-GovX.
+* **Statutory Framework Literacy:** Demystifies complex public procurement frameworks in plain language — including **GFR Rule 170** (100% EMD exemptions), **GFR Rule 173(i)** (turnover and operating history waivers), **MSMED Act 2006 Sections 15 & 16** (mandatory 45-day payment ceilings, 30-day sandbox SLAs, and 3x RBI bank rate penal interest), **SIPP Scheme** (80% patent rebate), and **GeM Startup Runway**.
+* **Dynamic Official Government Reference Links:** Contextually cites official government portals ([Startup India Hub](https://www.startupindia.gov.in), [DPIIT](https://dpiit.gov.in), [Department of Expenditure](https://doe.gov.in), [GeM](https://gem.gov.in), [MSME Samadhaan](https://samadhaan.msme.gov.in), [IP India](https://ipindia.gov.in)).
+* **Embedded Platform Action Deep-Links:** Surfaces actionable one-click buttons directing founders straight to the **Startup Passport** (`/startup/profile`), **Civic Challenges** (`/challenges`), **Pilot Canvas** (`/pilots`), or **Submissions** (`/startup/submissions`).
+* **Multi-Model Resilience:** Powered by OpenRouter with high-throughput free model cascading (`nex-agi/nex-n2.5-pro:free`, `nex-agi/nex-n2.5-mini:free`), per-model 8-second request timeouts, and a deterministic simulated legal expert fallback system.
+
 ---
 
 ## ⚖️ Legal Terms & Statutory Framework Lexicon
@@ -349,8 +356,9 @@ SIH2026/
 ├── client/                                # React 18 + Vite Frontend Monorepo
 │   ├── public/                            # Public web assets (hero_section.png, logo.png)
 │   ├── src/
-│   │   ├── assets/                        # Brand emblems & logos
+│   │   ├── assets/                        # Brand emblems & logos (including bot.jpg)
 │   │   ├── components/
+│   │   │   ├── ai/                        # StartupLegalAssistantWidget (Startup Mitra Concierge)
 │   │   │   ├── certificate/               # Sovereign E-Certificate modal & PDF exporter
 │   │   │   ├── common/                    # ErrorBoundary, PulseRail, DistrictGeoMap, Modals
 │   │   │   ├── government/                # DecisionModal, AssignEvaluatorModal, ReadinessMeter
@@ -358,7 +366,7 @@ SIH2026/
 │   │   │   └── ui/                        # Radix UI accessible primitives (Card, Button, Dialog)
 │   │   ├── context/                       # In-memory dual-token AuthContext
 │   │   ├── hooks/                         # React Query hooks (useSubmissions, useEscrow, useEvaluations)
-│   │   ├── lib/                           # Axios client with silent refresh, TanStack QueryClient
+│   │   ├── lib/                           # Axios client with silent refresh, TanStack QueryClient, API helpers
 │   │   ├── pages/
 │   │   │   ├── admin/                     # AdminAuditConsole (system-wide audit log)
 │   │   │   ├── app/                       # ProfilePage, NotificationCenter
@@ -377,21 +385,21 @@ SIH2026/
 ├── Docs/                                  # Role-Specific Architecture Specifications
 │   ├── Evaluator.md                       # Double-blind evaluator protocol & rubric criteria
 │   ├── Government_offical.md              # Department nodal officer challenge & pilot governance
-│   └── Startup.md                         # Startup passport, DPIIT waiver & proposal lifecycle
+│   └── Startup.md                         # Startup passport, DPIIT waiver, proposal lifecycle & Startup Mitra AI
 ├── Public/                                # Platform Documentation Graphics
 │   ├── pipeline.png                       # Complete end-to-end pipeline architecture diagram
 │   └── readme-flow.png                    # Official 4-stage platform flow diagram
 ├── server/                                # Node.js + Express Backend Monorepo
 │   ├── config/                            # Database, Redis & Passport OAuth configurations
 │   ├── constants/                         # User roles, submission statuses, FSM stages
-│   ├── controllers/                       # HTTP REST controllers (auth, submission, escrow, evaluation)
+│   ├── controllers/                       # HTTP REST controllers (auth, submission, escrow, evaluation, ai)
 │   ├── emails/                            # Transactional HTML email templates
 │   ├── middleware/                        # Auth guards, role checks, rate limiters, validation
 │   ├── models/                            # Mongoose schemas (submission, escrow, decision, aiRun)
 │   ├── queues/                            # BullMQ distributed queue factories
 │   ├── routes/                            # Modular Express API route declarations (/v1)
 │   ├── services/
-│   │   ├── ai/                            # Multi-model consensus verification (Gemini, Groq, OpenRouter)
+│   │   ├── ai/                            # Multi-model consensus (Gemini/Groq) & Startup Mitra (legalAssistant.service.js)
 │   │   ├── eligibility/                   # Deterministic GFR 173(i) eligibility rule engine
 │   │   ├── geocoding/                     # Nominatim service for Maharashtra 36-district mapping
 │   │   ├── government/                    # Digilocker, API Setu & OGD gateway adapters
@@ -402,17 +410,18 @@ SIH2026/
 │   │   ├── storage.service.js             # S3 presigned upload generator with MIME validation
 │   │   └── submission.service.js          # Proposal lifecycle & certificate generation
 │   ├── utils/                             # Cryptographic digests & helpers
-│   ├── validators/                        # Zod schemas for request validation
+│   ├── validators/                        # Zod schemas for request validation (including legalQuerySchema)
 │   ├── workers/                           # BullMQ background workers (AI, SLA cron, email, notify)
 │   ├── app.js                             # Express application assembly & security middleware
 │   └── server.js                          # HTTP server startup listener
-├── test/                                  # Automated Vitest Test Suites (10 suites, 99 tests)
+├── test/                                  # Automated Vitest Test Suites (11 suites, 113 tests)
 │   ├── aiPolicy.test.js                   # AI zero-cost allowlist & prompt sanitization tests
 │   ├── authValidator.test.js              # Password complexity & input sanitization tests
 │   ├── Clarification.test.js              # Department-to-startup clarification cycles
 │   ├── Decision.test.js                   # Sanction order, milestone tranches & compact acceptance
 │   ├── eligibilityRules.test.js           # GFR 173(i) DPIIT turnover & experience waiver tests
 │   ├── evidenceValidator.test.js          # S3 MIME & 25MB file boundary tests
+│   ├── legalAssistant.test.js             # Startup Mitra zero-symbol typography, link citations & OpenRouter tests
 │   ├── Pipeline.test.js                   # End-to-end challenge-to-submission lifecycle tests
 │   ├── redisQueue.test.js                 # BullMQ queue priority & retry resilience tests
 │   ├── SandboxEscrow.test.js              # Escrow funding, milestone math & tranche release tests
@@ -431,7 +440,7 @@ SIH2026/
 For exhaustive engineering and security deep-dives into Pragati-GovX:
 
 * 👉 **[Comprehensive Technical Architecture & Engineering Specification (Technical.md)](Technical.md)**  
-  *Deep dive into the statutory 7-stage Finite State Machine (FSM), BullMQ background workers, multi-model AI consensus verification (Gemini + Groq + OpenRouter), sovereign escrow milestone mathematics, and automated test suites.*
+  *Deep dive into the statutory 7-stage Finite State Machine (FSM), BullMQ background workers, multi-model AI consensus verification (Gemini + Groq + OpenRouter), Startup Mitra legal concierge, sovereign escrow milestone mathematics, and automated test suites.*
 
 * 👉 **[Comprehensive Security Architecture & Cryptographic Flow Specification (Security.md)](Security.md)**  
   *Exhaustive specification of the in-memory dual-token auth pattern, Refresh Token Rotation (RTR), 4-tier RBAC/PBAC matrix, double-blind evaluator anonymization, direct client-to-S3 presigned streaming with SHA-256 integrity verification, and OWASP Top 10 mitigation matrix.*
@@ -439,7 +448,7 @@ For exhaustive engineering and security deep-dives into Pragati-GovX:
 ### Role-Specific Architecture & Authorization Guides
 
 * 👉 **[Startup Architecture & Proposal Lifecycle Guide (Docs/Startup.md)](Docs/Startup.md)**  
-  *Covers the Startup Passport, 100% GFR 173(i) turnover & EMD waivers, 5-step Application Wizard, direct S3 streaming with SHA-256 digests, and MSMED Act 30-day payment SLA tracker.*
+  *Covers the Startup Passport, 100% GFR 173(i) turnover & EMD waivers, 5-step Application Wizard, direct S3 streaming with SHA-256 digests, MSMED Act 30-day payment SLA tracker, and Startup Mitra AI Concierge.*
 
 * 👉 **[Government Official Architecture & Governance Guide (Docs/Government_offical.md)](Docs/Government_offical.md)**  
   *Covers the Challenge Studio (0-100 Readiness Meter), 4-pillar Explainable AI candidate discovery, double-blind evaluator allocation, 90-day sandbox pilot compacts, and Scale Gate Sanction Orders for GeM.*
