@@ -1,122 +1,157 @@
 # Startup Architecture and Authorization Guide
 
+> **Platform Designation:** Sovereign Innovation Sandbox & Agile Public Procurement Gateway  
+> **Role Code:** `STARTUP_USER`  
+> **Target Jurisdiction:** Government of Maharashtra (MSInS / Dept. of Skills, Employment, Entrepreneurship & Innovation)  
+> **Statutory Foundations:** GFR 2017 Rule 173(i) • Maharashtra Startup Policy 2024 • MSMED Act 2006 Section 15 • DPDP Act 2023  
+> **Parent Documentation:** [README.md](../README.md) • [Technical Architecture (Technical.md)](../Technical.md) • [Security Architecture (Security.md)](../Security.md)
+
+---
+
 ## 1. Role Overview and Persona
-The Startup role (`STARTUP_USER`) represents verified innovative enterprises, founders, and technical teams applying for public sector challenges under the Pragati-GovX platform. The role is designed to facilitate agile public procurement, statutory DPIIT recognition verification, GFR Rule 173(i) exemption claims, cryptographic evidence submissions, and 90-day sovereign sandbox field pilots.
+
+The **Startup** (`STARTUP_USER`) role represents verified deep-tech founders, innovative MSMEs, and technology ventures seeking to deploy civic innovations in partnership with Government of Maharashtra departments.
+
+Pragati-GovX dismantles the legacy public procurement barrier for startups by providing:
+1. **Statutory 100% GFR 173(i) Waivers:** Elimination of prior audited turnover requirements, prior government execution criteria, and Earnest Money Deposits (EMD).
+2. **Double-Blind Impartiality:** Automatic scrubbing of corporate branding and founder identities during evaluation, allowing early-stage ventures to compete purely on engineering merit.
+3. **Memory-Safe Direct S3 Evidence Vault:** Cryptographic in-browser SHA-256 upload verification for technical schematics, lab test certificates, and telemetry data.
+4. **90-Day Sovereign Sandbox Compacts:** Controlled, legally protected field deployments with milestone-based tranche disbursements (30% - 40% - 30%).
+5. **Statutory 30-Day Payment SLA Enforcement:** Automated MSMED Act 2006 Section 15 milestone payment tracking, preventing cash-flow insolvency caused by bureaucratic payment delays.
+6. **Direct GeM Procurement Scale Gate:** Conversion of successful sandbox trials into direct government procurement contracts on the Government e-Marketplace.
 
 ---
 
-## 2. Authentication and Authorization Model
+## 2. Authentication, Authorization & Session Security
 
-### 2.1 Identity and Session Lifecycle
-- Primary Authentication: Local credentials (Argon2 password hashing) or Google OAuth 2.0.
-- Dual-Token Architecture:
-  - Access Token: Ephemeral JSON Web Token (15-minute lifespan) held strictly in client JavaScript memory. Never persisted in LocalStorage or SessionStorage to prevent Cross-Site Scripting (XSS) compromise.
-  - Refresh Token: Secure HTTP-only cookie (7-day lifespan) with `SameSite=Lax` (development) or `SameSite=Strict` (production).
-  - Silent Rotation: Handled automatically by the client Axios interceptor on 401 responses via `GET /v1/auth/refresh-token`.
-- Role Identifier: `STARTUP_USER`.
-- Route Guards: Protected on the server by `authenticate` and `requireRole(["STARTUP_USER", "ADMIN"])`.
+### 2.1 Identity and In-Memory Dual-Token Pattern
+* **Primary Authentication:** Local credentials (Argon2/Bcrypt with high work factor) or OAuth 2.0 institutional login.
+* **In-Memory Access Token Architecture (XSS Defense):**
+  * The short-lived access token (15-minute lifespan) is stored **strictly in JavaScript closure memory** via React `AuthContext`.
+  * **Zero Browser Storage:** It is never persisted to `localStorage` or `sessionStorage`, completely immunizing the user against malicious third-party script token exfiltration.
+* **Rotated Refresh Token (CSRF Defense):**
+  * Issued as a cryptographically signed cookie with `HttpOnly`, `Secure`, and `SameSite=Strict` flags.
+  * **Refresh Token Rotation (RTR):** Each refresh request invalidates the previous token and records the SHA-256 digest of the new token in MongoDB (`refreshTokenHash`).
+* **Axios Mutex & Silent Refresh Queue:**
+  * When an access token expires (HTTP 401), the frontend Axios response interceptor intercepts the failure, holds subsequent concurrent requests in a queue, executes silent refresh via `/v1/auth/refresh-token`, updates the in-memory token, and transparently replays the queued requests.
 
-### 2.2 Authorization Matrix
-| Resource | Operation | Access Level | Constraints |
+### 2.2 Startup Authorization Matrix (PBAC)
+
+| Resource | Operation | Permission Gate | Scope / Constraints |
 |---|---|---|---|
-| User Profile | Read / Update | Self | Can only view and edit personal identity and contact data. |
-| Organization Profile | Read / Update | Entity Owner | Scoped strictly to the startup's registered organization ID. |
-| Public Challenges | Read / Search | Public | Read-only access to published problem statements. |
-| Submissions | Create / Read | Scoped | Can only submit to published challenges; one active submission per challenge. |
-| Evidence Vault | Upload / Attach | Scoped | File uploads limited to 25 MB; client-side SHA-256 integrity hash verification. |
-| Pilot Compact | Read / Update | Assigned Entity | Access restricted to pilots awarded to the startup's entity. |
-| Evaluator Data | Forbidden | None | Evaluator identities, rubrics notes, and internal government scoring are masked. |
+| **User Profile** | Read / Update | Self | Contact information, security settings, password changes. |
+| **Startup Passport** | Read / Update | `requireRole("STARTUP_USER")` | Scoped strictly to the startup's registered organization ID. |
+| **Public Challenges** | Read / Search | `problem:view` | Full access to open challenges, GIS district boundaries, and KPIs. |
+| **Proposal Submissions**| Create | `submission:create` | Permitted only on active published challenges (one proposal per challenge). |
+| **Proposal Submissions**| Read / Track | `submission:view` | Scoped strictly to proposals authored by the startup's organization. |
+| **Evidence Vault** | Presigned Upload | `requireRole("STARTUP_USER")` | Direct S3 streaming; 25MB limit; client-side SHA-256 checksum binding. |
+| **Pilot Canvas** | Telemetry Stream | `requireRole("STARTUP_USER")` | Active sandboxes awarded to the startup; milestone telemetry submission. |
+| **Evaluator Data** | Read | **Forbidden** | Double-blind isolation; evaluator identities and internal scoring are shielded. |
+| **Competitor Proposals**| Read | **Forbidden** | Multi-tenant isolation; competitor submissions are strictly inaccessible. |
 
 ---
 
-## 3. Architecture and Data Flow
+## 3. Proposal Lifecycle: Canonical 7-Stage FSM
 
-### 3.1 High-Level Flow
-```
-[Startup Client (SPA)]
-        |
-        | 1. Authentication (JWT / OAuth)
-        v
-[API Gateway / Route Guards] -> requireRole(["STARTUP_USER"])
-        |
-        +---> [Organization Service] -> DPIIT Validation / GFR 173(i) Exemption
-        |
-        +---> [Problem Service]      -> Catalog Browsing & GIS Map
-        |
-        +---> [Submission Service]   -> Duplicate Check & SHA-256 Evidence Vault
-        |
-        +---> [Pilot Service]        -> 90-Day Sandbox Milestone Tracking
-```
+Startup proposals proceed through a strictly governed 7-stage **Finite State Machine (FSM)** enforced in `server/services/submission/transitionGuard.js`:
 
-### 3.2 Submission State Machine
-A startup's proposal moves through a formal finite state machine:
 ```
-[DRAFT] -> [SUBMITTED] -> [UNDER_REVIEW] -> [EVALUATED] -> [PILOT_ACTIVE] -> [PILOT_COMPLETED]
-                              |                                    |
-                              +--------> [REJECTED] <--------------+
+┌──────────────────────────────────────────────────────────────────────────────────────────────────┐
+│                             STARTUP PROPOSAL 7-STAGE FSM LIFECYCLE                               │
+├──────────────────────────────────────────────────────────────────────────────────────────────────┤
+│                                                                                                  │
+│  [ 1. DRAFT ] ────────────────────> Proposal drafted locally in Application Wizard               │
+│          │                                                                                       │
+│          ▼ Validated & Signed                                                                    │
+│  [ 2. SUBMITTED ] ────────────────> Immutable proposal sealed with SHA-256 evidence digests      │
+│          │                                                                                       │
+│          ▼ Evaluator Assigned                                                                    │
+│  [ 3. UNDER_REVIEW ] ─────────────> Double-blind 4-pillar technical evaluation (ANON-VENTURE)   │
+│          │                                                                                       │
+│          ├────────────────────────────────┬───────────────────────────────┐                      │
+│          ▼ Rejected                       ▼ Clarification required        ▼ Accepted             │
+│  ┌───────────────┐              ┌───────────────────┐           ┌───────────────────┐            │
+│  │ 4a. REJECTED  │              │ Clarification     │           │ 4b. ACCEPTED      │            │
+│  │ (Statutory    │              │ Query Response    │           │ (Sanction Order & │            │
+│  │ Feedback Log) │              └─────────┬─────────┘           │ Pilot Compact)    │            │
+│  └───────────────┘                        │                     └─────────┬─────────┘            │
+│                                           │                               │                      │
+│                                           └─────── Re-evaluated ──────────┘                      │
+│                                                                           │                      │
+│                                                                           ▼ Sandbox Initialized  │
+│                                                                 ┌───────────────────┐            │
+│                                                                 │ 5. PILOT_ACTIVE   │            │
+│                                                                 │ (90-Day Sandbox)  │            │
+│                                                                 └─────────┬─────────┘            │
+│                                                                           │                      │
+│                                                                           ▼ Milestones Complete  │
+│                                                                 ┌───────────────────┐            │
+│                                                                 │ 6. PILOT_COMPLETED│            │
+│                                                                 │ (Outcome Audit)   │            │
+│                                                                 └─────────┬─────────┘            │
+│                                                                           │                      │
+│                                                                           ▼ Commercial Scale-Up  │
+│                                                                 ┌───────────────────┐            │
+│                                                                 │ 7. SCALED         │            │
+│                                                                 │ (Direct GeM Entry)│            │
+│                                                                 └───────────────────┘            │
+│                                                                                                  │
+└──────────────────────────────────────────────────────────────────────────────────────────────────┘
 ```
-- DRAFT: Proposal prepared locally within the Application Wizard.
-- SUBMITTED: Formal submission recorded; immutable proposal snapshot with SHA-256 evidence hash.
-- UNDER_REVIEW: Assigned to external technical validators; proposal content is locked.
-- EVALUATED: Double-blind scoring completed by assigned evaluators.
-- PILOT_ACTIVE: 90-day field sandbox compact executed with government nodal department.
-- PILOT_COMPLETED: Milestone deliverables verified; final completion certificate issued.
-- REJECTED: Application disqualified or non-selected with statutory feedback.
 
 ---
 
 ## 4. Core Functional Modules
 
 ### 4.1 Startup Passport (`/startup/profile`)
-- Organization Identity: Legal name, incorporation date, company registration number, and core team size.
-- DPIIT Recognition: Automatic verification against government databases for startup certification.
-- Statutory Exemption Claims:
-  - 100% Earnest Money Deposit (EMD) waiver under GFR Rule 173(i).
-  - Exemption from prior turnover and prior operational experience criteria.
-- Technical Capabilities: Domain taxonomy, technology readiness level (TRL), patents, and deployment stage.
+* **DPIIT Sovereign Auto-Verification:** Entering a verified DPIIT recognition number automatically verifies the venture against official registries.
+* **100% Statutory Exemption Flags:**
+  * **Turnover Waiver:** 100% exemption from prior ₹5Cr – ₹50Cr turnover criteria under GFR Rule 173(i).
+  * **Experience Waiver:** Exemption from 3 to 5 years prior government execution history.
+  * **EMD Waiver:** 100% waiver of Earnest Money Deposit (EMD) and tender fees.
+* **Technical Capability Taxonomy:** Technology Readiness Level (TRL 1–9), patent registration numbers, core architecture classification, and deployment footprint.
 
-### 4.2 Application Wizard (`/challenges/:id/apply`)
-- Step 1 - Executive Summary: Solution title, abstract, problem-solution fit, and value proposition.
-- Step 2 - Technical Architecture: System architecture, scalability, API specifications, and data residency compliance.
-- Step 3 - Evidence Vault:
-  - Multi-file dropzone supporting PDF, DOCX, ZIP, and images up to 25 MB each.
-  - Document categories: Architecture Blueprint, Benchmark Report, Compliance Certificate, Telemetry Logs, Pitch Deck.
-  - Cryptographic SHA-256 verification computed on the client before upload to guarantee tamper-proof evidence.
-  - External artifact repository and live demonstration links.
-- Step 4 - Milestone Schedule: 90-day pilot deployment schedule broken into verifiable tranches.
-- Step 5 - Statutory Review & Declaration: Formal anti-collusion and GFR 173(i) eligibility certification.
+### 4.2 5-Step Application Wizard (`/challenges/:id/apply`)
+* **Step 1 - Executive Summary:** Solution title, technical abstract, civic problem-solution fit, and quantifiable outcome metrics.
+* **Step 2 - System Architecture:** API specifications, compute requirements, throughput benchmarks, and Maharashtra State Data Centre (SDC) compatibility.
+* **Step 3 - Evidence Vault (Direct S3 Streaming):**
+  * Client calculates cryptographic SHA-256 hash using the native browser `SubtleCrypto` API.
+  * Direct client-to-S3 presigned PUT streaming (15-minute TTL); the Express backend never buffers large binary files in server memory.
+  * Supports architectural schematics, lab test certificates, benchmark datasets, and telemetry logs up to 25MB each.
+* **Step 4 - Milestone Schedule:** Proposed 90-day sandbox pilot timeline broken into 3 statutory tranches (30% Inception Advance, 40% Mid-Term Telemetry, 30% Scale Gate).
+* **Step 5 - Statutory Certification:** Digital anti-collusion declaration and GFR 173(i) eligibility affirmation.
 
-### 4.3 Submissions Tracker (`/startup/submissions`)
-- Centralized tracking desk for all submitted applications.
-- Real-time status badges, submission timestamps, and challenge references.
-- Duplicate submission prevention: Challenge detail view detects existing applications and directs to the active submission record.
-
-### 4.4 Pilot Canvas (`/pilots/:id`)
-- Collaborative workspace active once a submission transitions to `PILOT_ACTIVE`.
-- Milestone KPI tracking against predetermined evaluation criteria.
-- Sensor data and field telemetry upload portal for public authority acceptance.
+### 4.3 Pilot Canvas & 30-Day Payment SLA Tracker (`/pilots/:id`)
+* **90-Day Field Sandbox Supervision:** Startups upload live telemetry and field sensor logs directly against agreed milestone KPIs.
+* **Statutory 30-Day Payment SLA:**
+  * When a milestone is approved by the department nodal officer, a statutory 30-day countdown initializes under **Section 15 of the MSMED Act 2006**.
+  * If the milestone payment remains pending past 30 days, automated escalation alerts are dispatched to the Directorate of Industries and MSInS leadership.
+* **Scale Gate Direct GeM Onboarding:** Upon pilot completion and final outcome verification, the platform generates a cryptographically sealed **Scale Gate Sanction Order**, enabling the startup to onboard directly to the Government e-Marketplace (GeM) special procurement window without open tender competition.
 
 ---
 
-## 5. API Surface
+## 5. API Reference for Startups
 
-| Method | Endpoint | Description | Authorization |
+All endpoints require `Authorization: Bearer <AccessToken>`:
+
+| Method | Route | Description | Guard / Permission |
 |---|---|---|---|
-| POST | `/api/v1/auth/login` | Email/password login | Public |
-| GET | `/api/v1/auth/google` | Google OAuth initiation | Public |
-| GET | `/api/v1/problems` | Browse open challenges with pagination and filtering | Authenticated |
-| GET | `/api/v1/problems/:id` | View challenge statement details | Authenticated |
-| POST | `/api/v1/submissions` | Submit new pilot compact application | STARTUP_USER |
-| GET | `/api/v1/submissions` | List entity's submitted proposals | STARTUP_USER (Scoped) |
-| GET | `/api/v1/submissions/:id` | View submission details and status | STARTUP_USER (Owner) |
-| PUT | `/api/v1/organizations/:id/profile` | Update startup passport and capabilities | STARTUP_USER (Owner) |
-| GET | `/api/v1/notifications` | Fetch status and milestone updates | Authenticated (Self) |
+| `POST` | `/v1/auth/login` | Email/password login; returns in-memory access token | Public |
+| `GET` | `/v1/auth/refresh-token` | Silent token refresh via HttpOnly cookie | Public (Cookie) |
+| `GET` | `/v1/problems` | Browse published challenges with GIS and sector filters | `requireAuth` |
+| `GET` | `/v1/problems/:id` | View challenge specification and KPI benchmarks | `requireAuth` |
+| `POST` | `/v1/submissions` | Submit new proposal under GFR 173(i) | `requirePermission("submission:create")` |
+| `GET` | `/v1/submissions` | List proposals authored by the startup's organization | `requirePermission("submission:view")` |
+| `GET` | `/v1/submissions/:id` | Fetch proposal details and live lifecycle status | `requirePermission("submission:view")` |
+| `POST` | `/v1/evidence/upload` | Request 15-min presigned S3 upload intent | `requireRole("STARTUP_USER")` |
+| `POST` | `/v1/evidence/finalize` | Finalize upload with in-browser SHA-256 digest | `requireRole("STARTUP_USER")` |
+| `PUT` | `/v1/organizations/:id` | Update Startup Passport and DPIIT credentials | `requireRole("STARTUP_USER")` (Owner) |
 
 ---
 
-## 6. Security and Compliance
+## 6. Security, Immutability & Trade Secret Protection
 
-1. Data Isolation: Startup entities cannot query or view applications submitted by competing startups.
-2. Anonymization in Review: Submissions are served to technical evaluators with brand and identifying data masked to enforce double-blind evaluation protocols.
-3. Cryptographic Integrity: Evidence vault documents store SHA-256 digests in MongoDB to prevent file substitution during technical scrutiny.
-4. Data Privacy: Fully compliant with the Digital Personal Data Protection (DPDP) Act 2023, offering 1-click sovereign data exports via the user profile console.
+* ✅ **Proprietary IP Shielding:** Proposals and architectural schematics are protected under double-blind protocols; evaluators only see anonymized dossiers (`ANON-VENTURE-XXXX`).
+* ✅ **Zero In-Memory File Buffering:** Direct S3 presigned streaming eliminates file caching on intermediate servers, ensuring proprietary blueprints stream directly to encrypted cloud vaults.
+* ✅ **Multi-Tenant Boundary Enforcement:** Organization data is strictly sandboxed; competitor startups cannot inspect or query submitted applications.
+* ✅ **Tamper-Evident SHA-256 Evidence Records:** Submitted files cannot be altered or substituted post-submission; any discrepancy between stored and calculated hashes triggers an automated security alert.

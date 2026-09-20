@@ -1,271 +1,449 @@
-# Pragati-GovX
+<div align="left">
+  <img src="client/src/assets/logo.png" alt="Pragati-GovX Logo" width="150" style="margin-bottom: 12px;" />
+  <h1>Pragati-GovX</h1>
+  <p><strong>Sovereign Innovation Sandbox & Agile Public Procurement Gateway</strong></p>
+</div>
 
-## Sovereign Innovation Sandbox & Agile Public Procurement Gateway
+---
 
-### Smart India Hackathon 2026 (SIH 2026)
+## 📌 Problem Statement (Official from SIH 2026)
+
+* **Competition:** Smart India Hackathon 2026 (SIH 2026)
 * **Problem Statement ID:** PS 26136 (PS:136)
+* **Problem Statement Title:** *Platform for Government Departments to Procure Innovative Solutions from Startups via Controlled Trials, Regulatory Sandboxes, and Milestone-Based Contracting*
 * **Nodal Authority:** Government of Maharashtra — Department of Skills, Employment, Entrepreneurship & Innovation / Maharashtra State Innovation Society (MSInS)
-* **Problem Statement Title:** Platform for Government Departments to Procure Innovative Solutions from Startups via Controlled Trials, Regulatory Sandboxes, and Milestone-Based Contracting
+* **Theme:** Smart Governance, Public Procurement & Deep-Tech Startup Enablement
+* **Statutory Frameworks:** 
+  * Rule 173(i) of General Financial Rules (GFR) 2017
+  * Maharashtra State Innovative Startup Policy 2024 (GR No. MAT-2024/CR-88/Ind-7)
+  * Section 15 of Micro, Small and Medium Enterprises Development (MSMED) Act 2006
+  * Government e-Marketplace (GeM) Special Procurement Gateway
 
 ---
 
-## 1. Executive Summary
+## 🚨 Problem Before This Project
 
-Public procurement in India has historically operated under rigid General Financial Rules (GFR) requiring multi-crore prior annual turnover (typically 5 Cr to 50 Cr INR) and a minimum of three years of past government execution experience. These criteria systematically disqualify early-stage and deep-tech startups, forcing government departments to rely on legacy system integrators with outdated technological capabilities.
+Public procurement across state and central government bodies in India has long been paralyzed by legacy administrative and financial constraints. These structural bottlenecks created a formidable "procurement barrier" that systematically excluded startups:
 
-**Pragati-GovX** solves this structural failure. It operationalizes **GFR Rule 173(i)** and the **Maharashtra State Innovative Startup Policy**, establishing an outcome-driven procurement gateway where DPIIT-recognized startups compete on engineering merit, quantifiable outcome benchmarks, and supervised field trial performance rather than balance sheet history.
+### 1. The GFR Turnover & Prior Experience Catch-22
+Standard public tenders mandatorily impose stringent qualification criteria:
+* Minimum **₹5 Crore to ₹50 Crore+** prior annual audited turnover over three consecutive fiscal years.
+* Minimum **3 to 5 years** of documented past government execution experience.
 
-The platform provides an end-to-end statutory bridge: from departmental problem formulation and explainable AI candidate discovery, through double-blind technical evaluation and multi-model AI anti-cascade audits, to 90-day field sandbox trials governed by a statutory 30-day payment SLA under the MSMED Act 2006, culminating in commercial procurement onboarding on the Government e-Marketplace (GeM) across all 36 Maharashtra districts.
+Early-stage and deep-tech startups—despite having cutting-edge technological solutions (e.g., IoT acoustic pipeline leak detectors, edge AI traffic controllers, drone agricultural imaging)—do not possess years of audited balance sheets. Consequently, they are disqualified at the preliminary technical scrutiny stage before their engineering merit is ever assessed.
 
----
+### 2. Preference for Balance Sheets Over Engineering Innovation
+Tender evaluation frameworks historically favored entrenched, large-scale System Integrators (SIs). These legacy vendors often subcontract work, supply outdated off-the-shelf software, and lack domain-specific innovation. Government departments remained locked into multi-year contracts with obsolete technological infrastructure.
 
-## 2. Key Features
+### 3. Bureaucratic Risk Aversion & Fear of Vigilance Inquiries
+Departmental nodal officers, municipal commissioners, and mission directors operate under strict oversight from the Comptroller & Auditor General (CAG) and State Vigilance Commissions. Procuring from an unproven startup without a standard tender was perceived as high-risk corruption or negligence. Without a legally recognized "safe-harbor" or finite-risk testing sandbox, officers naturally defaulted to familiar, non-innovative legacy vendors.
 
-The platform provides a comprehensive suite of tools organized by user role, built with clear, simple, and transparent workflows:
+### 4. Crippling Financial Burdens (EMD & Bank Guarantees)
+Startups were required to lock up substantial working capital in:
+* **2% – 5% Earnest Money Deposits (EMD)** upon tender submission.
+* **5% – 10% Performance Bank Guarantees (PBG)** held for multi-year warranty periods.
 
-### For Startups & Innovators
-* **Exemption from Turnover & EMD:** Automatic waiver of prior turnover requirements, past government experience clauses, and Earnest Money Deposits under GFR Rule 173(i) upon entering a valid DPIIT recognition number.
-* **Instant Eligibility Pre-Check:** Test challenge eligibility before applying with a single click, verifying sector match, applicant type, and active application windows.
-* **Startup Passport:** A single, reusable profile containing verified DPIIT credentials, Technology Readiness Level (TRL 3 to 9), sector tags, patent filings, and team qualifications.
-* **Structured 4-Step Proposal Wizard:** Simple step-by-step submission builder focusing on technical architecture, quantitative outcome targets, and milestone plans rather than complex tender paperwork.
-* **Cryptographic Evidence Vault:** Upload documents, schematics, and test datasets up to 25 MB directly to a secure S3 cloud bucket with in-browser SHA-256 integrity checksums that prevent file tampering.
-* **Transparent Lifecycle Tracker:** Track proposal progress in real time across a 7-stage state machine (Draft, Submitted, Under Review, Clarification, Accepted, Pilot Active, Scaled) with timestamped transition records.
-* **Statutory 30-Day Payment SLA Protection:** Milestone payments for field trials are legally protected under Section 15 of the MSMED Act 2006, backed by a live countdown clock tracking disbursement deadlines.
+For bootstrapped or seed-funded ventures, locking up lakhs of rupees in bank collateral severely throttles day-to-day R&D and operational runway.
 
-### For Government Departments & Municipal Bodies
-* **Challenge Authoring Studio:** Guided 5-step tool for nodal officers to formulate civic challenges with measurable baseline metrics, target outcome KPIs, district targets, and milestone budgets.
-* **Real-Time Challenge Readiness Meter:** A 0-to-100 quality indicator that ensures all mandatory statutory terms, TRL thresholds, and evaluation criteria are defined before publishing.
-* **Explainable AI Candidate Matching:** Automatically identifies and ranks capable startups against open challenges using a transparent 4-pillar score (Sector 35%, Capability 35%, Maturity 15%, DPIIT Status 15%) with detailed point-wise explanations.
-* **Department Command Center:** Executive dashboard providing visual analytics across published challenges, candidate applications, active field trials, and sector distributions.
-* **Finite-Risk Pilot Governance (Pilot Canvas):** Manage 90-day sandbox trials with a structured 30% / 40% / 30% milestone compact, reviewing live telemetry and S3 deliverables before releasing funds.
-* **Scale Gate Console & Official Sanction Orders:** Evaluate completed pilots across 5 pillars (KPI achievement, robustness, security, economics, readiness), aggregate budgets across all 36 Maharashtra districts, and generate printable Government Sanction Orders (GR-MSInS/2026/...) for direct onboarding to the Government e-Marketplace (GeM).
+### 5. Lethal Milestone Payment Delays (6 to 18 Months)
+Even when a startup was engaged for an ad-hoc trial, bureaucratic payment processing across departmental finance desks routinely took 6 to 18 months. Because early-stage startups operate on lean cash flows, delayed milestone payments frequently pushed innovative ventures into payroll insolvency and shutdown.
 
-### For Technical Evaluators
-* **Double-Blind Evaluation Room:** Evaluates submissions stripped of company names, founder identities, and commercial branding (`ANON-VENTURE-XXXX`), eliminating brand favoritism and unconscious bias.
-* **Mandatory Conflict-of-Interest (COI) Gate:** Statutory legal declaration required before scoring unlocks, with a 1-click recusal mechanism if any personal or financial connection exists.
-* **Calibrated 4-Pillar Scoring Rubric:** Responsive scoring sliders evaluating Problem-Solution Fit (30 pts), Innovation & TRL (25 pts), Feasibility & Team (25 pts), and Measurable Outcome Impact (20 pts) with mandatory qualitative feedback.
-* **Live 3-Model AI Anti-Cascade Audit:** One-click automated cross-verification that runs Gemini 3.6 Flash, Groq, and OpenRouter in sequence to verify technical claims against attached documents without replacing human decision-making.
-* **Cryptographically Sealed Scorecards:** Evaluator scorecards are immutably locked upon submission with audit trace IDs to prevent retrospective alterations.
+### 6. Subjective, Opaque, and Biased Evaluations
+Traditional evaluation panels lacked anonymization. Evaluators evaluated submissions with full knowledge of corporate identities, founder credentials, and commercial branding. This enabled unconscious brand bias, political lobbying, and vendor favoritism. Furthermore, evaluation panels had no automated tools to cross-verify technical claims against submitted engineering evidence.
 
-### Platform-Wide Governance & Transparency
-* **Interactive 36-District GIS Map:** Visual cluster map of open innovation challenges geocoded across every administrative division of Maharashtra.
-* **In-Memory Dual-Token Security:** High-security session model where access tokens remain in memory (never written to localStorage) and automatically rotate via secure httpOnly cookies.
-* **Perspective-Based About Guide:** Complete interactive manual with dedicated top-right role selectors that explain how the website operates from Startup, Government, and Validator perspectives.
-* **Immutable Forensic Audit Trail:** Every status update, scoring decision, and payment event is permanently logged with SHA-256 integrity hashes for public accountability and vigilance audits.
+### 7. The "Pilot-to-Procurement Valley of Death"
+In the rare cases where a department conducted a successful proof-of-concept (PoC), there was no statutory mechanism to transition that successful pilot into a scalable procurement contract. Departments were legally mandated to float a brand-new open tender, forcing the startup to compete against legacy bidders and often losing the contract to lower-cost, inferior clones.
 
 ---
 
-## 3. Technology Stack
+## 💡 Our Solution: Closing the Gap Between Govt of Maharashtra & Startups
 
-### Frontend Application (`client/`)
-* **Core Framework:** React 18 (Vite SPA toolchain, native ES modules)
-* **Component Architecture:** shadcn/ui built on Radix UI headless accessible primitives (Dialog, DropdownMenu, Select, Tabs, Tooltip, Sheet, Separator)
-* **Styling & Design System:** Tailwind CSS with CSS custom variables, civic-tech color palette, high-contrast typography, and strict zero-badge metadata tags
-* **Server State & Cache:** TanStack React Query v5 (declarative cache management, background invalidation, optimistic updates)
-* **Forms & Validation:** React Hook Form integrated with Zod schema validation
-* **Data Visualization:** Recharts (SVG-based evaluation radar charts, sector distribution bar charts, milestone KPI comparisons)
-* **Geographic Information Systems (GIS):** Leaflet & React-Leaflet (geocoded problem statement clusters and district coverage maps)
-* **Micro-Animations:** Framer Motion (page transitions and multi-step authoring wizards)
-* **Notification System:** Sonner (stacked toast notifications with non-overlapping header offsets)
-* **HTTP Client:** Axios with bidirectional interceptors (automatic in-memory JWT injection and silent token refresh rotation)
+**Pragati-GovX** eliminates this structural chasm by establishing a sovereign, outcome-driven innovation gateway. It legally and operationally bridges Maharashtra's 36 administrative districts with verified startups through five core pillars:
 
-### Backend Services (`server/`)
-* **Runtime & Architecture:** Node.js (v20+, native ES Modules `"type": "module"`), Express.js RESTful API
-* **Database & ODM:** MongoDB with Mongoose (schema validation, compound indices, transactional references)
-* **Asynchronous Task Queue & Distributed Caching:** Redis & BullMQ (message broker and distributed job queue orchestration for background multi-model AI verification jobs, statutory 30-day SLA countdown monitors, automated email dispatch, and geocoded query acceleration)
-* **Authentication & Cryptography:** Argon2 / Bcrypt password hashing, JSON Web Tokens (JWT), Web Crypto API SHA-256 checksums, Passport.js (Google OAuth 2.0 integration)
-* **Security & Hardening:** Helmet (HTTP security headers), Express Rate Limit (DDoS mitigation), CORS origin whitelisting, input sanitization middleware
-* **Logging & Tracing:** Morgan HTTP logger, UUID v4 request trace ID injection (`x-trace-id`) across every request envelope
+<p align="center">
+  <img src="Public/readme-flow.png" alt="Pragati-GovX Platform Flow" width="100%" />
+</p>
 
-### Cloud Storage & S3 Evidence Vault
-* **Storage Protocol:** AWS S3-compatible protocol via `@aws-sdk/client-s3` and `@aws-sdk/s3-request-presigner`
-* **Cloud Provider:** Supabase Storage (zero-cost cloud bucket `SIH2026136-vault` in region `ap-southeast-1`)
-* **Presigned Upload Pipeline:** Browser calculates SHA-256 hash in client memory, requests upload intent, and streams binary files directly to the S3 bucket via presigned PUT URLs, preventing Express server memory exhaustion
-* **Supported MIME Types:** PDF, CSV, JSON, PNG, JPEG, WEBP, ZIP, DOC, DOCX (up to 25 MB)
+### 1. Statutory Exemption Engine (GFR Rule 173(i) & MH Startup Policy)
+* Seamlessly operationalizes **GFR Rule 173(i)** and the **Maharashtra State Innovative Startup Policy 2024**.
+* Entering a verified DPIIT recognition number automatically triggers a **100% waiver of prior turnover, prior experience, and EMD requirements**.
+* Verified startups can apply with zero balance-sheet prerequisites, competing purely on technical capability and quantifiable outcomes.
 
-### AI Advisory & Governance Pipeline
-* **Model Standard:** Google GenAI SDK (`gemini-3.6-flash`)
-* **Multi-Model Anti-Cascade Chain:** Google Gemini 3.6 Flash (Layer 1: Generator) -> Groq LLaMA-3.3 70B (Layer 2: Independent Verifier) -> OpenRouter / Ollama Fallback (Layer 3: Arbiter)
-* **Governance Enforcement:** Strict zero-price allowlist (`ai.policy.js`) blocking unauthorized paid models with HTTP 403, Bearer token redaction, and prompt length limits (30,000 characters)
+### 2. Outcome-Driven Challenge Formulation
+* Instead of prescribing rigid, outdated technical specifications, departmental nodal officers utilize the **Challenge Studio** to specify civic challenges via quantifiable benchmarks (e.g., *Baseline: 38.5% water loss → Target: <14% loss across 12km trial zone within 90 days*).
+* Challenges are tagged by administrative department, district target zones, and allocated pilot grant corpus.
 
-### Testing & Quality Assurance
-* **Test Runner:** Vitest (native ESM in-memory test runner)
-* **Test Coverage:** 5 dedicated test suites with 43 automated unit tests in `test/`
-* **CI/CD Integration:** GitHub Actions (`.github/workflows/ci.yml`) automatically running backend integrity checks, Vitest test suites, and frontend production builds on every push and pull request
+### 3. Explainable AI Candidate Discovery
+* Department officers can instantly discover matching startups from Maharashtra’s innovation ecosystem using a transparent 4-pillar matching algorithm:
+  * **Sector Alignment (35%)**
+  * **Core Technical Capability (35%)**
+  * **Technology Readiness Level / TRL (15%)**
+  * **DPIIT Sovereign Recognition (15%)**
+* Provides natural language rationale for why each startup fits the challenge, democratizing opportunities for startups from Tier-2 and Tier-3 hubs (Nashik, Nagpur, Aurangabad, Kolhapur, Solapur).
 
----
+### 4. Double-Blind Meritocratic Evaluation & Conflict-of-Interest (COI) Gate
+* All proposals are automatically scrubbed of company names, founder identities, and commercial branding, assigned a synthetic identifier (`ANON-VENTURE-XXXX`).
+* Evaluators must sign a legally binding statutory **Conflict-of-Interest (COI) Undertaking** before scores can be unlocked.
+* Scoring follows a calibrated 4-pillar rubric (100 pts) evaluating Problem-Solution Fit, Architecture & TRL, Feasibility & Constraints, and Measurable Outcome Impact.
 
-## 4. System Architecture & The 6-Stage Innovation Lifecycle
+### 5. Multi-Model AI Anti-Cascade Consensus Verification
+* Employs an automated, independent 3-model verification cascade:
+  * **Layer 1 (Analysis):** Google Gemini 3.6 Flash
+  * **Layer 2 (Cross-Audit):** Groq LLaMA-3.3 70B
+  * **Layer 3 (Arbiter):** OpenRouter Fallback
+* Scrutinizes technical proposals against attached engineering schematics and test logs to detect hallucinations, inflated claims, and architectural gaps, generating an explainable audit report that advises human evaluators without replacing human authority.
 
-```
-Stage 1: Challenge Studio (Government)
-   - Baseline vs Target KPIs formulated
-   - 36 Maharashtra districts selected
-   - GFR Rule 173(i) exemption terms defined
-          │
-          ▼
-Stage 2: Discovery & Deterministic Pre-Check (Startup)
-   - Startups browse geocoded catalog
-   - Instant DPIIT recognition validation
-   - 100% EMD waiver applied
-          │
-          ▼
-Stage 3: Evidence Submission & S3 Vault
-   - 4-step proposal authoring wizard
-   - In-browser SHA-256 checksum computation
-   - Direct S3 presigned upload
-          │
-          ▼
-Stage 4: Double-Blind Evaluation (Validator)
-   - Entity masked to ANON-VENTURE-XXXX
-   - Mandatory statutory Conflict-of-Interest (COI) gate
-   - 4-pillar weighted rubric scoring (0-100)
-          │
-          ▼
-Stage 5: Live Multi-Model AI Consensus Audit
-   - Gemini 3.6 Flash -> Groq -> OpenRouter
-   - Independent claim-evidence verification
-   - Advisory report generated (human authority preserved)
-          │
-          ▼
-Stage 6: Sandbox Field Pilot & 30-Day SLA Payment (Execution & Scale)
-   - 90-day sandbox pilot on Pilot Canvas
-   - 30% / 40% / 30% milestone compact
-   - MSMED Act Section 15 statutory 30-day payment countdown
-   - Scale Gate Console generates 36-district GeM Sanction Order
-```
+### 6. Finite-Risk 90-Day Regulatory Sandboxes (Pilot Canvas)
+* Transforms subjective pilots into controlled, legally protected field trials with air-gapped data boundaries.
+* Contracts are structured around a transparent milestone schedule:
+  * **Phase 1 (Inception & Deployment):** 30% disbursement
+  * **Phase 2 (Operational Telemetry & Mid-Term Review):** 40% disbursement
+  * **Phase 3 (Final KPI Verification & Audit):** 30% disbursement
+* Officers review live sensor telemetry and cryptographic S3 deliverables directly on the **Pilot Canvas** before clearing milestone approvals.
+
+### 7. Sovereign Escrow & Statutory 30-Day Payment SLA Protection
+* Resolves startup liquidity starvation by integrating a **Sovereign Treasury Escrow Engine**.
+* Milestone grant funds are pre-committed to escrow upon pilot sanction.
+* Governed under **Section 15 of the MSMED Act 2006** and Maharashtra government regulations, enforcing a statutory **30-day payment SLA** backed by an automated countdown timer that penalizes unwarranted bureaucratic delays.
+
+### 8. Direct Commercial Onboarding via Scale Gate Console
+* Solves the "pilot-to-procurement" bottleneck.
+* Completed pilots undergo a 5-pillar Scale Gate audit (KPI achievement, technical robustness, data security, economic viability, organizational readiness).
+* Upon approval, the platform auto-generates an official **Government Sanction Order (`GR-MSInS/2026/...`)** aggregating budgets across all 36 Maharashtra districts for direct listing and procurement via the **Government e-Marketplace (GeM)** Special Innovation Window.
 
 ---
 
-## 5. Role-Based Authorization & Workspaces
+## ⚖️ Legal Terms & Statutory Framework Lexicon
 
-The platform enforces strict role boundaries across four primary user personas:
+Pragati-GovX operates strictly within the Indian administrative law and statutory public procurement jurisprudence. The platform encodes the following core legal instruments and statutory terms directly into its database schemas, route guards, and state transition engines:
 
-| User Role | Workspace Path | Primary Responsibilities & Permissions |
+| Legal Term / Statutory Instrument | Statutory Authority / Act | Legal Definition & Implementation in Pragati-GovX |
 |---|---|---|
-| `STARTUP_USER` | `/startup/dashboard` | Manage Startup Passport; browse challenges; run deterministic pre-checks; author technical proposals; upload SHA-256 verified evidence; track 7-stage submission lifecycles; submit sandbox milestone deliverables; monitor 30-day SLA payment disbursements. |
-| `GOVERNMENT_USER` | `/government/dashboard` | Access Department Command Center; author problem statements in Challenge Studio; set baseline vs target KPIs; run Explainable AI candidate matching; assign anonymized submissions to evaluators; govern field trials in Pilot Canvas; inspect telemetry; issue 36-district Sanction Orders (`GR-MSInS/2026/...`). |
-| `EVALUATOR` | `/evaluator/queue` | Access assigned evaluation queue; complete mandatory statutory Conflict-of-Interest (COI) legal recusal gate; conduct double-blind scoring on 4-pillar rubrics (100 pts); run live multi-model AI anti-cascade verification; seal immutable scorecards with audit trace IDs. |
-| `ADMIN` | `/admin/audit` | Oversee cross-departmental operations; inspect system-wide forensic audit logs; verify SHA-256 state transition integrity; manage user organizations; resolve system-level escalation flags. |
+| **GFR Rule 173(i)** | *General Financial Rules 2017, Ministry of Finance* | Authorizes government procuring entities to **relax conditions of prior annual turnover and prior operating experience** for DPIIT-recognized startups, provided they meet quality and technical specifications. Embedded directly into the eligibility rule engine to bypass legacy balance-sheet gates. |
+| **Maharashtra Startup Policy 2024** | *GR No. MAT-2024/CR-88/Ind-7, Govt of Maharashtra* | State Government Resolution empowering Maharashtra departments, municipal corporations, and autonomous statutory boards to issue direct sandbox work orders (up to ₹25–₹50 Lakhs) for experimental field trials without floating open tenders. |
+| **EMD Waiver (Earnest Money Deposit)** | *GFR Rule 170(i) & MoF OM F.20/2/2014-PPD(Pt.)* | Bid Security / EMD (typically 2% to 5% of tender value) is **100% exempted** for verified startups. Pragati-GovX automatically injects this exemption upon DPIIT number verification, unlocking zero-cost application rights. |
+| **Performance Bank Guarantee (PBG) Waiver** | *Ministry of Finance Procurement Guidelines* | Performance security held as fixed deposit/bank collateral (typically 5%–10% of contract value). Under Pragati-GovX, traditional PBGs are waived and replaced with sovereign milestone escrow tranche retention, protecting startup operational liquidity. |
+| **Section 15, MSMED Act 2006** | *Micro, Small & Medium Enterprises Development Act* | Mandates that public buyers shall make payments to suppliers **on or before the agreed date, not exceeding 45 days**. Pragati-GovX enforces a strict **30-day statutory payment SLA** backed by automated BullMQ cron alerts to the Directorate of Industries. |
+| **Section 16 Penal Interest Mandate** | *MSMED Act 2006, Section 16* | Prescribes that buyers failing to disburse milestone payments within the statutory SLA are liable to pay **compound interest with monthly rests at 3x the Bank Rate** notified by the Reserve Bank of India (RBI). |
+| **Regulatory Sandbox ("Safe-Harbor")** | *Administrative Procurement Doctrine* | A legally bounded, controlled operational environment with air-gapped data boundaries and defined trial zones. Protects departmental nodal officers under statutory **"Safe-Harbor" indemnity** against vigilance inquiries (CVC/CAG) while testing unproven technologies. |
+| **Tripartite Pilot Compact** | *Indian Contract Act 1872 & GFR 2017* | A legally binding agreement executed between the State Department/Municipal Body, the verified Startup Entity, and the Maharashtra State Innovation Society (MSInS), codifying quantitative KPIs, milestone tranches (30%-40%-30%), IP rights, and exit criteria. |
+| **Administrative Financial Sanction (AFS)** | *Maharashtra Budget Manual & Treasury Rules* | The official statutory sanction issued by the competent departmental finance desk authorizing the legal reservation of public funds and deposit into the Sovereign Treasury Escrow before trial mobilization. |
+| **Double-Blind Review (*Nemo Judex*)** | *Principles of Natural Justice & Administrative Law* | Legal doctrine mandating total impartiality in state decision-making. Evaluators review synthetic masked dossiers (`ANON-VENTURE-XXXX`) without access to company branding, founder identities, or GSTINs. |
+| **Statutory COI Recusal Gate** | *Central Vigilance Commission (CVC) Guidelines* | Mandates that every evaluator sign an affirmative **Conflict-of-Interest (COI) Undertaking** under penalty of administrative de-registration. Any familial, financial, or consulting relationship triggers immediate statutory recusal (`ASSIGNMENT_STATUS.RECUSED`). |
+| **Electronic Evidence Certification** | *Section 65B, Indian Evidence Act 1872 / BSA 2023* | Legal standard governing the admissibility of electronic records in judicial and administrative scrutiny. All schematics, sensor telemetry logs, and test data are stamped with client-side **SHA-256 cryptographic digests** ensuring tamper-proof evidentiary standing. |
+| **State Data Localization Mandate** | *Digital Personal Data Protection (DPDP) Act 2023* | Statutory framework ensuring all sensitive municipal telemetry, citizen data, and proprietary intellectual property reside exclusively within sovereign Indian data centers (Maharashtra SDC / MeitY-empanelled cloud), strictly barring cross-border transit. |
+| **Scale Gate to GeM Gateway** | *GFR 2017 Rule 149 & GeM Special Innovation Window* | A statutory procurement mechanism transitioning successful 90-day sandbox pilots directly onto the **Government e-Marketplace (GeM)** catalog for state-wide public procurement, eliminating the requirement to float a new open tender. |
+| **DPIIT Sovereign Recognition** | *Gazette Notification G.S.R. 127(E), DPIIT* | Official certificate issued by the Department for Promotion of Industry and Internal Trade, legally conferring "Startup" status for up to 10 years from incorporation with turnover under ₹100 Crore. |
 
 ---
 
-## 6. Security, Session & Data Governance Architecture
+## Tri-Persona Authentication & Role Governance (The 3 Auth Models)
 
-### Dual-Token Lifecycle (XSS & CSRF Defense)
-1. **Access Token (15-Minute Expiry):** Kept strictly in JavaScript memory closure. Never persisted in `localStorage` or `sessionStorage` to eliminate Cross-Site Scripting (XSS) extraction risks.
-2. **Refresh Token (7-Day Expiry):** Transmitted in an `httpOnly`, `secure`, `sameSite=strict` cookie.
-3. **Silent Token Rotation:** Upon receiving an HTTP 401 Unauthorized status, the Axios response interceptor intercepts the failure, queries `GET /v1/auth/refresh-token` using the secure cookie, updates the in-memory access token, and transparently replays the queued request without disrupting the user.
+Pragati-GovX implements a strictly segregated, role-scoped security architecture tailored to the three statutory stakeholders of public procurement under General Financial Rules (GFR):
 
-### Double-Blind Anonymization
-All candidate submissions are stripped of corporate trademarks, founder identities, and commercial branding upon submission. Reviewers and evaluation committees interact solely with synthetic sovereign codes (e.g. `ANON-VENTURE-4981`), ensuring complete insulation against vendor favoritism, political lobbying, or brand bias.
+```
+┌─────────────────────────────────────────────────────────────────────────────────────────────┐
+│                                   THE 3 AUTH STAKEHOLDER PERSONAS                           │
+├───────────────────────────────┬───────────────────────────────┬─────────────────────────────┤
+│  1. STARTUP / INNOVATOR AUTH  │  2. GOVERNMENT NODAL AUTH     │  3. TECHNICAL VALIDATOR AUTH│
+│  (STARTUP_USER)               │  (GOVERNMENT_USER)            │  (EVALUATOR)                │
+│  • DPIIT Sovereign Validation │  • Ministry & Municipal SSO   │  • Statutory COI Recusal    │
+│  • 100% Turnover / EMD Waiver │  • Challenge Studio & KPIs    │  • Air-Gapped Double-Blind  │
+│  • S3 Evidence Vault & SLA    │  • 90-Day Pilot Canvas & GeM  │  • 3-Model AI Anti-Cascade  │
+└───────────────────────────────┴───────────────────────────────┴─────────────────────────────┘
+```
 
-### Mandatory Conflict-of-Interest (COI) Charter
-Before an evaluator can view any technical dossier or input scores, they must complete a legal declaration affirming zero financial, equity, advisory, or familial connection to any participating party. A single-click recusal mechanism immediately reallocates the submission to an alternate evaluator without administrative penalty.
-
-### Cryptographic Evidence Integrity
-Every technical document, sensor log, and audit artifact uploaded by a startup undergoes Web Cryptography SHA-256 calculation inside the client browser. The resulting digest is stored immutably in the database before the binary file streams to the S3 bucket. Any subsequent modification or substitution immediately invalidates the cryptographic checksum.
+### 1. Startup / Innovator Authentication (`STARTUP_USER`)
+* **Target Users:** DPIIT-recognized startup founders, deep-tech researchers, and MSME entrepreneurs.
+* **Onboarding & Verification Gate:**
+  * Validates official DPIIT registration credentials in real-time, verifying certificate active status, incorporation date (<10 years), and legal entity type (Pvt Ltd, LLP, Partnership).
+  * Automatically applies **GFR Rule 173(i) and Maharashtra Startup Policy exemptions**, waiving prior turnover balance sheets and Earnest Money Deposit (EMD) requirements.
+* **Role-Scoped Workspace (`/startup/*`):**
+  * **Startup Passport:** A single, reusable cryptographic profile containing verified DPIIT status, Technology Readiness Level (TRL 3 to 9), sector tags, patent filings, and team qualifications.
+  * **Structured Proposal Builder:** 4-step wizard capturing technical architecture, quantitative outcome targets, and milestone plans without tender paperwork.
+  * **Cryptographic Evidence Vault:** Direct binary upload of schematics, test logs, and whitepapers up to 25 MB directly to Supabase S3 via presigned URLs with in-browser SHA-256 integrity checksums.
+  * **Lifecycle & SLA Payment Monitor:** Real-time visibility into the 7-stage finite state machine (Draft, Submitted, Under Review, Clarification, Accepted, Pilot Active, Scaled) with statutory 30-day payment countdown timers under Section 15 of the MSMED Act 2006.
 
 ---
 
-## 7. Statutory Compliance & Legal Backing
-
-1. **General Financial Rules (GFR) Rule 173(i):** Provides statutory authority for state procuring entities to waive conditions of prior turnover and prior experience for recognized startups, provided technical specifications are met.
-2. **Micro, Small and Medium Enterprises Development (MSMED) Act 2006 (Section 15):** Enforces mandatory milestone payment within 45 days (implemented as 30 days under Maharashtra GR No. MAT-2024/CR-88/Ind-7). The system calculates statutory interest liability if deadlines lapse.
-3. **Maharashtra State Innovative Startup Policy 2024:** Authorizes departmental trial pilots up to 15 Lakh INR without standard tendering and allows direct procurement transition up to 1 Crore INR upon successful pilot audit.
-4. **Digital Personal Data Protection (DPDP) Act 2023:** Role-scoped access control ensures commercial IP, technical schematics, and personal identifying data remain segregated and encrypted.
+### 2. Government Department Nodal Authentication (`GOVERNMENT_USER`)
+* **Target Users:** Departmental nodal officers, municipal corporation commissioners, mission directors, and public procurement authorities across all 36 Maharashtra districts.
+* **Onboarding & Verification Gate:**
+  * Authenticates authorized departmental officers via official government domain identity or Google Workspace SSO.
+  * Scoped strictly to the officer's affiliated state ministry, directorate, or urban local body (ULB).
+* **Role-Scoped Workspace (`/government/*`):**
+  * **Challenge Authoring Studio:** Formulates outcome-driven civic problem statements with measurable baseline vs target KPIs, allocated pilot grants, and district zones.
+  * **Readiness Quality Meter:** A 0-to-100 statutory quality indicator ensuring mandatory terms, rubric weights, and TRL thresholds are fully defined before publishing.
+  * **Explainable AI Candidate Matching:** Discovers and ranks capable Maharashtra startups using a transparent 4-pillar algorithm (Sector 35%, Technical Capability 35%, Maturity 15%, DPIIT Status 15%) with point-wise rationale.
+  * **Pilot Canvas Governance:** Oversees 90-day sandbox trials with structured 30% / 40% / 30% milestone tranches, reviewing live sensor telemetry and deliverables before releasing escrow funds.
+  * **Scale Gate Console:** Audits completed pilots across 5 pillars (KPIs, robustness, security, economics, readiness) and auto-generates official Government Sanction Orders (`GR-MSInS/2026/...`) for direct onboarding onto the Government e-Marketplace (GeM).
 
 ---
 
-## 8. Directory Structure
+### 3. Technical Evaluator / Validator Authentication (`EVALUATOR`)
+* **Target Users:** Accredited domain experts, IIT/NIT academicians, technical directors, and sovereign evaluation committee members.
+* **Onboarding & Verification Gate:**
+  * Vetted by state procurement committees and allocated anonymously to proposal evaluation queues.
+  * **Mandatory Conflict-of-Interest (COI) Legal Recusal Gate:** Before accessing any submission dossier, the evaluator must digitally sign a statutory undertaking affirming zero financial, advisory, equity, or familial interest. Includes a 1-click legal recusal mechanism that reassigns the dossier without administrative penalty.
+* **Role-Scoped Workspace (`/evaluator/*`):**
+  * **Air-Gapped Double-Blind Evaluation Queue:** Dossiers are completely scrubbed of corporate logos, venture names, and founder identities, presented under synthetic sovereign IDs (`ANON-VENTURE-XXXX`) to eliminate brand bias and vendor favoritism.
+  * **Calibrated 4-Pillar Scoring Rubric:** Responsive scoring sliders evaluating Problem-Solution Fit (30 pts), Architecture & TRL (25 pts), Feasibility & Team (25 pts), and Measurable Outcome Impact (20 pts) with mandatory qualitative critique.
+  * **3-Model AI Anti-Cascade Consensus Verification:** Triggers a live, independent multi-model audit chain (Gemini 3.6 Flash → Groq LLaMA-3.3 70B → OpenRouter Arbiter) that scrutinizes proposal claims against attached engineering schematics to detect technical discrepancies without overriding human evaluator authority.
+  * **Cryptographically Sealed Scorecards:** Evaluator scorecards are immutably locked upon submission with audit trace IDs to prevent retrospective tampering.
+
+---
+
+### Dual-Token Security & Session Architecture
+All three authentication personas are guarded by an enterprise defense-in-depth security model:
+1. **In-Memory Access Token (15-Minute Expiry):** Kept strictly in JavaScript memory closure. Never persisted in `localStorage` or `sessionStorage`, completely neutralizing Cross-Site Scripting (XSS) credential theft.
+2. **HttpOnly Secure Refresh Cookie (7-Day Expiry):** Transmitted with `SameSite=Strict`, `Secure`, and `HttpOnly` flags, immunizing the platform against Cross-Site Request Forgery (CSRF).
+3. **Transparent Silent Token Rotation:** Upon token expiry (HTTP 401), the Axios response interceptor silently requests `GET /v1/auth/refresh-token` using the secure cookie, updates the in-memory access token, and transparently replays queued requests without disrupting user workflow.
+4. **Statutory Role-Based Access Control (RBAC):** Every API endpoint is guarded by Express middleware (`authenticate`, `requireRole`, and `requirePermission`) preventing horizontal or vertical privilege escalation.
+
+---
+
+## Tech Approach
+
+<table align="center" width="100%">
+  <thead>
+    <tr>
+      <th align="center" width="80">Logo</th>
+      <th align="left" width="180">Technology</th>
+      <th align="left" width="160">Category</th>
+      <th align="left">Role & Implementation in Pragati-GovX</th>
+    </tr>
+  </thead>
+  <tbody>
+    <!-- Frontend -->
+    <tr>
+      <td align="center">
+        <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/react/react-original.svg" alt="React" width="36" />
+      </td>
+      <td><strong>React 18</strong></td>
+      <td>Frontend Framework</td>
+      <td>Component-based SPA architecture with hooks, suspense, and role-based route boundaries.</td>
+    </tr>
+    <tr>
+      <td align="center">
+        <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/vitejs/vitejs-original.svg" alt="Vite" width="36" />
+      </td>
+      <td><strong>Vite</strong></td>
+      <td>Build Tool & Bundler</td>
+      <td>Next-generation frontend tooling offering fast HMR, optimized rollups, and tree-shaking.</td>
+    </tr>
+    <tr>
+      <td align="center">
+        <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/tailwindcss/tailwindcss-original.svg" alt="Tailwind CSS" width="36" />
+      </td>
+      <td><strong>Tailwind CSS</strong></td>
+      <td>UI Styling System</td>
+      <td>Utility-first responsive styling with custom civic-tech tokens, HSL palettes, and animations.</td>
+    </tr>
+    <tr>
+      <td align="center">
+        <img src="https://avatars.githubusercontent.com/u/75042455?s=200&v=4" alt="Radix UI" width="36" />
+      </td>
+      <td><strong>Radix UI / shadcn</strong></td>
+      <td>Accessible Components</td>
+      <td>Unstyled, WAI-ARIA compliant accessible UI primitives (Dialogs, Dropdowns, Tabs, Sheets, Sliders).</td>
+    </tr>
+    <tr>
+      <td align="center">
+        <img src="https://raw.githubusercontent.com/TanStack/query/main/media/repo-header.png" onerror="this.onerror=null;this.src='https://cdn.jsdelivr.net/gh/devicons/devicon/icons/react/react-original.svg';" alt="TanStack Query" width="36" />
+      </td>
+      <td><strong>TanStack Query v5</strong></td>
+      <td>State & Cache Engine</td>
+      <td>Declarative server-state caching, optimistic mutations, background invalidation, and polling.</td>
+    </tr>
+    <!-- Backend -->
+    <tr>
+      <td align="center">
+        <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/nodejs/nodejs-original.svg" alt="Node.js" width="36" />
+      </td>
+      <td><strong>Node.js (v20+)</strong></td>
+      <td>Backend Runtime</td>
+      <td>Asynchronous, event-driven runtime using native ES Modules (`"type": "module"`).</td>
+    </tr>
+    <tr>
+      <td align="center">
+        <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/express/express-original.svg" alt="Express.js" width="36" />
+      </td>
+      <td><strong>Express.js</strong></td>
+      <td>RESTful API Framework</td>
+      <td>Enterprise HTTP routing, input sanitization, rate-limiting, and microservice middleware pipeline.</td>
+    </tr>
+    <!-- Database & Cache -->
+    <tr>
+      <td align="center">
+        <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/mongodb/mongodb-original.svg" alt="MongoDB" width="36" />
+      </td>
+      <td><strong>MongoDB & Mongoose</strong></td>
+      <td>Database & ODM</td>
+      <td>Document-oriented database with strict schema validation, compound indices, and ACID transactions.</td>
+    </tr>
+    <tr>
+      <td align="center">
+        <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/redis/redis-original.svg" alt="Redis" width="36" />
+      </td>
+      <td><strong>Redis & BullMQ</strong></td>
+      <td>Queue & Caching</td>
+      <td>In-memory distributed message broker managing background AI verification runs, SLA timers, and email queues.</td>
+    </tr>
+    <!-- Cloud & Storage -->
+    <tr>
+      <td align="center">
+        <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/supabase/supabase-original.svg" alt="Supabase S3" width="36" />
+      </td>
+      <td><strong>Supabase Storage</strong></td>
+      <td>S3 Evidence Vault</td>
+      <td>AWS S3-compatible cloud storage with browser-side SHA-256 presigned direct streaming.</td>
+    </tr>
+    <!-- AI Verification -->
+    <tr>
+      <td align="center">
+        <img src="https://www.gstatic.com/lamda/images/gemini_sparkle_v002_d4735304ff6292a690345.svg" alt="Gemini" width="36" />
+      </td>
+      <td><strong>Google Gemini 3.6 Flash</strong></td>
+      <td>AI Verification Engine</td>
+      <td>Primary multi-modal LLM reasoning engine for technical claim verification and rubric synthesis.</td>
+    </tr>
+    <tr>
+      <td align="center">
+        <img src="https://avatars.githubusercontent.com/u/152636544?s=200&v=4" alt="Groq" width="36" />
+      </td>
+      <td><strong>Groq & OpenRouter</strong></td>
+      <td>AI Cross-Audit & Fallback</td>
+      <td>High-speed LLaMA-3.3 70B inference engine providing secondary independent anti-cascade verification.</td>
+    </tr>
+    <!-- Testing -->
+    <tr>
+      <td align="center">
+        <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/vitest/vitest-original.svg" alt="Vitest" width="36" />
+      </td>
+      <td><strong>Vitest</strong></td>
+      <td>Automated Testing</td>
+      <td>Fast, ESM-native unit & integration test runner executing 10 comprehensive test suites (99 tests).</td>
+    </tr>
+    <!-- DevOps -->
+    <tr>
+      <td align="center">
+        <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/docker/docker-original.svg" alt="Docker" width="36" />
+      </td>
+      <td><strong>Docker & Compose</strong></td>
+      <td>Containerization</td>
+      <td>Containerized Redis instance, environment isolation, and multi-stage production build configuration.</td>
+    </tr>
+  </tbody>
+</table>
+---
+
+## 📁 Project Structure Tree
 
 ```
 SIH2026/
 ├── .github/
+│   ├── PULL_REQUEST_TEMPLATE/
+│   │   └── pull_request_template.md     # Standardized pull request format
 │   └── workflows/
-│       └── ci.yml                     # GitHub Actions CI pipeline
-├── Docs/
-│   ├── Startup.md                     # Startup architecture & authorization spec
-│   ├── Government_offical.md          # Government nodal officer architecture spec
-│   └── Evaluator.md                   # Technical evaluator architecture spec
-├── client/                            # React 18 + Vite Frontend Monorepo
+│       └── ci.yml                         # GitHub Actions automated test & build CI
+├── client/                                # React 18 + Vite Frontend Monorepo
+│   ├── public/                            # Public web assets (hero_section.png, logo.png)
 │   ├── src/
-│   │   ├── assets/                    # Brand assets & logos
+│   │   ├── assets/                        # Brand emblems & logos
 │   │   ├── components/
-│   │   │   ├── common/                # ErrorBoundary, PulseRail, Modals
-│   │   │   ├── government/            # AssignEvaluatorModal, ReadinessMeter
-│   │   │   ├── layout/                # Navbar, Footer, AppLayout, RoleGuard
-│   │   │   └── ui/                    # Accessible shadcn/ui primitives
-│   │   ├── context/                   # AuthContext (session, login, token memory)
-│   │   ├── hooks/                     # Custom React Query hooks
-│   │   ├── lib/                       # Axios client envelope, queryClient
+│   │   │   ├── certificate/               # Sovereign E-Certificate modal & PDF exporter
+│   │   │   ├── common/                    # ErrorBoundary, PulseRail, DistrictGeoMap, Modals
+│   │   │   ├── government/                # DecisionModal, AssignEvaluatorModal, ReadinessMeter
+│   │   │   ├── layout/                    # Navbar, Footer, AppLayout, RoleGuard
+│   │   │   └── ui/                        # Radix UI accessible primitives (Card, Button, Dialog)
+│   │   ├── context/                       # In-memory dual-token AuthContext
+│   │   ├── hooks/                         # React Query hooks (useSubmissions, useEscrow, useEvaluations)
+│   │   ├── lib/                           # Axios client with silent refresh, TanStack QueryClient
 │   │   ├── pages/
-│   │   │   ├── app/                   # Profile, NotificationCenter, Redirects
-│   │   │   ├── evaluator/             # EvaluatorQueue, EvaluationRoom
-│   │   │   ├── government/            # DepartmentDashboard, ChallengeStudio, ScaleGate
-│   │   │   ├── pilot/                 # PilotCanvas (30-day SLA payment ledger)
-│   │   │   ├── public/                # LandingPage, ChallengeCatalog, AboutPage, Policy
-│   │   │   └── startup/               # StartupDashboard, Passport, Wizard, Tracker
-│   │   ├── App.jsx                    # Central client routing table
-│   │   ├── index.css                  # Design tokens, variables & typography
-│   │   └── main.jsx                   # Application bootstrapping entrypoint
-│   └── package.json
-├── server/                            # Node.js Express Backend Monorepo
-│   ├── config/                        # Database connection & passport strategies
-│   ├── constants/                     # Roles, system statuses & configuration
-│   ├── controllers/                   # Request handlers for all domain entities
-│   ├── middleware/                    # Auth guards, role checks, rate limiters
-│   ├── models/                        # Mongoose schemas & data models
-│   ├── routes/                        # Express API route declarations (/v1)
+│   │   │   ├── admin/                     # AdminAuditConsole (system-wide audit log)
+│   │   │   ├── app/                       # ProfilePage, NotificationCenter
+│   │   │   ├── evaluator/                 # EvaluatorQueue, EvaluationRoom (Double-blind scoring)
+│   │   │   ├── government/                # DepartmentDashboard, ChallengeStudio, CandidateMatching
+│   │   │   ├── pilot/                     # PilotCanvas (90-day sandbox governance & SLA tracking)
+│   │   │   ├── public/                    # LandingPage, ChallengeCatalog, AboutPage, Policy
+│   │   │   └── startup/                   # StartupDashboard, Passport, Wizard, SubmissionDetail
+│   │   ├── App.jsx                        # Master client routing table
+│   │   ├── index.css                      # Tailwind styling & civic-tech tokens
+│   │   └── main.jsx                       # Client bootstrap entrypoint
+│   ├── index.html                         # HTML5 entrypoint
+│   ├── package.json                       # Frontend dependencies & scripts
+│   ├── tailwind.config.js                 # Design system theme configuration
+│   └── vite.config.js                     # Vite build configuration & path aliases
+├── Docs/                                  # Role-Specific Architecture Specifications
+│   ├── Evaluator.md                       # Double-blind evaluator protocol & rubric criteria
+│   ├── Government_offical.md              # Department nodal officer challenge & pilot governance
+│   └── Startup.md                         # Startup passport, DPIIT waiver & proposal lifecycle
+├── Public/                                # Platform Documentation Graphics
+│   ├── pipeline.png                       # Complete end-to-end pipeline architecture diagram
+│   └── readme-flow.png                    # Official 4-stage platform flow diagram
+├── server/                                # Node.js + Express Backend Monorepo
+│   ├── config/                            # Database, Redis & Passport OAuth configurations
+│   ├── constants/                         # User roles, submission statuses, FSM stages
+│   ├── controllers/                       # HTTP REST controllers (auth, submission, escrow, evaluation)
+│   ├── emails/                            # Transactional HTML email templates
+│   ├── middleware/                        # Auth guards, role checks, rate limiters, validation
+│   ├── models/                            # Mongoose schemas (submission, escrow, decision, aiRun)
+│   ├── queues/                            # BullMQ distributed queue factories
+│   ├── routes/                            # Modular Express API route declarations (/v1)
 │   ├── services/
-│   │   ├── ai/                        # Multi-model verification, Gemini/Groq adapters
-│   │   ├── eligibility/               # Deterministic statutory rule engine
-│   │   ├── government/                # Digilocker, API Setu, OGD adapters
-│   │   ├── submission/                # FSM transition guards
-│   │   ├── audit.service.js           # Immutable SHA-256 audit logging
-│   │   ├── matching.service.js        # Deterministic explainable matching engine
-│   │   ├── storage.service.js         # Supabase S3 presigned URL generator
-│   │   └── submission.service.js      # Proposal lifecycle operations
-│   ├── validators/                    # Zod validation schemas
-│   ├── app.js                         # Express application assembly
-│   └── server.js                      # Server startup listener
-├── test/                              # Automated Vitest Test Suites
-│   ├── aiPolicy.test.js               # AI model allowlist & sanitization tests
-│   ├── authValidator.test.js          # Password complexity & registration tests
-│   ├── eligibilityRules.test.js       # Statutory window & DPIIT gate tests
-│   ├── evidenceValidator.test.js      # S3 MIME & 25MB file limit tests
-│   └── transitionGuard.test.js        # 7-stage FSM state transition tests
-├── package.json                       # Root workspace package manifest
-├── testing.md                         # Comprehensive API testing guide
-└── README.md                          # Authoritative platform documentation
+│   │   ├── ai/                            # Multi-model consensus verification (Gemini, Groq, OpenRouter)
+│   │   ├── eligibility/                   # Deterministic GFR 173(i) eligibility rule engine
+│   │   ├── geocoding/                     # Nominatim service for Maharashtra 36-district mapping
+│   │   ├── government/                    # Digilocker, API Setu & OGD gateway adapters
+│   │   ├── submission/                    # Transition guard enforcing 7-stage FSM rules
+│   │   ├── audit.service.js               # Cryptographic SHA-256 immutable event hashing
+│   │   ├── matching.service.js            # Explainable 4-pillar candidate discovery engine
+│   │   ├── payment.service.js             # Sovereign escrow calculations & tranche releases
+│   │   ├── storage.service.js             # S3 presigned upload generator with MIME validation
+│   │   └── submission.service.js          # Proposal lifecycle & certificate generation
+│   ├── utils/                             # Cryptographic digests & helpers
+│   ├── validators/                        # Zod schemas for request validation
+│   ├── workers/                           # BullMQ background workers (AI, SLA cron, email, notify)
+│   ├── app.js                             # Express application assembly & security middleware
+│   └── server.js                          # HTTP server startup listener
+├── test/                                  # Automated Vitest Test Suites (10 suites, 99 tests)
+│   ├── aiPolicy.test.js                   # AI zero-cost allowlist & prompt sanitization tests
+│   ├── authValidator.test.js              # Password complexity & input sanitization tests
+│   ├── Clarification.test.js              # Department-to-startup clarification cycles
+│   ├── Decision.test.js                   # Sanction order, milestone tranches & compact acceptance
+│   ├── eligibilityRules.test.js           # GFR 173(i) DPIIT turnover & experience waiver tests
+│   ├── evidenceValidator.test.js          # S3 MIME & 25MB file boundary tests
+│   ├── Pipeline.test.js                   # End-to-end challenge-to-submission lifecycle tests
+│   ├── redisQueue.test.js                 # BullMQ queue priority & retry resilience tests
+│   ├── SandboxEscrow.test.js              # Escrow funding, milestone math & tranche release tests
+│   └── transitionGuard.test.js            # 7-stage FSM transition rules & role-permission tests
+├── docker-compose.yml                     # Docker Compose configuration for Redis
+├── package.json                           # Root workspace package manifest
+├── Security.md                            # Comprehensive security architecture & cryptographic flow specification
+├── Technical.md                           # Comprehensive technical architecture & engineering specification
+└── README.md                              # Authoritative project documentation
 ```
 
 ---
 
-## 9. Automated Testing with Vitest
+##  In-Depth Technical & Security Specifications
 
-The project includes an in-memory testing suite executed via Vitest, requiring zero external database connections:
+For exhaustive engineering and security deep-dives into Pragati-GovX:
 
-```bash
-# Run test suite once
-npm test
+* 👉 **[Comprehensive Technical Architecture & Engineering Specification (Technical.md)](Technical.md)**  
+  *Deep dive into the statutory 7-stage Finite State Machine (FSM), BullMQ background workers, multi-model AI consensus verification (Gemini + Groq + OpenRouter), sovereign escrow milestone mathematics, and automated test suites.*
 
-# Run tests in interactive watch mode
-npx vitest
-```
+* 👉 **[Comprehensive Security Architecture & Cryptographic Flow Specification (Security.md)](Security.md)**  
+  *Exhaustive specification of the in-memory dual-token auth pattern, Refresh Token Rotation (RTR), 4-tier RBAC/PBAC matrix, double-blind evaluator anonymization, direct client-to-S3 presigned streaming with SHA-256 integrity verification, and OWASP Top 10 mitigation matrix.*
 
-### Test Suite Summary (`test/`)
-* **`test/transitionGuard.test.js`:** Enforces the 7-stage finite state machine. Blocks illegal state jumps (e.g. `DRAFT` to `SCALED`) with `400 INVALID_TRANSITION` and blocks unauthorized role transitions with `403 TRANSITION_FORBIDDEN`.
-* **`test/aiPolicy.test.js`:** Validates model allowlists (`gemini-3.6-flash`, `openai/gpt-oss-20b`), verifies prompt sanitization, redacts Bearer JWT credentials, and limits prompt sizes.
-* **`test/eligibilityRules.test.js`:** Validates statutory application window timelines, GFR 173(i) DPIIT certificate checks, applicant organization eligibility, and case-insensitive sector alignment.
-* **`test/authValidator.test.js`:** Enforces password complexity (uppercase, lowercase, number, special character `@$!%*?&`, minimum 8 characters), username injection protection, and 6-digit numeric OTP validation.
-* **`test/evidenceValidator.test.js`:** Validates file size limits (25 MB max), permitted MIME formats (PDF, CSV, JSON, ZIP, images), blocks executable `.exe` scripts, and enforces 24-character hex MongoDB ObjectId formats.
+### Role-Specific Architecture & Authorization Guides
 
----
+* 👉 **[Startup Architecture & Proposal Lifecycle Guide (Docs/Startup.md)](Docs/Startup.md)**  
+  *Covers the Startup Passport, 100% GFR 173(i) turnover & EMD waivers, 5-step Application Wizard, direct S3 streaming with SHA-256 digests, and MSMED Act 30-day payment SLA tracker.*
 
-## 10. Authors & Institutional Attribution
+* 👉 **[Government Official Architecture & Governance Guide (Docs/Government_offical.md)](Docs/Government_offical.md)**  
+  *Covers the Challenge Studio (0-100 Readiness Meter), 4-pillar Explainable AI candidate discovery, double-blind evaluator allocation, 90-day sandbox pilot compacts, and Scale Gate Sanction Orders for GeM.*
 
-* **Smart India Hackathon 2026:** Problem Statement 26136 (PS:136)
-* **Sponsoring Authority:** Government of Maharashtra (Department of Skills, Employment, Entrepreneurship & Innovation / Maharashtra State Innovation Society)
-* **Lead Author & System Architect:** Aditya Jha
-* **Platform Designation:** Pragati-GovX (Sovereign Innovation Sandbox & Agile Public Procurement Gateway)
+* 👉 **[Technical Evaluator Architecture & Rubric Guide (Docs/Evaluator.md)](Docs/Evaluator.md)**  
+  *Covers double-blind masked dossiers (`ANON-VENTURE-XXXX`), statutory Conflict-of-Interest (COI) recusal protocols, standardized 4-pillar rubric (100 pts), independent score isolation, and tamper-evident scorecard locks.*
+
