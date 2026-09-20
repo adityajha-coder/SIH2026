@@ -225,7 +225,14 @@ export const evaluationService = {
         const assignments = await evaluationAssignmentModel.find({
             evaluatorId: actor._id,
         })
-            .populate("submissionId", "solutionTitle executiveSummary status organizationId problemId")
+            .populate({
+                path: "submissionId",
+                select: "solutionTitle executiveSummary proposalDetails evidenceFileIds status organizationId problemId",
+                populate: {
+                    path: "problemId",
+                    select: "title shortSummary sectors geography mandatoryRequirements preferredRequirements constraints",
+                },
+            })
             .populate("templateId", "title criteria")
             .sort({ deadline: 1 });
 
@@ -431,6 +438,14 @@ export const evaluationService = {
             rationale: input.rationale,
             decidedById: actor._id,
             evaluationResponseIds: responseIds,
+            grantAmount: input.grantAmount !== undefined ? input.grantAmount : 2500000,
+            paymentDescription: input.paymentDescription || undefined,
+            tranches: input.tranches && input.tranches.length > 0 ? input.tranches : undefined,
+            planDetails: input.planDetails || undefined,
+            durationDays: input.durationDays || 90,
+            planDocumentUrl: input.planDocumentUrl || undefined,
+            planDocumentName: input.planDocumentName || undefined,
+            planDocumentHash: input.planDocumentHash || undefined,
         });
 
         const targetStatus = input.outcome === "ACCEPTED"
@@ -446,6 +461,10 @@ export const evaluationService = {
             timestamp: new Date(),
         });
         await submission.save();
+
+        // Notify startup of final statutory decision
+        notificationService.onDecisionReleased({ decisionRecord: decision, submission })
+            .catch((err) => console.error("Failed to dispatch onDecisionReleased notification:", err));
 
         return decision;
     },

@@ -66,6 +66,18 @@ const aiRunSchema = new mongoose.Schema(
             type: mongoose.Schema.Types.Mixed,
             default: null,
         },
+        auditorResult: {
+            type: mongoose.Schema.Types.Mixed,
+            default: null,
+        },
+        result: {
+            type: mongoose.Schema.Types.Mixed,
+            default: null,
+        },
+        errorMessage: {
+            type: String,
+            default: null,
+        },
         disagreements: {
             type: [String],
             default: [],
@@ -73,18 +85,6 @@ const aiRunSchema = new mongoose.Schema(
         totalLatencyMs: {
             type: Number,
             default: 0,
-        },
-        generatorResult: {
-            type: mongoose.Schema.Types.Mixed,
-            default: null,
-        },
-        verifierResult: {
-            type: mongoose.Schema.Types.Mixed,
-            default: null,
-        },
-        auditorResult: {
-            type: mongoose.Schema.Types.Mixed,
-            default: null,
         },
     },
     {

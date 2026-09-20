@@ -138,3 +138,38 @@ export function useSubmissionAssignments(submissionId) {
   });
 }
 
+export function useDecision(submissionId) {
+  return useQuery({
+    queryKey: ["evaluations", "decision", submissionId],
+    queryFn: async () => {
+      if (!submissionId) return null;
+      try {
+        const res = await apiClient.get(`/evaluations/decisions/submission/${submissionId}`);
+        return res?.data || null;
+      } catch {
+        return null;
+      }
+    },
+    enabled: Boolean(submissionId),
+    staleTime: 1000 * 60,
+  });
+}
+
+export function useCreateDecision() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (payload) => {
+      const res = await apiClient.post("/evaluations/decisions", payload);
+      return res?.data;
+    },
+    onSuccess: (_, variables) => {
+      queryClient.invalidateQueries({
+        queryKey: ["evaluations", "decision", variables?.submissionId],
+      });
+      queryClient.invalidateQueries({ queryKey: ["department", "submissions"] });
+      queryClient.invalidateQueries({ queryKey: ["submission", variables?.submissionId] });
+      queryClient.invalidateQueries({ queryKey: ["submissions"] });
+    },
+  });
+}

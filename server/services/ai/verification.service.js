@@ -4,7 +4,7 @@ import { groqProvider } from "./providers/groq.provider.js";
 import { openrouterProvider } from "./providers/openrouter.provider.js";
 import { ollamaProvider } from "./providers/ollama.provider.js";
 import { aiPolicy } from "./ai.policy.js";
-import { AIRun, AI_VERDICTS } from "../../models/aiRun.model.js";
+import { AIRun, AI_VERDICTS, AI_RUN_STATUS } from "../../models/aiRun.model.js";
 
 export const verificationService = {
     /**
@@ -109,35 +109,12 @@ Reported Issues: ${(verifierResult.issues || []).join("; ") || "None"}
 
         const totalLatencyMs = Date.now() - startTime;
 
-        // aiRun record
-        const runData = {
-            task,
-            userInputHash: inputHash,
-            promptVersion: "1.0",
-            verdict: finalVerdict,
-            requestedById: actor?._id || null,
-            entityType,
-            entityId,
-            generatorResult,
-            verifierResult,
-            auditorResult,
-            disagreements,
-            totalLatencyMs,
-        };
-        let aiRun;
-        if (existingRunId) {
-            aiRun = await AIRun.findByIdAndUpdate(existingRunId, runData, { new: true });
-        } else {
-            aiRun = await AIRun.create(runData);
-        }
-
-
-        return {
-            runId: aiRun._id,
+        const formattedResult = {
+            runId: existingRunId,
             verdict: finalVerdict,
             disagreements,
             summary: generatorResult.conclusion,
-            auditedClaims: generatorResult.claims,
+            auditedClaims: generatorResult.claims || [],
             flags: [...(verifierResult.uncertainties || []), ...(auditorResult.uncertainties || [])],
             totalLatencyMs,
             providerChain: [
@@ -146,5 +123,34 @@ Reported Issues: ${(verifierResult.issues || []).join("; ") || "None"}
                 auditorResult.provider,
             ],
         };
+
+        // aiRun record
+        const runData = {
+            task,
+            userInputHash: inputHash,
+            promptVersion: "1.0",
+            status: AI_RUN_STATUS.COMPLETED,
+            verdict: finalVerdict,
+            requestedById: actor?._id || null,
+            entityType,
+            entityId,
+            generatorResult,
+            verifierResult,
+            auditorResult,
+            result: formattedResult,
+            disagreements,
+            totalLatencyMs,
+        };
+
+        let aiRun;
+        if (existingRunId) {
+            aiRun = await AIRun.findByIdAndUpdate(existingRunId, runData, { new: true });
+            formattedResult.runId = aiRun._id;
+        } else {
+            aiRun = await AIRun.create(runData);
+            formattedResult.runId = aiRun._id;
+        }
+
+        return formattedResult;
     },
 };

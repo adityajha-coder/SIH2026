@@ -64,8 +64,29 @@ export const aiController = {
                 });
             }
 
+            const runObj = run.toObject();
+            if (!runObj.result && (runObj.generatorResult || runObj.verdict)) {
+                runObj.result = {
+                    runId: runObj._id,
+                    verdict: runObj.verdict,
+                    disagreements: runObj.disagreements || [],
+                    summary: runObj.generatorResult?.conclusion || "AI verification completed.",
+                    auditedClaims: runObj.generatorResult?.claims || [],
+                    flags: [
+                        ...(runObj.verifierResult?.uncertainties || []),
+                        ...(runObj.auditorResult?.uncertainties || []),
+                    ],
+                    totalLatencyMs: runObj.totalLatencyMs || 0,
+                    providerChain: [
+                        runObj.generatorResult?.provider,
+                        runObj.verifierResult?.provider,
+                        runObj.auditorResult?.provider,
+                    ].filter(Boolean),
+                };
+            }
+
             return res.status(200).json({
-                data: run,
+                data: runObj,
                 meta: { traceId: req.id, timestamp: new Date().toISOString() },
                 error: null,
             });

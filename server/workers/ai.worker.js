@@ -24,6 +24,12 @@ export const aiWorker = createWorker(
                 existingRunId: runId
             });
 
+            await AIRun.findByIdAndUpdate(runId, {
+                status: AI_RUN_STATUS.COMPLETED,
+                result,
+                verdict: result.verdict,
+            });
+
             console.log(` [AI Worker] Finished Run [${runId}] with Verdict: ${result.verdict}`);
 
             return result;
