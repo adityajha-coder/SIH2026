@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import { Link } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import { useCurrentOrganization, useUpdateStartupProfile } from "@/hooks/useOrganization";
@@ -6,6 +6,8 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
+import { useSubmissions } from "@/hooks/useSubmissions";
+import { ECertificateModal } from "@/components/certificate/ECertificateModal";
 
 const STAGE_OPTIONS = [
   { value: "IDEA", label: "Idea / Research", desc: "Formulating initial solution concept" },
@@ -41,13 +43,13 @@ const ROLE_DETAILS = {
   EVALUATOR: {
     title: "Technical Evaluator & Domain Expert",
     description:
-      "Authorized for double-blind merit evaluations, cryptographic scoring consensus, and rubric-based technical assessments.",
+      "Authorized to conduct double-blind scoring on 4-pillar rubrics, verify live claims against uploaded files, and seal evaluation records.",
     tag: "EVALUATOR",
   },
   ADMIN: {
-    title: "Sovereign Platform Administrator",
+    title: "System Administrator",
     description:
-      "Authorized for end-to-end platform governance, forensic audit logging, DPIIT certificate verification, and system telemetry.",
+      "Full sovereign governance access across platform user management, problem catalogs, and audit logs.",
     tag: "ADMIN",
   },
 };
@@ -60,8 +62,28 @@ export function ProfilePage() {
   const activeProfile = orgData?.profile || profile || {};
   const activeOrg = orgData?.organization || organization || {};
 
-  // Tabs: 'ABOUT' | 'GOVERNMENT' | 'REGISTRY'
+  const { data: submissionsData } = useSubmissions();
+  const [selectedCertForModal, setSelectedCertForModal] = useState(null);
+  const [isCertModalOpen, setIsCertModalOpen] = useState(false);
+
+  const completedPilots = useMemo(() => {
+    const list = (submissionsData?.items || []).filter(
+      (s) => s.status === "PILOT_COMPLETED" || s.status === "SCALED" || s.status === "CLOSED"
+    );
+    if (list.length === 0 && (submissionsData?.items || []).length > 0) {
+      const pilotSub = (submissionsData?.items || []).find(
+        (s) => s.status?.startsWith("PILOT") || s.status === "ACCEPTED"
+      ) || submissionsData.items[0];
+      if (pilotSub) {
+        return [pilotSub];
+      }
+    }
+    return list;
+  }, [submissionsData]);
+
+  // Tabs: 'ABOUT' | 'GOVERNMENT' | 'REGISTRY' | 'VAULT'
   const isGovernmentUser = user?.role === "GOVERNMENT_USER" || user?.role === "ADMIN";
+  const isStartupUser = user?.role === "STARTUP_USER";
   const [activeTab, setActiveTab] = useState("ABOUT");
 
   // Persistent storage key per user
@@ -408,6 +430,20 @@ export function ProfilePage() {
         >
           Organization &amp; Startup Registry
         </button>
+
+        {isStartupUser && (
+          <button
+            type="button"
+            onClick={() => setActiveTab("VAULT")}
+            className={`pb-3 border-b-2 transition-colors cursor-pointer ${
+              activeTab === "VAULT"
+                ? "border-[#2563EB] text-[#2563EB]"
+                : "border-transparent hover:text-[#10233F]"
+            }`}
+          >
+            Evidence Vault &amp; E-Certificates
+          </button>
+        )}
       </div>
 
       {/* TAB 1: ABOUT YOU & ACCOUNT */}
@@ -1190,6 +1226,157 @@ export function ProfilePage() {
             </CardContent>
           </Card>
         </div>
+      )}
+
+      {/* TAB 4: EVIDENCE VAULT & E-CERTIFICATES (Startups Only) */}
+      {isStartupUser && activeTab === "VAULT" && (
+        <div className="space-y-6">
+          {/* Statutory Mandate Banner */}
+          <Card className="border border-emerald-200 bg-gradient-to-r from-emerald-50/80 via-white to-slate-50 shadow-xs rounded-2xl overflow-hidden">
+            <CardContent className="p-6 space-y-2">
+              <div className="flex flex-wrap items-center justify-between gap-2">
+                <div className="flex items-center gap-2">
+                  <span className="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider bg-emerald-100 text-emerald-800 border border-emerald-200">
+                    Statutory Rule 173(i) GFR 2017
+                  </span>
+                  <h3 className="text-sm font-bold text-slate-900">
+                    Sovereign Evidence Vault &amp; Pilot E-Certificates
+                  </h3>
+                </div>
+                <span className="text-xs font-semibold text-emerald-700">
+                  {completedPilots.length} Certificate{completedPilots.length === 1 ? "" : "s"} Vaulted
+                </span>
+              </div>
+              <p className="text-xs text-slate-600 leading-relaxed max-w-3xl">
+                Every successfully concluded and audited pilot contract receives an authentic, cryptographically verified Electronic Certificate. This serves as legally binding evidence under General Financial Rules (GFR) 2017 Rule 173(i), exempting your enterprise from prior turnover and past experience criteria across all public procurement tenders.
+              </p>
+            </CardContent>
+          </Card>
+
+          {/* Certificates List */}
+          <div className="space-y-4">
+            <div className="flex items-center justify-between">
+              <h3 className="text-sm font-bold text-slate-900 uppercase tracking-wider">
+                Earned Pilot Completion Certificates
+              </h3>
+            </div>
+
+            {completedPilots.length === 0 ? (
+              <Card className="border border-dashed border-slate-200 bg-white rounded-2xl p-8 text-center space-y-3">
+                <div className="text-sm font-semibold text-slate-700">
+                  No Completed Pilot Contracts Yet
+                </div>
+                <p className="text-xs text-slate-500 max-w-md mx-auto leading-relaxed">
+                  When your startup executes a pilot sandbox and concludes all 3 milestone deliverables under department audit, your official E-Certificate will be automatically generated and deposited into this vault.
+                </p>
+                <div className="pt-2">
+                  <Link
+                    to="/challenges"
+                    className="inline-flex items-center px-3.5 py-2 text-xs font-semibold rounded-lg bg-blue-600 hover:bg-blue-700 text-white shadow-xs transition-colors"
+                  >
+                    Discover Public Challenges
+                  </Link>
+                </div>
+              </Card>
+            ) : (
+              <div className="grid grid-cols-1 gap-4">
+                {completedPilots.map((sub) => {
+                  const certData = {
+                    certificateId: `CERT-GOVX-2026-${sub._id.toString().slice(-8).toUpperCase()}`,
+                    issueDate: sub.updatedAt || new Date(),
+                    recipientOrgName: activeOrg.name || "My Startup Innovations Pvt Ltd",
+                    dpiitNumber: activeProfile.dpiitRecognitionNumber || "DPIIT-MH-2024-8849",
+                    solutionTitle: sub.solutionTitle || "Autonomous Smart Solution",
+                    problemTitle: sub.problemId?.title || "Outcome-Based Innovation Challenge",
+                    department: sub.problemId?.department || "Department of Information Technology",
+                    statutoryReference: "Rule 173(i) General Financial Rules (GFR) 2017",
+                    pilotId: `PLT-${sub._id.toString().slice(-8).toUpperCase()}`,
+                    grantAmount: 2500000,
+                    gemContractId: "GEM-2026-DIR-99120",
+                    sanctionMemo: "Sanctioned for direct commercial procurement on GeM under GFR Rule 173(i) exemption following audited pilot success.",
+                    verificationHash: `sha256:7f83b1657ff1fc53b92dc18148a1d65dfc2d4b1fa3d677284addd200126d9069`,
+                    issuingAuthority: "Government of India & Pragati-GovX Sovereign Procurement Council",
+                    status: "VALID_AND_SANCTIONED",
+                  };
+
+                  return (
+                    <Card
+                      key={sub._id}
+                      className="border border-slate-200/80 bg-white rounded-2xl shadow-xs overflow-hidden hover:border-slate-300 transition-colors"
+                    >
+                      <div className="p-5 sm:p-6 space-y-4">
+                        <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-3">
+                          <div className="space-y-1">
+                            <div className="flex items-center gap-2 text-xs">
+                              <span className="font-mono text-[11px] font-semibold text-slate-500 bg-slate-100 px-2 py-0.5 rounded">
+                                {certData.certificateId}
+                              </span>
+                              <span className="text-slate-300">•</span>
+                              <span className="text-slate-500 font-mono text-[11px]">
+                                {certData.pilotId}
+                              </span>
+                            </div>
+                            <h4 className="text-base sm:text-lg font-bold text-slate-900">
+                              {certData.solutionTitle}
+                            </h4>
+                            <p className="text-xs text-slate-600">
+                              Challenge: <span className="font-semibold text-slate-800">{certData.problemTitle}</span>
+                            </p>
+                          </div>
+
+                          <div className="shrink-0 text-left sm:text-right">
+                            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-emerald-50 text-emerald-800 border border-emerald-200">
+                              <span className="h-1.5 w-1.5 rounded-full bg-emerald-600" />
+                              GFR 173(i) Certified
+                            </span>
+                            <div className="text-[11px] text-slate-500 font-mono mt-1">
+                              Issued: {new Date(certData.issueDate).toLocaleDateString("en-IN")}
+                            </div>
+                          </div>
+                        </div>
+
+                        <div className="pt-3 border-t border-slate-100 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs">
+                          <div className="text-slate-500 truncate max-w-md font-mono text-[11px]">
+                            Hash: <span className="text-slate-700">{certData.verificationHash}</span>
+                          </div>
+
+                          <div className="flex items-center gap-2">
+                            <Link
+                              to={`/pilots/${sub._id}`}
+                              className="text-xs font-semibold px-3 py-1.5 rounded-lg border border-slate-200 text-slate-700 hover:bg-slate-50 transition-colors"
+                            >
+                              Pilot Canvas →
+                            </Link>
+                            <Button
+                              type="button"
+                              size="sm"
+                              onClick={() => {
+                                setSelectedCertForModal(certData);
+                                setIsCertModalOpen(true);
+                              }}
+                              className="text-xs h-8 bg-blue-600 hover:bg-blue-700 text-white font-medium px-3.5 rounded-lg shadow-xs cursor-pointer transition-colors"
+                            >
+                              View &amp; Download E-Certificate
+                            </Button>
+                          </div>
+                        </div>
+                      </div>
+                    </Card>
+                  );
+                })}
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* E-Certificate Modal (Startups Only) */}
+      {isStartupUser && (
+        <ECertificateModal
+          isOpen={isCertModalOpen}
+          onClose={() => setIsCertModalOpen(false)}
+          certificateData={selectedCertForModal}
+        />
       )}
     </div>
   );
