@@ -29,3 +29,21 @@ export const aiMatchSchema = z.object({
         .regex(objectIdRegex, "Invalid organization ID format")
         .optional(),
 });
+
+export const legalQuerySchema = z.object({
+    query: z
+        .string({ required_error: "Query is required" })
+        .trim()
+        .min(2, "Query must be at least 2 characters")
+        .max(1000, "Query cannot exceed 1000 characters"),
+    conversationHistory: z
+        .array(
+            z.object({
+                role: z.enum(["user", "assistant"]),
+                content: z.string().max(2000),
+            })
+        )
+        .optional()
+        .default([]),
+});
+

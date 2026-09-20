@@ -4,6 +4,7 @@ import { aiPolicy } from "../services/ai/ai.policy.js";
 import { AIRun } from "../models/aiRun.model.js";
 import { matchingService } from "../services/matching.service.js";
 import { enqueueAiVerification } from "../queues/ai.queue.js";
+import { legalAssistantService } from "../services/ai/legalAssistant.service.js";
 
 export const aiController = {
     
@@ -109,9 +110,29 @@ export const aiController = {
                 meta: { traceId: req.id, timestamp: new Date().toISOString() },
                 error: null,
             });
-        }catch (error) {
+        } catch (error) {
             next(error);
-            }
+        }
+    },
+
+    // POST /v1/ai/legal-chat — Dedicated Legal & Platform Concierge for Startups
+    async chatLegalAssistant(req, res, next) {
+        try {
+            const { query, conversationHistory } = req.body;
+            const result = await legalAssistantService.queryAssistant({
+                query,
+                conversationHistory,
+                startupUser: req.user,
+            });
+
+            return res.status(200).json({
+                data: result,
+                meta: { traceId: req.id, timestamp: new Date().toISOString() },
+                error: null,
+            });
+        } catch (error) {
+            next(error);
+        }
     },
 
 };
