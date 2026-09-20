@@ -89,6 +89,7 @@ jobs:
               import('./server/services/ai/providers/groq.provider.js'),
               import('./server/services/ai/providers/openrouter.provider.js'),
               import('./server/services/ai/providers/ollama.provider.js'),
+              import('./server/services/ai/legalAssistant.service.js'),
               import('./server/services/geocoding/nominatim.service.js'),
               import('./server/services/government/ogd.service.js'),
               import('./server/services/government/apiSetu.service.js'),

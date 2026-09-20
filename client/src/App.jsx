@@ -5,6 +5,7 @@ import { queryClient } from "./lib/queryClient.js";
 import { Toaster } from "sonner";
 import { AuthProvider } from "./context/AuthContext";
 import { OrgSetupModal } from "./components/common/OrgSetupModal";
+import StartupLegalAssistantWidget from "./components/ai/StartupLegalAssistantWidget";
 import { AppLayout } from "./components/layout/AppLayout";
 import { PublicLayout } from "./components/layout/PublicLayout";
 import { RoleGuard } from "./components/layout/RoleGuard";
@@ -225,6 +226,7 @@ export function App() {
           </Routes>
           </React.Suspense>
           <OrgSetupModal />
+          <StartupLegalAssistantWidget />
         </AuthProvider>
       </BrowserRouter>
       <Toaster
