@@ -6,18 +6,19 @@
 
 ---
 
-## 📌 Problem Statement (Official from SIH 2026)
+## 📌 Smart India Hackathon 2026 — Team & Problem Statement Details
 
-* **Competition:** Smart India Hackathon 2026 (SIH 2026)
-* **Problem Statement ID:** PS 26136 (PS:136)
-* **Problem Statement Title:** *Platform for Government Departments to Procure Innovative Solutions from Startups via Controlled Trials, Regulatory Sandboxes, and Milestone-Based Contracting*
-* **Nodal Authority:** Government of Maharashtra — Department of Skills, Employment, Entrepreneurship & Innovation / Maharashtra State Innovation Society (MSInS)
-* **Theme:** Smart Governance, Public Procurement & Deep-Tech Startup Enablement
-* **Statutory Frameworks:** 
-  * Rule 173(i) of General Financial Rules (GFR) 2017
-  * Maharashtra State Innovative Startup Policy 2024 (GR No. MAT-2024/CR-88/Ind-7)
-  * Section 15 of Micro, Small and Medium Enterprises Development (MSMED) Act 2006
-  * Government e-Marketplace (GeM) Special Procurement Gateway
+| Parameter | Details |
+| :--- | :--- |
+| **Team Name** | **Goodfella** |
+| **Team ID** | **166091** |
+| **Project ID / Problem Statement ID** | **26136** |
+| **Problem Statement Title (PS)** | **Platform for Government Departments to Procure Innovative Solutions from Startups via Controlled Trials, Regulatory Sandboxes, and Milestone-Based Contracting** |
+| **Theme** | **Smart Automation** |
+| **PS Category** | **Software** |
+| **Description** | **Pragati-GovX** is a sovereign innovation sandbox and agile public procurement gateway designed for government departments to legally and securely procure cutting-edge solutions from deep-tech startups. It bridges the "pilot-to-procurement valley of death" through statutory waivers under **GFR Rule 173(i)** and the **Maharashtra State Innovative Startup Policy 2024** (100% waiver of prior turnover, experience, and EMD), outcome-driven challenge formulation, double-blind meritocratic evaluation with multi-model AI consensus verification, finite-risk 90-day regulatory sandboxes, and milestone-based contracting with automated escrow disbursements. |
+| **Nodal Authority** | Government of Maharashtra — Department of Skills, Employment, Entrepreneurship & Innovation / Maharashtra State Innovation Society (MSInS) |
+| **Statutory Frameworks** | • Rule 173(i) of General Financial Rules (GFR) 2017<br>• Maharashtra State Innovative Startup Policy 2024 (GR No. MAT-2024/CR-88/Ind-7)<br>• Section 15 of Micro, Small and Medium Enterprises Development (MSMED) Act 2006<br>• Government e-Marketplace (GeM) Special Procurement Gateway |
 
 ---
 
