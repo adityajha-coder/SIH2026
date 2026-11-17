@@ -103,3 +103,83 @@ export async function getMe(req, res) {
         error: null,
     });
 }
+
+export async function demoLogin(req, res) {
+    const { role } = req.body;
+
+    const validRoles = ["STARTUP_USER", "GOVERNMENT_USER", "EVALUATOR"];
+    if (!role || !validRoles.includes(role)) {
+        return res.status(400).json({
+            message: "Invalid role specified for demo login. Allowed roles: STARTUP_USER, GOVERNMENT_USER, EVALUATOR"
+        });
+    }
+
+    // Prioritize dedicated demo user, else fallback to any verified user with this role
+    let user = await userModel.findOne({
+        role,
+        verified: true,
+        email: { $regex: /demo\./i }
+    });
+
+    if (!user) {
+        user = await userModel.findOne({ role, verified: true }).sort({ createdAt: 1 });
+    }
+
+    if (!user) {
+        return res.status(404).json({
+            message: `No active account found for role: ${role}`
+        });
+    }
+
+    const refreshToken = jwt.sign(
+        { id: user._id },
+        config.JWT_SECRET,
+        { expiresIn: "7d" }
+    );
+
+    const refreshTokenHash = hashSHA256(refreshToken);
+
+    const session = await sessionModel.create({
+        user: user._id,
+        refreshTokenHash,
+        ip: req.ip,
+        userAgent: req.headers["user-agent"] || "JudgeDemoSession"
+    });
+
+    const accessToken = jwt.sign(
+        {
+            id: user._id,
+            sessionId: session._id,
+            role: user.role,
+        },
+        config.JWT_SECRET,
+        { expiresIn: "15m" }
+    );
+
+    res.cookie("refreshToken", refreshToken, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === "production",
+        sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
+        maxAge: 7 * 24 * 60 * 60 * 1000 // 7 days
+    });
+
+    return res.status(200).json({
+        data: {
+            message: "Demo login successful",
+            user: {
+                userName: user.userName,
+                email: user.email,
+                id: user.id || user._id,
+                role: user.role,
+                status: user.status,
+            },
+            accessToken,
+        },
+        meta: {
+            traceId: req.id,
+            timestamp: new Date().toISOString(),
+        },
+        error: null,
+    });
+}
+

@@ -22,6 +22,12 @@ authRouter.post("/register", registerLimiter, validate(registerSchema), authCont
 authRouter.post("/login", loginLimiter, validate(loginSchema), authController.login)
 
 /**
+ * POST /api/auth/demo-login
+ * Instant demo session for hackathon judges & evaluators
+ */
+authRouter.post("/demo-login", loginLimiter, authController.demoLogin)
+
+/**
  * GET /api/auth/get-me
  */
 authRouter.get("/get-me", requireAuth, authController.getMe)
