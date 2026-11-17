@@ -15,6 +15,30 @@ export const ROLE_DASHBOARD_PATHS = Object.freeze({
   ADMIN: "/admin/audit",
 });
 
+export const DEMO_CREDENTIALS = Object.freeze({
+  STARTUP_USER: {
+    email: "demo.startup@pragati-govx.gov.in",
+    password: "DemoJudge@2026",
+    role: "STARTUP_USER",
+    label: "Startup Founder",
+    defaultPath: "/startup/dashboard",
+  },
+  GOVERNMENT_USER: {
+    email: "demo.government@pragati-govx.gov.in",
+    password: "DemoJudge@2026",
+    role: "GOVERNMENT_USER",
+    label: "Department Official",
+    defaultPath: "/government/dashboard",
+  },
+  EVALUATOR: {
+    email: "demo.evaluator@pragati-govx.gov.in",
+    password: "DemoJudge@2026",
+    role: "EVALUATOR",
+    label: "Technical Evaluator",
+    defaultPath: "/evaluator/queue",
+  },
+});
+
 const EMPTY_SESSION = {
   user: null,
   organization: null,
@@ -137,6 +161,51 @@ export function AuthProvider({ children }) {
     [setSession]
   );
 
+  const demoLogin = useCallback(
+    async (role) => {
+      let data = null;
+      let token = null;
+
+      try {
+        const response = await apiClient.post("/auth/demo-login", { role });
+        data = unwrapData(response);
+        token = data?.accessToken;
+      } catch {
+        // Fallback for cases where remote backend does not yet have /auth/demo-login deployed
+        const fallbackCreds = DEMO_CREDENTIALS[role];
+        if (fallbackCreds) {
+          const response = await apiClient.post("/auth/login", {
+            email: fallbackCreds.email,
+            password: fallbackCreds.password,
+          });
+          data = unwrapData(response);
+          token = data?.accessToken;
+        } else {
+          throw new Error(`No credentials configured for demo role ${role}`);
+        }
+      }
+
+      if (!token || !data?.user) {
+        throw new Error("Demo login did not return a valid session token");
+      }
+
+      setAccessToken(token);
+      const orgData = await fetchOrganizationSafely();
+      const nextSession = {
+        user: data.user,
+        organization: orgData.organization ?? null,
+        membership: orgData.membership ?? null,
+        profile: orgData.profile ?? null,
+      };
+
+      setSession(nextSession);
+      const roleLabel = DEMO_CREDENTIALS[data.user.role]?.label || data.user.role;
+      toast.success(`Signed in as ${roleLabel} (Judge Demo)`);
+      return nextSession;
+    },
+    [setSession]
+  );
+
   const register = useCallback(async (payload) => {
     const response = await apiClient.post("/auth/register", payload);
     const data = unwrapData(response);
@@ -246,9 +315,11 @@ export function AuthProvider({ children }) {
       createOrganization,
       refreshOrganization,
       handleOAuthToken,
+      demoLogin,
     }),
     [
       createOrganization,
+      demoLogin,
       forgotPassword,
       handleOAuthToken,
       login,

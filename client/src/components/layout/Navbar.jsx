@@ -6,7 +6,10 @@ import {
   ArrowRight, 
   LayoutDashboard,
   LogOut,
-  UserCircle
+  UserCircle,
+  Building2,
+  Landmark,
+  ClipboardCheck,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -33,7 +36,7 @@ export function Navbar() {
   const [mobileOpen, setMobileOpen] = useState(false);
   const location = useLocation();
   const navigate = useNavigate();
-  const { user, organization, isAuthenticated, isLoading, logout } = useAuth();
+  const { user, organization, isAuthenticated, isLoading, logout, demoLogin } = useAuth();
 
   const navLinks = [
     { label: "Home", href: "/" },
@@ -102,6 +105,40 @@ export function Navbar() {
           </Link>
         </DropdownMenuItem>
         <DropdownMenuSeparator />
+        <DropdownMenuLabel className="text-[10px] font-semibold text-slate-400 uppercase tracking-wider px-2 py-0.5">
+          Judge Demo Switch
+        </DropdownMenuLabel>
+        <DropdownMenuItem
+          className="gap-2 text-xs cursor-pointer"
+          onClick={async () => {
+            const next = await demoLogin("STARTUP_USER");
+            navigate(getRoleDashboardPath(next.user.role));
+          }}
+        >
+          <Building2 className="h-3.5 w-3.5 text-blue-600" />
+          <span>Startup View</span>
+        </DropdownMenuItem>
+        <DropdownMenuItem
+          className="gap-2 text-xs cursor-pointer"
+          onClick={async () => {
+            const next = await demoLogin("GOVERNMENT_USER");
+            navigate(getRoleDashboardPath(next.user.role));
+          }}
+        >
+          <Landmark className="h-3.5 w-3.5 text-teal-600" />
+          <span>Government View</span>
+        </DropdownMenuItem>
+        <DropdownMenuItem
+          className="gap-2 text-xs cursor-pointer"
+          onClick={async () => {
+            const next = await demoLogin("EVALUATOR");
+            navigate(getRoleDashboardPath(next.user.role));
+          }}
+        >
+          <ClipboardCheck className="h-3.5 w-3.5 text-purple-600" />
+          <span>Evaluator View</span>
+        </DropdownMenuItem>
+        <DropdownMenuSeparator />
         <DropdownMenuItem
           className="gap-2 text-[#DC2626] focus:text-[#DC2626]"
           onClick={handleLogout}
@@ -119,7 +156,7 @@ export function Navbar() {
         </Button>
       </Link>
       <Link to="/register">
-        <Button size="sm" className="gap-1.5 font-medium text-xs shadow-sm">
+        <Button size="sm" className="gap-1.5 font-medium text-xs shadow-sm bg-[#2563EB] hover:bg-blue-600">
           Register Startup
           <ArrowRight className="h-3.5 w-3.5" />
         </Button>

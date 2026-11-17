@@ -18,7 +18,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import { getRoleDashboardPath } from "@/context/AuthContext";
+import { DEMO_CREDENTIALS, getRoleDashboardPath } from "@/context/AuthContext";
 import { API_BASE_URL } from "@/lib/api/client";
 import { useAuth } from "@/hooks/useAuth";
 import { loginSchema } from "@/schemas/authSchemas";
@@ -50,7 +50,8 @@ function GoogleIcon(props) {
 export function LoginPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [unverifiedEmail, setUnverifiedEmail] = useState("");
-  const { login } = useAuth();
+  const [activeDemoRole, setActiveDemoRole] = useState(null);
+  const { login, demoLogin } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -83,6 +84,19 @@ export function LoginPage() {
     }
   };
 
+  const handleDemoLogin = async (role) => {
+    try {
+      setActiveDemoRole(role);
+      const session = await demoLogin(role);
+      const target = returnPath || getRoleDashboardPath(session.user.role);
+      navigate(target, { replace: true });
+    } catch (error) {
+      toast.error(error?.message || "Demo login failed");
+    } finally {
+      setActiveDemoRole(null);
+    }
+  };
+
   return (
     <section className="min-h-[calc(100vh-140px)] flex flex-col items-center justify-center bg-[#F7F9FC] px-4 py-10 sm:py-16">
       <div className="w-full max-w-[420px] space-y-5">
@@ -112,6 +126,63 @@ export function LoginPage() {
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4 px-6 sm:px-8 pb-6">
+            {/* Simple Demo Login for Judges */}
+            <div className="space-y-2">
+              <label className="text-xs font-semibold text-[#10233F]">
+                Judge Demo Login
+              </label>
+              <div className="grid grid-cols-3 gap-2">
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  disabled={Boolean(activeDemoRole) || form.formState.isSubmitting}
+                  onClick={() => handleDemoLogin("STARTUP_USER")}
+                  className="h-9 w-full text-xs font-medium border-[#CBD5E1] bg-white text-[#10233F] hover:bg-slate-50 transition-colors"
+                >
+                  {activeDemoRole === "STARTUP_USER" ? (
+                    <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                  ) : (
+                    "Startup"
+                  )}
+                </Button>
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  disabled={Boolean(activeDemoRole) || form.formState.isSubmitting}
+                  onClick={() => handleDemoLogin("GOVERNMENT_USER")}
+                  className="h-9 w-full text-xs font-medium border-[#CBD5E1] bg-white text-[#10233F] hover:bg-slate-50 transition-colors"
+                >
+                  {activeDemoRole === "GOVERNMENT_USER" ? (
+                    <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                  ) : (
+                    "Government"
+                  )}
+                </Button>
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  disabled={Boolean(activeDemoRole) || form.formState.isSubmitting}
+                  onClick={() => handleDemoLogin("EVALUATOR")}
+                  className="h-9 w-full text-xs font-medium border-[#CBD5E1] bg-white text-[#10233F] hover:bg-slate-50 transition-colors"
+                >
+                  {activeDemoRole === "EVALUATOR" ? (
+                    <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                  ) : (
+                    "Evaluator"
+                  )}
+                </Button>
+              </div>
+            </div>
+
+            <div className="flex items-center gap-3 text-xs text-[#94A3B8]">
+              <div className="h-px flex-1 bg-[#E2E8F0]" />
+              <span className="text-[11px] uppercase tracking-wider text-slate-400">or sign in with email</span>
+              <div className="h-px flex-1 bg-[#E2E8F0]" />
+            </div>
+
             <Button
               asChild
               variant="outline"
@@ -122,12 +193,6 @@ export function LoginPage() {
                 Continue with Google
               </a>
             </Button>
-
-            <div className="flex items-center gap-3 text-xs text-[#94A3B8]">
-              <div className="h-px flex-1 bg-[#E2E8F0]" />
-              <span className="text-[11px] uppercase tracking-wider text-slate-400">or sign in with email</span>
-              <div className="h-px flex-1 bg-[#E2E8F0]" />
-            </div>
 
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
               <div className="space-y-1.5">
